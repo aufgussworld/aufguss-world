@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>aufguss.world — Portal turystyki saunowej</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsvectormap@1.4.4/dist/css/jsvectormap.min.css">
+<style>
+:root{
+  --ember-1:#ff7a3d;
+  --ember-2:#e8552a;
+  --ember-3:#d6491f;
+  --bg:#fbf5ea;
+  --surface:#ffffff;
+  --surface-2:#f3e8d6;
+  --ink:#2a1b10;
+  --ink-dim:#6b5a47;
+  --stone:#8a7960;
+  --line:rgba(42,27,16,0.1);
+  --line-strong:rgba(42,27,16,0.18);
+  --glow: radial-gradient(700px circle at var(--mx,50%) var(--my,10%), rgba(255,122,61,0.10), transparent 60%);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:'Instrument Sans',sans-serif;
+  overflow-x:hidden;
+  position:relative;
+}
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background:var(--glow);
+  pointer-events:none;
+  z-index:1;
+  transition:background 0.1s ease-out;
+}
+.noise{
+  position:fixed;inset:0;
+  pointer-events:none;
+  opacity:0.025;
+  z-index:2;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+h1,h2,h3,.display{font-family:'Fraunces',serif;font-weight:400;}
+em{font-style:italic;font-weight:500;color:var(--ember-3);}
+a{color:inherit;text-decoration:none;}
+
+/* HEADER */
+header{
+  position:fixed;top:0;left:0;right:0;
+  z-index:50;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 5vw;
+  backdrop-filter:blur(10px);
+  background:rgba(251,245,234,0.78);
+  border-bottom:1px solid transparent;
+  transition:background .3s, padding .3s, border-color .3s;
+}
+header.scrolled{background:rgba(251,245,234,0.96);padding:13px 5vw;border-bottom:1px solid var(--line);}
+.logo{font-family:'Fraunces',serif;font-size:1.4rem;letter-spacing:-0.01em;display:flex;align-items:center;gap:10px;}
+.logo img{width:30px;height:30px;}
+.logo .dot{color:var(--ember-2);font-style:italic;}
+nav{display:flex;gap:38px;font-size:0.82rem;letter-spacing:0.04em;text-transform:uppercase;}
+nav a{position:relative;opacity:0.7;transition:opacity .25s;color:var(--ink);}
+nav a:hover{opacity:1;}
+nav a::after{content:'';position:absolute;left:0;bottom:-6px;width:0;height:1px;background:var(--ember-2);transition:width .3s;}
+nav a:hover::after{width:100%;}
+.header-right{display:flex;align-items:center;gap:22px;}
+
+/* LANGUAGE DROPDOWN */
+.lang-dd{position:relative;}
+.lang-trigger{
+  display:flex;align-items:center;gap:8px;
+  padding:9px 14px;border:1px solid var(--line-strong);border-radius:100px;
+  background:var(--surface);cursor:pointer;font-size:0.78rem;font-weight:500;
+  color:var(--ink);transition:border-color .2s;
+}
+.lang-trigger:hover{border-color:var(--ember-1);}
+.lang-trigger img{width:18px;border-radius:2px;}
+.lang-trigger .chev{font-size:0.6rem;opacity:0.5;transition:transform .25s;}
+.lang-dd.open .chev{transform:rotate(180deg);}
+.lang-menu{
+  position:absolute;top:calc(100% + 10px);right:0;
+  background:var(--surface);border:1px solid var(--line);border-radius:14px;
+  box-shadow:0 16px 40px rgba(42,27,16,0.14);
+  min-width:190px;padding:8px;
+  opacity:0;visibility:hidden;transform:translateY(-6px);
+  transition:all .2s ease;
+}
+.lang-dd.open .lang-menu{opacity:1;visibility:visible;transform:translateY(0);}
+.lang-option{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;border-radius:9px;font-size:0.84rem;cursor:pointer;
+  transition:background .15s;
+}
+.lang-option:hover{background:var(--surface-2);}
+.lang-option img{width:20px;border-radius:2px;}
+.lang-option .code{font-weight:600;width:26px;}
+.lang-option .full{color:var(--ink-dim);font-size:0.8rem;}
+.lang-option.active{background:rgba(255,122,61,0.1);}
+.lang-option.active .code{color:var(--ember-2);}
+.lang-divider{height:1px;background:var(--line);margin:6px 4px;}
+.lang-soon{padding:8px 12px;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--stone);}
+
+/* HERO */
+.hero{
+  position:relative;
+  min-height:96vh;
+  display:flex;align-items:center;
+  padding:0 5vw;
+  overflow:hidden;
+  background:
+    radial-gradient(1200px 700px at 80% 10%, rgba(255,160,90,0.35), transparent 60%),
+    radial-gradient(900px 600px at 10% 90%, rgba(255,90,60,0.25), transparent 60%),
+    linear-gradient(165deg, #3a1c10, #7a3618 55%, #c9651f 110%);
+  color:#fbf0e2;
+}
+.ember-field{position:absolute;inset:0;z-index:0;}
+.ember-particle{
+  position:absolute;
+  bottom:-20px;
+  width:var(--s);height:var(--s);
+  border-radius:50%;
+  background:radial-gradient(circle, #ffd9a8, #ff8a3d 60%, transparent 75%);
+  opacity:0;
+  animation:rise var(--dur) ease-in var(--delay) infinite;
+  filter:blur(0.5px);
+}
+@keyframes rise{
+  0%{opacity:0;transform:translateY(0) translateX(0) scale(0.6);}
+  10%{opacity:0.9;}
+  80%{opacity:0.5;}
+  100%{opacity:0;transform:translateY(-100vh) translateX(var(--drift)) scale(1.3);}
+}
+.hero-inner{position:relative;z-index:2;max-width:1400px;margin:0 auto;width:100%;display:grid;grid-template-columns:1.15fr 0.85fr;gap:60px;align-items:center;padding-top:90px;}
+.kicker{display:inline-flex;align-items:center;gap:10px;font-size:0.74rem;letter-spacing:0.18em;text-transform:uppercase;color:#ffd2a8;margin-bottom:26px;opacity:0.95;}
+.kicker .pulse{width:7px;height:7px;border-radius:50%;background:#ffb56b;box-shadow:0 0 0 0 rgba(255,181,107,0.6);animation:pulse 2s infinite;}
+@keyframes pulse{
+  0%{box-shadow:0 0 0 0 rgba(255,181,107,0.55);}
+  70%{box-shadow:0 0 0 12px rgba(255,181,107,0);}
+  100%{box-shadow:0 0 0 0 rgba(255,181,107,0);}
+}
+.hero h1{
+  font-size:clamp(3rem,6vw,5.6rem);
+  line-height:0.98;
+  letter-spacing:-0.02em;
+  font-weight:340;
+  margin-bottom:28px;
+  color:#fffaf2;
+}
+.hero p.lead{font-size:1.08rem;line-height:1.65;color:#f3dcc4;max-width:480px;margin-bottom:38px;font-weight:400;}
+.hero-actions{display:flex;gap:16px;align-items:center;flex-wrap:wrap;}
+.btn{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:16px 30px;
+  font-size:0.76rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:600;
+  border-radius:100px;
+  cursor:pointer;border:none;
+  transition:transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s;
+}
+.btn-fire{
+  background:linear-gradient(120deg, #ff8a3d, #ff5a3d);
+  color:#2a0e02;
+  box-shadow:0 8px 30px rgba(255,90,50,0.35);
+}
+.btn-fire:hover{transform:translateY(-3px) scale(1.02);box-shadow:0 14px 40px rgba(255,90,50,0.5);}
+.btn-ghost2{border:1px solid rgba(255,245,234,0.4);color:#fffaf2;background:transparent;}
+.btn-ghost2:hover{border-color:#ffb56b;background:rgba(255,181,107,0.12);}
+
+.hero-stat-rail{display:flex;gap:34px;margin-top:54px;}
+.hero-stat-rail div{display:flex;flex-direction:column;}
+.hero-stat-rail .num{font-family:'Fraunces',serif;font-size:1.9rem;color:#ffb56b;}
+.hero-stat-rail .lbl{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:#e3c6a8;margin-top:4px;}
+
+/* hero visual: orbiting events */
+.hero-orb{position:relative;height:560px;display:flex;align-items:center;justify-content:center;}
+.orb-core{
+  width:220px;height:220px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%, #ffd9a8, #ff8a3d 45%, #e8552a 80%);
+  box-shadow:0 0 90px rgba(255,140,80,0.6), inset -20px -20px 50px rgba(0,0,0,0.25);
+  position:relative;z-index:2;
+  animation:breathe 6s ease-in-out infinite;
+}
+@keyframes breathe{0%,100%{transform:scale(1);}50%{transform:scale(1.035);}}
+.orbit{
+  position:absolute;
+  border:1px dashed rgba(255,245,234,0.22);
+  border-radius:50%;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+}
+.orbit.o1{width:340px;height:340px;animation:spin 38s linear infinite;}
+.orbit.o2{width:460px;height:460px;animation:spin 60s linear infinite reverse;}
+.orbit.o3{width:560px;height:560px;animation:spin 90s linear infinite;}
+@keyframes spin{from{transform:translate(-50%,-50%) rotate(0deg);}to{transform:translate(-50%,-50%) rotate(360deg);}}
+.event-chip{
+  position:absolute;top:-19px;left:50%;
+  transform:translateX(-50%);
+  background:#fff8ee;
+  color:var(--ink);
+  padding:9px 16px;border-radius:100px;
+  font-size:0.72rem;white-space:nowrap;
+  display:flex;align-items:center;gap:8px;
+  animation:counterspin 38s linear infinite;
+  box-shadow:0 8px 22px rgba(40,15,5,0.35);
+}
+.orbit.o2 .event-chip{animation-duration:60s;animation-direction:reverse;}
+.orbit.o3 .event-chip{animation-duration:90s;}
+@keyframes counterspin{from{transform:translateX(-50%) rotate(0deg);}to{transform:translateX(-50%) rotate(-360deg);}}
+.event-chip .flag{width:16px;height:12px;border-radius:2px;}
+.event-chip b{color:var(--ember-3);font-weight:600;}
+
+.scroll-cue{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:10px;font-size:0.68rem;letter-spacing:0.15em;text-transform:uppercase;color:#e3c6a8;z-index:3;}
+.scroll-cue .line{width:1px;height:34px;background:linear-gradient(#ffb56b,transparent);animation:slide 1.8s ease-in-out infinite;}
+@keyframes slide{0%{transform:scaleY(0);transform-origin:top;}50%{transform:scaleY(1);transform-origin:top;}51%{transform-origin:bottom;}100%{transform:scaleY(0);transform-origin:bottom;}}
+
+/* SECTION GENERIC */
+section{position:relative;z-index:2;padding:130px 5vw;}
+.section-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:56px;gap:30px;flex-wrap:wrap;}
+.section-head .tag{font-size:0.74rem;text-transform:uppercase;letter-spacing:0.18em;color:var(--ember-2);margin-bottom:14px;display:block;font-weight:600;}
+.section-head h2{font-size:clamp(2.1rem,3.6vw,3.4rem);font-weight:380;letter-spacing:-0.01em;color:var(--ink);}
+.section-link{font-size:0.8rem;text-transform:uppercase;letter-spacing:0.08em;border-bottom:1px solid var(--ember-2);padding-bottom:4px;color:var(--ember-2);white-space:nowrap;}
+
+/* EVENTS STRIP */
+.events-row{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+.event-card{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:22px;
+  padding:34px 30px;
+  position:relative;
+  overflow:hidden;
+  transition:transform .4s cubic-bezier(.2,.8,.2,1), border-color .4s, box-shadow .4s;
+  box-shadow:0 1px 0 rgba(42,27,16,0.02);
+}
+.event-card::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(420px circle at var(--mx,30%) var(--my,20%), rgba(255,122,61,0.14), transparent 65%);
+  opacity:0;transition:opacity .4s;
+}
+.event-card:hover{transform:translateY(-8px);border-color:rgba(255,122,61,0.45);box-shadow:0 24px 50px rgba(42,27,16,0.1);}
+.event-card:hover::before{opacity:1;}
+.event-rank{display:inline-block;font-size:0.66rem;text-transform:uppercase;letter-spacing:0.1em;padding:5px 12px;border-radius:100px;margin-bottom:22px;font-weight:600;}
+.rank-intl{background:rgba(232,85,42,0.12);color:#c43a13;}
+.rank-nat{background:rgba(255,140,60,0.16);color:#b5560f;}
+.rank-local{background:rgba(255,191,40,0.18);color:#9c6c00;}
+.event-card .date{font-family:'Fraunces',serif;font-size:2.4rem;line-height:1;margin-bottom:14px;color:var(--ink);}
+.event-card .date span{font-size:1.1rem;color:var(--stone);font-family:'Instrument Sans',sans-serif;}
+.event-card h3{font-size:1.3rem;font-weight:450;margin-bottom:10px;line-height:1.25;color:var(--ink);}
+.event-card .meta{font-size:0.82rem;color:var(--ink-dim);display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.event-card .meta .flag{width:18px;border-radius:2px;}
+
+/* MAP SECTION */
+.map-section{background:linear-gradient(180deg, var(--surface-2), var(--bg));}
+.map-wrap{
+  display:grid;grid-template-columns:1.4fr 1fr;gap:50px;align-items:center;
+}
+.map-box{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:28px;
+  padding:10px;
+  position:relative;
+  overflow:hidden;
+  box-shadow:0 20px 60px rgba(42,27,16,0.08);
+}
+#europeMap{height:560px;width:100%;}
+.map-side h3{font-size:1.6rem;margin-bottom:18px;font-weight:420;color:var(--ink);}
+.map-side p{color:var(--ink-dim);line-height:1.7;margin-bottom:30px;}
+.country-pill-list{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:34px;}
+.country-pill{font-size:0.78rem;padding:8px 16px;border:1px solid var(--line-strong);border-radius:100px;display:flex;align-items:center;gap:8px;transition:all .25s;cursor:default;color:var(--ink-dim);}
+.country-pill.active{border-color:var(--ember-1);background:rgba(255,122,61,0.12);color:var(--ember-3);}
+.country-pill .n{opacity:0.6;font-size:0.7rem;}
+.map-hover-readout{font-size:0.85rem;color:var(--ink-dim);min-height:24px;margin-top:-6px;margin-bottom:24px;}
+.map-hover-readout b{color:var(--ember-2);font-weight:600;}
+
+/* MASTERS */
+.masters-track-wrap{overflow:hidden;margin:0 -5vw;padding:0 5vw;}
+.masters-track{display:flex;gap:24px;animation:scrollX 38s linear infinite;width:max-content;}
+.masters-track:hover{animation-play-state:paused;}
+@keyframes scrollX{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+.master-card{
+  width:236px;flex-shrink:0;
+  border-radius:20px;overflow:hidden;
+  position:relative;height:344px;
+  background:var(--surface);
+  border:1px solid var(--line);
+  box-shadow:0 6px 20px rgba(42,27,16,0.06);
+  transition:transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s, border-color .35s;
+  display:flex;flex-direction:column;
+}
+.master-card:hover{transform:translateY(-6px);border-color:rgba(255,122,61,0.4);box-shadow:0 18px 40px rgba(42,27,16,0.12);}
+.master-card .ph{height:180px;background:linear-gradient(150deg, #ffd9a8, #ff8a3d);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:2.6rem;color:#fff6ea;position:relative;}
+.master-card .ph .flag{position:absolute;top:12px;right:12px;width:26px;border-radius:3px;box-shadow:0 2px 8px rgba(0,0,0,0.25);}
+.master-card .info{padding:15px 17px;display:flex;flex-direction:column;flex:1;}
+.master-card h4{font-size:1rem;font-weight:500;margin-bottom:3px;color:var(--ink);}
+.master-card .role{font-size:0.74rem;color:var(--stone);margin-bottom:11px;}
+.master-rank{display:inline-flex;align-items:center;gap:7px;font-size:0.68rem;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;padding:5px 11px;border-radius:100px;align-self:flex-start;margin-bottom:12px;}
+.master-rank .lvl{font-family:'Fraunces',serif;font-size:0.74rem;}
+.rank-rookie{background:rgba(138,121,96,0.14);color:#6b5a47;}
+.rank-advanced{background:rgba(255,140,60,0.16);color:#b5560f;}
+.rank-expert{background:rgba(232,85,42,0.14);color:#c43a13;}
+.rank-promaster{background:linear-gradient(120deg,#ff8a3d,#e8552a);color:#fff6ea;}
+.master-cal{margin-top:auto;display:flex;align-items:center;gap:8px;font-size:0.76rem;font-weight:600;color:var(--ember-2);padding-top:11px;border-top:1px solid var(--line);}
+.master-cal.disabled{color:var(--stone);font-weight:400;}
+.master-cal:hover:not(.disabled){color:var(--ember-3);}
+
+/* ABOUT BAND */
+.about-band{display:flex;gap:60px;align-items:center;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--surface-2);}
+.about-band h3{font-size:clamp(1.7rem,2.6vw,2.5rem);max-width:340px;font-weight:400;line-height:1.25;flex-shrink:0;color:var(--ink);}
+.about-band p{color:var(--ink-dim);line-height:1.75;font-size:1rem;}
+
+/* NEWSLETTER */
+.newsletter{text-align:center;max-width:640px;margin:0 auto;}
+.newsletter h2{margin-bottom:18px;color:var(--ink);}
+.newsletter p{color:var(--ink-dim);margin-bottom:34px;}
+.newsletter-form{display:flex;gap:0;max-width:460px;margin:0 auto;}
+.newsletter-form input{flex:1;background:var(--surface);border:1px solid var(--line-strong);border-right:none;padding:16px 20px;color:var(--ink);font-family:'Instrument Sans';border-radius:100px 0 0 100px;outline:none;}
+.newsletter-form button{border-radius:0 100px 100px 0;padding:16px 30px;}
+
+footer{padding:70px 5vw 40px;border-top:1px solid var(--line);position:relative;z-index:2;background:#241608;color:#f3e0c8;}
+footer .logo{color:#fffaf2;}
+.footer-grid{display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr;gap:40px;margin-bottom:60px;}
+.footer-grid h5{font-size:0.74rem;text-transform:uppercase;letter-spacing:0.1em;color:#caa787;margin-bottom:18px;}
+.footer-grid a{display:block;font-size:0.88rem;color:#e3cdb1;margin-bottom:12px;}
+.footer-grid a:hover{color:#ffb56b;}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;font-size:0.78rem;color:#caa787;flex-wrap:wrap;gap:14px;border-top:1px solid rgba(255,245,234,0.1);padding-top:24px;}
+
+@media(max-width:980px){
+  .hero-inner{grid-template-columns:1fr;}
+  .hero-orb{height:380px;}
+  .events-row{grid-template-columns:1fr;}
+  .map-wrap{grid-template-columns:1fr;}
+  .about-band{flex-direction:column;align-items:flex-start;gap:24px;}
+  .footer-grid{grid-template-columns:1fr 1fr;}
+  nav{display:none;}
+  section{padding:90px 5vw;}
+}
+@media(max-width:560px){
+  header{padding:13px 5vw;}
+  .logo{font-size:1.12rem;}
+  .logo img{width:23px;height:23px;}
+  .header-right{gap:10px;}
+  header .btn-fire{display:none;}
+  .hero{min-height:auto;padding-bottom:60px;}
+  .hero-inner{padding-top:80px;gap:40px;}
+  .hero-stat-rail{gap:22px;flex-wrap:wrap;}
+  section{padding:68px 5vw;}
+  #europeMap{height:380px;}
+  .footer-grid{grid-template-columns:1fr;gap:28px;}
+  .newsletter-form{flex-direction:column;gap:10px;}
+  .newsletter-form input{border-right:1px solid var(--line-strong);border-radius:100px;}
+  .newsletter-form button{border-radius:100px;}
+}
+
+/* jsVectorMap region tint overrides — higher contrast */
+.jvm-region{transition:fill .25s ease;}
+.jvm-tooltip{background:var(--ink)!important;border:none!important;color:#fff8ee!important;font-family:'Instrument Sans';font-size:0.78rem!important;border-radius:8px!important;padding:8px 12px!important;}
+</style>
+</head>
+<body>
+
+<div class="noise"></div>
+
+<header id="siteHeader">
+  <div class="logo"><img src="../assets/logo-mark.svg" alt="aufguss.world">aufguss<span class="dot">.</span>world</div>
+  <nav>
+    <a href="#kalendarz">Kalendarz</a>
+    <a href="#mapa">Mapa obiektów</a>
+    <a href="#spolecznosc">Społeczność</a>
+    <a href="#sklep">Sklep</a>
+  </nav>
+  <div class="header-right">
+    <div class="lang-dd" id="langDd">
+      <div class="lang-trigger" id="langTrigger">
+        <img src="https://flagcdn.com/20x15/pl.png" id="langFlag"> <span id="langCode">PL</span> <span class="chev">▾</span>
+      </div>
+      <div class="lang-menu" id="langMenu">
+        <div class="lang-option active" data-code="PL" data-flag="pl"><img src="https://flagcdn.com/20x15/pl.png"><span class="code">PL</span><span class="full">Polski</span></div>
+        <div class="lang-option" data-code="EN" data-flag="gb"><img src="https://flagcdn.com/20x15/gb.png"><span class="code">EN</span><span class="full">English</span></div>
+        <div class="lang-option" data-code="DE" data-flag="de"><img src="https://flagcdn.com/20x15/de.png"><span class="code">DE</span><span class="full">Deutsch</span></div>
+        <div class="lang-option" data-code="NL" data-flag="nl"><img src="https://flagcdn.com/20x15/nl.png"><span class="code">NL</span><span class="full">Nederlands</span></div>
+        <div class="lang-divider"></div>
+        <div class="lang-soon">Wkrótce: CZ · IT</div>
+      </div>
+    </div>
+    <a href="#" class="btn btn-fire" style="padding:11px 22px;">Dołącz</a>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="ember-field" id="emberField"></div>
+  <div class="hero-inner">
+    <div>
+      <div class="kicker"><span class="pulse"></span> Pierwszy europejski portal turystyki saunowej</div>
+      <h1>Ciepło, które<br>łączy <em>saunamistrzów</em><br>całej Europy.</h1>
+      <p class="lead">Jedno miejsce zamiast dziesiątek profili na Facebooku. Kalendarz turniejów, mapa obiektów i społeczność Aufguss — wszystko żywe, wszystko na bieżąco.</p>
+      <div class="hero-actions">
+        <a href="#mapa" class="btn btn-fire">Odkryj mapę obiektów →</a>
+        <a href="calendar.html" class="btn btn-ghost2">Najbliższe turnieje</a>
+      </div>
+      <div class="hero-stat-rail">
+        <div><span class="num">107</span><span class="lbl">Obiektów w bazie</span></div>
+        <div><span class="num">8</span><span class="lbl">Grup krajów Europy</span></div>
+        <div><span class="num">4</span><span class="lbl">Języki portalu</span></div>
+      </div>
+    </div>
+    <div class="hero-orb">
+      <div class="orbit o1"><div class="event-chip"><img class="flag" src="https://flagcdn.com/20x15/nl.png">Aufguss WM <b>Eindhoven</b></div></div>
+      <div class="orbit o2"><div class="event-chip"><img class="flag" src="https://flagcdn.com/20x15/pl.png">PTS Classic <b>Słupsk</b></div></div>
+      <div class="orbit o3"><div class="event-chip"><img class="flag" src="https://flagcdn.com/20x15/de.png">Nocny Aufguss <b>Berlin</b></div></div>
+      <div class="orb-core"></div>
+    </div>
+  </div>
+  <div class="scroll-cue"><div class="line"></div>Przewiń</div>
+</section>
+
+<section id="kalendarz">
+  <div class="section-head">
+    <div>
+      <span class="tag">Kalendarz saunowy</span>
+      <h2>Co się dzieje<br>w najbliższych tygodniach</h2>
+    </div>
+    <a href="calendar.html" class="section-link">Pełny kalendarz →</a>
+  </div>
+  <div class="events-row">
+    <div class="event-card">
+      <span class="event-rank rank-intl">Turniej międzynarodowy</span>
+      <div class="date">15<span>marca</span></div>
+      <h3>Mistrzostwa Świata Aufguss — Eindhoven</h3>
+      <div class="meta"><img class="flag" src="https://flagcdn.com/20x15/nl.png">Holandia · Thermaalbad</div>
+    </div>
+    <div class="event-card">
+      <span class="event-rank rank-nat">Turniej krajowy</span>
+      <div class="date">21<span>marca</span></div>
+      <h3>Mistrzostwa Polski PTS Classic — Słupsk</h3>
+      <div class="meta"><img class="flag" src="https://flagcdn.com/20x15/pl.png">Polska · Centrum SPA</div>
+    </div>
+    <div class="event-card">
+      <span class="event-rank rank-local">Wydarzenie obiektowe</span>
+      <div class="date">29<span>marca</span></div>
+      <h3>Nocna ceremonia Aufguss — Liquidrom</h3>
+      <div class="meta"><img class="flag" src="https://flagcdn.com/20x15/de.png">Niemcy · Berlin Mitte</div>
+    </div>
+  </div>
+</section>
+
+<section id="mapa" class="map-section">
+  <div class="section-head">
+    <div>
+      <span class="tag">Mapa obiektów</span>
+      <h2>Europa widziana<br>oczami saunamistrza</h2>
+    </div>
+    <a href="map.html" class="section-link">Otwórz pełną mapę →</a>
+  </div>
+  <div class="map-wrap">
+    <div class="map-box">
+      <div id="europeMap"></div>
+    </div>
+    <div class="map-side">
+      <h3>Najedź na kraj, poczuj klimat</h3>
+      <p>Mapa rozjaśnia się tam, gdzie tętni życie saunowe. Każdy kraj kryje obiekty, wydarzenia i lokalnych saunamistrzów — pełny widok z filtrowalnymi kartami czeka na podstronie mapy.</p>
+      <div class="map-hover-readout" id="mapReadout">Najedź kursorem na mapę, aby zobaczyć kraj →</div>
+      <div class="country-pill-list">
+        <span class="country-pill active">🇵🇱 Polska <span class="n">31</span></span>
+        <span class="country-pill">🇩🇪 Niemcy <span class="n">31</span></span>
+        <span class="country-pill">🇳🇱 Holandia+BE <span class="n">17</span></span>
+        <span class="country-pill">🇨🇿 Czechy+SK <span class="n">10</span></span>
+        <span class="country-pill">🇦🇹 Austria+CH <span class="n">9</span></span>
+        <span class="country-pill">🇮🇹 Włochy <span class="n">5</span></span>
+      </div>
+      <a href="map.html" class="btn btn-fire">Pełna mapa obiektów →</a>
+    </div>
+  </div>
+</section>
+
+<section id="spolecznosc">
+  <div class="section-head">
+    <div>
+      <span class="tag">Społeczność</span>
+      <h2>Saunamistrzowie, którzy<br>tworzą atmosferę</h2>
+    </div>
+    <a href="#" class="section-link">Zobacz wszystkich →</a>
+  </div>
+  <div class="masters-track-wrap">
+    <div class="masters-track" id="mastersTrack"></div>
+  </div>
+</section>
+
+<section class="about-band">
+  <h3>Dlaczego <em>aufguss.world</em>?</h3>
+  <p>Informacje o turniejach i ceremoniach saunowych są dziś rozproszone po dziesiątkach profili w social mediach. Zbieramy je w jednym miejscu — z mapą obiektów, kalendarzem wydarzeń i profilami saunamistrzów — żeby każdy pasjonat Aufguss w Europie wiedział, gdzie i kiedy dzieje się coś wartego podróży.</p>
+</section>
+
+<section id="sklep">
+  <div class="section-head">
+    <div>
+      <span class="tag">Sklep</span>
+      <h2>Niszowe produkty saunowe</h2>
+    </div>
+  </div>
+  <div style="border:1px dashed var(--line-strong);border-radius:24px;padding:60px;text-align:center;color:var(--ink-dim);background:var(--surface);">
+    Sklep — uruchomienie wkrótce. Szlafroki, ręczniki Aufguss, wachlarze i olejki eteryczne od sprawdzonych europejskich marek.
+  </div>
+</section>
+
+<section class="newsletter">
+  <span class="tag">Newsletter</span>
+  <h2>Bądź na bieżąco</h2>
+  <p>Nowe obiekty, turnieje i materiały — raz w tygodniu, bez spamu.</p>
+  <div class="newsletter-form">
+    <input type="email" placeholder="twój@email.com">
+    <button class="btn btn-fire">Zapisz się</button>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-grid">
+    <div>
+      <div class="logo"><img src="../assets/logo-mark-white.svg" alt="aufguss.world">aufguss<span class="dot">.</span>world</div>
+      <p style="color:#caa787;font-size:0.85rem;margin-top:16px;max-width:280px;">Portal turystyki saunowej. Brand wideo: <span style="color:#ffb56b;">aufguss.tv</span></p>
+    </div>
+    <div>
+      <h5>Portal</h5>
+      <a href="#kalendarz">Kalendarz</a>
+      <a href="#mapa">Mapa obiektów</a>
+      <a href="#spolecznosc">Społeczność</a>
+      <a href="#sklep">Sklep</a>
+    </div>
+    <div>
+      <h5>Dla obiektów</h5>
+      <a href="#">Zgłoś obiekt</a>
+      <a href="#">Materiały do pobrania</a>
+      <a href="#">Współpraca</a>
+    </div>
+    <div>
+      <h5>Informacje</h5>
+      <a href="#">Polityka prywatności</a>
+      <a href="#">Kontakt</a>
+      <a href="#">aufguss.tv</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 aufguss.world — Wszystkie prawa zastrzeżone</span>
+    <span>Słupsk, Polska 🇵🇱</span>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/jsvectormap@1.4.4/dist/js/jsvectormap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsvectormap@1.4.4/dist/maps/world-merc.js"></script>
+<script>
+// header scroll state
+const header = document.getElementById('siteHeader');
+window.addEventListener('scroll', () => header.classList.toggle('scrolled', window.scrollY > 40));
+
+// subtle cursor glow only within hero
+document.querySelector('.hero').addEventListener('mousemove', e => {
+  document.body.style.setProperty('--mx', e.clientX + 'px');
+  document.body.style.setProperty('--my', e.clientY + 'px');
+});
+document.querySelectorAll('.event-card').forEach(card=>{
+  card.addEventListener('mousemove', e=>{
+    const r = card.getBoundingClientRect();
+    card.style.setProperty('--mx', (e.clientX-r.left)+'px');
+    card.style.setProperty('--my', (e.clientY-r.top)+'px');
+  });
+});
+
+// language dropdown
+const langDd = document.getElementById('langDd');
+const langTrigger = document.getElementById('langTrigger');
+const langCode = document.getElementById('langCode');
+const langFlag = document.getElementById('langFlag');
+langTrigger.addEventListener('click', (e)=>{ e.stopPropagation(); langDd.classList.toggle('open'); });
+document.querySelectorAll('.lang-option').forEach(opt=>{
+  opt.addEventListener('click', ()=>{
+    document.querySelectorAll('.lang-option').forEach(o=>o.classList.remove('active'));
+    opt.classList.add('active');
+    langCode.textContent = opt.dataset.code;
+    langFlag.src = `https://flagcdn.com/20x15/${opt.dataset.flag}.png`;
+    langDd.classList.remove('open');
+  });
+});
+document.addEventListener('click', ()=> langDd.classList.remove('open'));
+
+// ember particles (contained to hero)
+const field = document.getElementById('emberField');
+for(let i=0;i<22;i++){
+  const p = document.createElement('div');
+  p.className='ember-particle';
+  const size = (Math.random()*5+2).toFixed(1);
+  p.style.setProperty('--s', size+'px');
+  p.style.left = Math.random()*100+'%';
+  p.style.setProperty('--dur', (Math.random()*10+9).toFixed(1)+'s');
+  p.style.setProperty('--delay', (Math.random()*12).toFixed(1)+'s');
+  p.style.setProperty('--drift', (Math.random()*120-60).toFixed(0)+'px');
+  field.appendChild(p);
+}
+
+// masters slider (duplicated for seamless loop)
+// rank: docelowo wyliczana z punktów rankingowych za turnieje (10-stopniowa skala)
+const rankStyles = {
+  rookie:     {cls:'rank-rookie',    lvl:'I'},
+  advanced:   {cls:'rank-advanced',  lvl:'IV'},
+  expert:     {cls:'rank-expert',    lvl:'VII'},
+  promaster:  {cls:'rank-promaster', lvl:'X'},
+};
+const masters = [
+  {name:'Robert Zídek',    role:'Czechy · 3× Mistrz Świata', flag:'cz', rank:'promaster', rankLabel:'Pro Master', cal:true},
+  {name:'Arek Dan',        role:'Polska · Rezydent 3 obiektów', flag:'pl', rank:'expert', rankLabel:'Steam Expert', cal:true},
+  {name:'Jeremi Dygas',    role:'Polska · Finalista MP', flag:'pl', rank:'expert', rankLabel:'Steam Expert', cal:true},
+  {name:'Lukas Weber',     role:'Niemcy · Mistrz kraju 2023', flag:'de', rank:'promaster', rankLabel:'Pro Master', cal:true},
+  {name:'Sanne de Vries',  role:'Holandia · Sędzia WAC', flag:'nl', rank:'advanced', rankLabel:'Advanced', cal:false},
+  {name:'Petra Nováková',  role:'Czechy · Rezydentka', flag:'cz', rank:'advanced', rankLabel:'Advanced', cal:true},
+  {name:'Andrea Rossi',    role:'Włochy · Gościnnie', flag:'it', rank:'rookie', rankLabel:'Rookie', cal:false},
+  {name:'Tomasz Kowal',    role:'Polska · Sędzia PTS', flag:'pl', rank:'advanced', rankLabel:'Advanced', cal:true},
+];
+const track = document.getElementById('mastersTrack');
+[...masters, ...masters].forEach(m=>{
+  const rs = rankStyles[m.rank];
+  const el = document.createElement('div');
+  el.className='master-card';
+  const initials = m.name.split(' ').map(n=>n[0]).join('');
+  el.innerHTML = `
+    <div class="ph">${initials}<img class="flag" src="https://flagcdn.com/40x30/${m.flag}.png" alt="${m.flag}"></div>
+    <div class="info">
+      <h4>${m.name}</h4>
+      <div class="role">${m.role}</div>
+      <span class="master-rank ${rs.cls}"><span class="lvl">${rs.lvl}</span> ${m.rankLabel}</span>
+      ${m.cal
+        ? `<a href="#" class="master-cal">📅 Kalendarz saunamistrza →</a>`
+        : `<span class="master-cal disabled">Brak kalendarza</span>`}
+    </div>`;
+  track.appendChild(el);
+});
+
+// jsVectorMap — dedykowana mapa Europy, podświetlanie krajów z obiektami
+const activeCodes = ['PL','DE','NL','CZ','AT','IT','BE','SK','CH','SE','NO','DK','HU','RO'];
+const readout = document.getElementById('mapReadout');
+// kraje wyznaczające kadr Europy (zoom przycinający widok do tego regionu)
+const focusCodes = ['PT','ES','IE','GB','FR','NO','SE','FI','IT','GR','PL','RO','EE'];
+const map = new jsVectorMap({
+  selector: '#europeMap',
+  map: 'world_merc',
+  zoomButtons: false,
+  zoomOnScroll: false,
+  draggable: false,
+  backgroundColor: 'transparent',
+  regionStyle: {
+    initial: { fill: '#e7d8bf', stroke: '#cdb892', strokeWidth: 0.6 },
+    hover: { fill: '#ff7a3d', fillOpacity: 1, cursor: 'pointer', stroke:'#7a3618', strokeWidth:1 },
+  },
+  series: { regions: [{ values: Object.fromEntries(activeCodes.map(c=>[c,1])), attribute: 'fill', scale: { '0':'#e7d8bf','1':'#d9a36a' } }] },
+  onRegionOver(event, code){
+    const name = map.regions[code]?.config?.name || code;
+    readout.innerHTML = activeCodes.includes(code)
+      ? `Najechano: <b>${name}</b>`
+      : `${name} — wkrótce`;
+  },
+  onRegionOut(){ readout.innerHTML = 'Najedź kursorem na mapę, aby zobaczyć kraj →'; },
+});
+// przytnij widok do Europy (kadr po współrzędnych środka kontynentu)
+function focusEurope(){ try{ map.setFocus({ coords: [57, 14], scale: 2.7, animate: false }); }catch(e){} }
+setTimeout(focusEurope, 120);
+setTimeout(focusEurope, 500);
+window.addEventListener('resize', ()=>setTimeout(focusEurope, 60));
+</script>
+</body>
+</html>

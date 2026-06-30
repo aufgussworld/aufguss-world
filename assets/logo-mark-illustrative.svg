@@ -1,0 +1,34 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="emberGrad2" x1="8" y1="85" x2="92" y2="12" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#c43a13"/>
+      <stop offset="55%" stop-color="#ff8a3d"/>
+      <stop offset="100%" stop-color="#ffc178"/>
+    </linearGradient>
+  </defs>
+  <circle cx="50" cy="50" r="44" fill="none" stroke="url(#emberGrad2)" stroke-width="2.4"/>
+
+  <!-- raised arm holding towel -->
+  <path d="M48,33 C56,29 63,25 69,21 C71,20 73,22 71,24 C65,29 58,33 51,37 Z" fill="url(#emberGrad2)"/>
+  <!-- towel trailing from hand -->
+  <path d="M69,21 C74,19 78,21 79,25 C80,29 77,32 73,31" fill="none" stroke="url(#emberGrad2)" stroke-width="3.2" stroke-linecap="round"/>
+
+  <!-- head -->
+  <circle cx="41" cy="23" r="6.4" fill="url(#emberGrad2)"/>
+
+  <!-- robe body, bell-shaped -->
+  <path d="M31,34 C29,29 34,25 41,25 C48,25 53,29 51,34 L57,78 C57,83 49,86 41,86 C33,86 25,83 25,78 Z" fill="url(#emberGrad2)"/>
+
+  <!-- far arm bent at hip -->
+  <path d="M30,38 C24,42 21,48 22,55 C22,57 25,57 26,55 C26,49 28,45 33,41 Z" fill="url(#emberGrad2)"/>
+
+  <!-- stove -->
+  <rect x="63" y="68" width="20" height="15" rx="3" fill="url(#emberGrad2)"/>
+  <ellipse cx="68" cy="67" rx="2.6" ry="2.1" fill="url(#emberGrad2)"/>
+  <ellipse cx="73.5" cy="65.5" rx="2.6" ry="2.1" fill="url(#emberGrad2)"/>
+  <ellipse cx="79" cy="67" rx="2.6" ry="2.1" fill="url(#emberGrad2)"/>
+
+  <!-- steam spiral rising from stove -->
+  <path d="M73,63 C72,55 80,52 80,45 C80,40 74,39 73,43 C72,46 76,47 77,44"
+        fill="none" stroke="url(#emberGrad2)" stroke-width="3" stroke-linecap="round"/>
+</svg>

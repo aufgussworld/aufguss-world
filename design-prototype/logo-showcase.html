@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<title>aufguss.world — propozycja loga</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:'Instrument Sans',sans-serif;background:#f4ede0;color:#241a12;padding:60px 6vw;}
+  h1{font-family:'Fraunces',serif;font-weight:500;font-size:2rem;margin-bottom:6px;}
+  p.lead{color:#7a6a55;max-width:600px;margin-bottom:50px;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:28px;margin-bottom:60px;}
+  .card{border-radius:20px;padding:34px;display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center;}
+  .card img,.card svg{width:96px;height:96px;}
+  .card .label{font-size:0.78rem;text-transform:uppercase;letter-spacing:0.08em;color:inherit;opacity:0.65;}
+  .bg-light{background:#fffaf0;border:1px solid #e6d8c2;}
+  .bg-dark{background:#1c140e;color:#f6efe3;}
+  .bg-ember{background:linear-gradient(135deg,#ff8a3d,#ff5a3d);color:#1c0c04;}
+  .lockup{display:flex;align-items:center;gap:14px;}
+  .lockup .word{font-family:'Fraunces',serif;font-size:1.7rem;}
+  .lockup .word .dot{color:#ff7a3d;font-style:italic;}
+  .mockup-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:28px;}
+  .mockup{border-radius:20px;background:#fffaf0;border:1px solid #e6d8c2;padding:30px;display:flex;flex-direction:column;align-items:center;gap:16px;}
+  .patch{width:130px;height:130px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#f0e4d0);box-shadow:0 6px 20px rgba(0,0,0,0.12), inset 0 0 0 6px #fffaf0, inset 0 0 0 8px #c9b894;display:flex;align-items:center;justify-content:center;}
+  .patch svg{width:70px;height:70px;}
+  .towel{width:110px;height:160px;background:#f0e4d0;border-radius:6px;position:relative;box-shadow:0 6px 16px rgba(0,0,0,0.1);}
+  .towel svg{width:46px;position:absolute;top:24px;left:50%;transform:translateX(-50%);}
+  .mug{width:110px;height:110px;border-radius:14px 14px 30px 30px;background:#fffaf0;border:1px solid #e6d8c2;display:flex;align-items:center;justify-content:center;position:relative;}
+  .mug svg{width:50px;}
+  .mockup .label{font-size:0.78rem;color:#7a6a55;}
+</style>
+</head>
+<body>
+<h1>Propozycja znaku marki</h1>
+<p class="lead">Spirala pary unoszącej się znad rozgrzanych kamieni, zamknięta w pierścieniu — odniesienie do Aufguss i idei „świata" (world). Forma jest na tyle prosta, że działa w jednym kolorze: do haftu na szlafrokach, grawerunku na kubkach, czy druku na hamamach.</p>
+
+<div class="grid">
+  <div class="card bg-light">
+    <img src="../assets/logo-mark.svg" alt="logo gradient">
+    <div class="label">Wersja podstawowa (gradient)</div>
+  </div>
+  <div class="card bg-dark">
+    <img src="../assets/logo-mark-white.svg" alt="logo white">
+    <div class="label">Wersja na ciemnym tle</div>
+  </div>
+  <div class="card bg-light">
+    <img src="../assets/logo-mark-mono.svg" alt="logo mono">
+    <div class="label">Wersja jednokolorowa (haft / grawer)</div>
+  </div>
+  <div class="card bg-ember">
+    <img src="../assets/logo-mark-white.svg" alt="logo on ember">
+    <div class="label">Na akcencie kolorystycznym</div>
+  </div>
+</div>
+
+<h1>Lockup z wordmarkiem</h1>
+<p class="lead">Do nagłówka strony, stopki, materiałów dla obiektów.</p>
+<div class="grid">
+  <div class="card bg-light">
+    <div class="lockup"><img src="../assets/logo-mark.svg" style="width:48px;height:48px;"><span class="word">aufguss<span class="dot">.</span>world</span></div>
+    <div class="label">Lockup poziomy</div>
+  </div>
+  <div class="card bg-dark">
+    <div class="lockup"><img src="../assets/logo-mark-white.svg" style="width:48px;height:48px;"><span class="word">aufguss<span class="dot">.</span>tv</span></div>
+    <div class="label">Wariant brandu wideo</div>
+  </div>
+</div>
+
+<h1>Zastosowania (mockup)</h1>
+<p class="lead">Poglądowo — jak znak zachowuje się na gadżetach i materiałach obiektów.</p>
+<div class="mockup-row">
+  <div class="mockup">
+    <div class="patch"><img src="../assets/logo-mark-mono.svg"></div>
+    <div class="label">Naszywka / haft na szlafroku</div>
+  </div>
+  <div class="mockup">
+    <div class="towel"><img src="../assets/logo-mark-mono.svg"></div>
+    <div class="label">Ręcznik Aufguss</div>
+  </div>
+  <div class="mockup">
+    <div class="mug"><img src="../assets/logo-mark.svg"></div>
+    <div class="label">Kubek / ceramika</div>
+  </div>
+</div>
+
+</body>
+</html>

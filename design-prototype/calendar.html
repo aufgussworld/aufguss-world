@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kalendarz wydarzeń — aufguss.world</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ember-1:#ff7a3d;--ember-2:#e8552a;--ember-3:#d6491f;
+  --bg:#fbf5ea;--surface:#ffffff;--surface-2:#f3e8d6;
+  --ink:#2a1b10;--ink-dim:#6b5a47;--stone:#8a7960;
+  --line:rgba(42,27,16,0.1);--line-strong:rgba(42,27,16,0.18);
+  --intl:#c43a13;--intl-bg:rgba(196,58,19,0.1);
+  --nat:#b5560f;--nat-bg:rgba(255,140,60,0.16);
+  --local:#9c6c00;--local-bg:rgba(255,191,40,0.18);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--ink);font-family:'Instrument Sans',sans-serif;}
+h1,h2,h3{font-family:'Fraunces',serif;font-weight:400;}
+a{color:inherit;text-decoration:none;}
+
+header{display:flex;align-items:center;justify-content:space-between;padding:16px 5vw;border-bottom:1px solid var(--line);background:var(--surface);}
+.logo{font-family:'Fraunces',serif;font-size:1.25rem;display:flex;align-items:center;gap:9px;}
+.logo img{width:26px;height:26px;}
+.logo .dot{color:var(--ember-2);font-style:italic;}
+.back-link{font-size:0.8rem;color:var(--ink-dim);}
+.back-link:hover{color:var(--ember-2);}
+
+.wrap{max-width:1720px;margin:0 auto;padding:30px clamp(20px,3.5vw,60px) 80px;}
+.page-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;margin-bottom:10px;}
+.page-head .tag{font-size:0.74rem;text-transform:uppercase;letter-spacing:0.16em;color:var(--ember-2);font-weight:600;display:block;margin-bottom:10px;}
+.page-head h1{font-size:clamp(1.9rem,3.4vw,2.8rem);}
+.view-switch{display:flex;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:100px;padding:4px;}
+.view-switch button{border:none;background:transparent;padding:9px 16px;border-radius:100px;font-size:0.78rem;font-weight:600;color:var(--ink-dim);cursor:pointer;font-family:inherit;transition:all .2s;}
+.view-switch button.active{background:var(--ink);color:#fff8ee;}
+
+.month-nav{display:flex;align-items:center;gap:14px;margin-bottom:18px;}
+.month-nav button{width:38px;height:38px;border-radius:50%;border:1px solid var(--line-strong);background:var(--surface);cursor:pointer;font-size:1rem;color:var(--ink);transition:all .2s;}
+.month-nav button:hover{border-color:var(--ember-1);color:var(--ember-2);}
+.month-nav .label{font-family:'Fraunces',serif;font-size:1.5rem;min-width:200px;text-align:center;}
+
+.layout{display:grid;grid-template-columns:320px minmax(0,1fr);gap:26px;align-items:start;margin-top:24px;}
+.left-col{position:sticky;top:18px;display:flex;flex-direction:column;gap:18px;}
+.main{display:flex;flex-direction:column;}
+
+/* LEFT FILTER SIDEBAR (spójnie z mapą) */
+.filter-side{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:20px 18px;display:flex;flex-direction:column;gap:8px;}
+.filter-side h4{font-size:0.72rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--ink-dim);margin-bottom:10px;}
+.scope-opt{display:flex;align-items:center;gap:11px;padding:11px 13px;border-radius:12px;cursor:pointer;border:1px solid transparent;transition:all .18s;user-select:none;}
+.scope-opt:hover{background:var(--surface-2);}
+.scope-opt.active{border-color:currentColor;}
+.scope-opt[data-scope="miedzynarodowe"].active{color:var(--intl);background:var(--intl-bg);}
+.scope-opt[data-scope="krajowe"].active{color:var(--nat);background:var(--nat-bg);}
+.scope-opt[data-scope="lokalne"].active{color:var(--local);background:var(--local-bg);}
+.scope-opt .sw{width:12px;height:12px;border-radius:50%;flex-shrink:0;}
+.scope-opt .nm{font-size:0.9rem;font-weight:600;color:var(--ink);}
+.scope-opt.active .nm{color:inherit;}
+.scope-opt .cnt{margin-left:auto;font-size:0.7rem;color:var(--stone);}
+
+.subfilter{margin-top:6px;border-top:1px solid var(--line);padding-top:14px;}
+.subfilter .hint{font-size:0.78rem;color:var(--stone);line-height:1.5;padding:4px 2px;}
+.f-row{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:9px;cursor:pointer;font-size:0.84rem;transition:background .15s;user-select:none;}
+.f-row:hover{background:var(--surface-2);}
+.f-row input{appearance:none;width:16px;height:16px;border-radius:5px;border:1.5px solid var(--line-strong);background:var(--surface);cursor:pointer;flex-shrink:0;position:relative;transition:all .15s;}
+.f-row input:checked{background:var(--ember-1);border-color:var(--ember-1);}
+.f-row input:checked::after{content:'';position:absolute;left:4.5px;top:1px;width:4px;height:8px;border:solid white;border-width:0 2px 2px 0;transform:rotate(45deg);}
+.f-row .n{margin-left:auto;font-size:0.7rem;color:var(--stone);background:var(--surface-2);padding:2px 8px;border-radius:100px;}
+.f-row img{width:18px;border-radius:2px;}
+.venue-group{margin-top:2px;}
+.venue-group > .f-row{font-weight:600;}
+.venue-list{padding-left:14px;border-left:1px solid var(--line);margin:2px 0 8px 16px;}
+.venue-list .f-row{font-size:0.8rem;padding:5px 9px;}
+.venue-list .city{color:var(--stone);font-size:0.72rem;margin-left:4px;}
+.sub-label{font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink-dim);margin:8px 2px 6px;font-weight:600;}
+
+/* CALENDAR GRID */
+.cal{background:var(--surface);border:1px solid var(--line);border-radius:20px;overflow:hidden;box-shadow:0 14px 40px rgba(42,27,16,0.06);}
+.cal-dow{display:grid;grid-template-columns:repeat(7,1fr);background:var(--surface-2);border-bottom:1px solid var(--line);}
+.cal-dow span{padding:12px 10px;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink-dim);font-weight:600;text-align:left;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);}
+.cal-cell{min-height:clamp(96px,13.5vh,150px);min-width:0;border-right:1px solid var(--line);border-bottom:1px solid var(--line);padding:9px 9px 7px;cursor:pointer;transition:background .15s;position:relative;display:flex;flex-direction:column;gap:5px;}
+.cal-cell .ev{max-width:100%;}
+.cal-cell:nth-child(7n){border-right:none;}
+.cal-cell.out{background:#faf3e6;}
+.cal-cell:hover{background:var(--surface-2);}
+.cal-cell.selected{background:rgba(255,122,61,0.08);box-shadow:inset 0 0 0 2px var(--ember-1);}
+.cal-cell .daynum{font-size:0.8rem;color:var(--ink-dim);font-weight:600;}
+.cal-cell.out .daynum{opacity:0.35;}
+.cal-cell.today .daynum{background:var(--ember-2);color:#fff;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+.ev{font-size:0.72rem;line-height:1.3;padding:4px 8px;border-radius:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500;border-left:3px solid;}
+.ev.intl{background:var(--intl-bg);color:var(--intl);border-color:var(--intl);}
+.ev.nat{background:var(--nat-bg);color:var(--nat);border-color:var(--nat);}
+.ev.local{background:var(--local-bg);color:var(--local);border-color:var(--local);}
+.ev .ic{margin-right:3px;}
+.ev.span-mid,.ev.span-end{border-radius:0 6px 6px 0;}
+.more{font-size:0.64rem;color:var(--stone);padding-left:4px;}
+
+.head-hint{font-size:0.84rem;color:var(--ink-dim);max-width:300px;text-align:right;}
+
+/* LEGEND (pod filtrami) */
+.legend{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px 20px;}
+.legend h4{font-size:0.74rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--ink-dim);margin-bottom:14px;}
+.legend-row{display:flex;align-items:center;gap:10px;font-size:0.82rem;margin-bottom:10px;color:var(--ink);}
+.legend-row:last-child{margin-bottom:0;}
+.legend-row .sw{width:14px;height:14px;border-radius:4px;}
+.sw.intl{background:var(--intl);}.sw.nat{background:var(--nat);}.sw.local{background:var(--local);}
+
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(30,16,8,0.62);display:none;align-items:flex-start;justify-content:center;z-index:100;padding:40px 18px;overflow:auto;}
+.modal-bg.open{display:flex;}
+.modal{background:var(--bg);border-radius:20px;max-width:600px;width:100%;padding:26px 26px 30px;position:relative;box-shadow:0 30px 80px rgba(0,0,0,0.4);margin:auto;}
+.modal h3{font-size:1.5rem;margin-bottom:4px;}
+.modal-sub{font-size:0.84rem;color:var(--ink-dim);margin-bottom:18px;}
+.modal-close{position:absolute;top:16px;right:18px;font-size:1.5rem;cursor:pointer;color:var(--stone);background:none;border:none;line-height:1;}
+
+/* DAY MODAL — karty wydarzeń */
+.dm-ev{background:var(--surface);border:1px solid var(--line);border-left:3px solid;border-radius:14px;padding:15px 17px;margin-bottom:14px;}
+.dm-ev.intl{border-left-color:var(--intl);}
+.dm-ev.nat{border-left-color:var(--nat);}
+.dm-ev.local{border-left-color:var(--local);}
+.dm-ev .etype{font-size:0.64rem;text-transform:uppercase;letter-spacing:0.06em;font-weight:600;margin-bottom:7px;display:inline-block;padding:3px 9px;border-radius:100px;}
+.dm-ev.intl .etype{background:var(--intl-bg);color:var(--intl);}
+.dm-ev.nat .etype{background:var(--nat-bg);color:var(--nat);}
+.dm-ev.local .etype{background:var(--local-bg);color:var(--local);}
+.dm-ev h5{font-size:1.02rem;font-weight:600;font-family:'Instrument Sans';line-height:1.3;margin-bottom:7px;}
+.dm-ev .venue{font-size:0.8rem;color:var(--ink-dim);display:flex;align-items:center;gap:7px;margin-bottom:8px;}
+.dm-ev .venue img{width:17px;border-radius:2px;}
+.dm-ev .masters{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:13px;}
+.dm-ev .m-pill{font-size:0.66rem;background:var(--surface-2);color:var(--ink-dim);padding:3px 9px;border-radius:100px;text-decoration:none;cursor:pointer;transition:all .15s;}
+.dm-ev .m-pill b{color:var(--ink);font-weight:600;}
+.dm-ev .m-pill:hover{background:rgba(255,122,61,0.18);}
+.dm-ev .m-pill:hover b{color:var(--ember-3);}
+.dm-ev .venue a{color:var(--ember-2);border-bottom:1px solid rgba(232,85,42,0.35);transition:color .15s,border-color .15s;}
+.dm-ev .venue a:hover{color:var(--ember-3);border-color:var(--ember-3);}
+.dm-actions{display:flex;flex-wrap:wrap;gap:8px;border-top:1px solid var(--line);padding-top:12px;}
+.dm-btn{display:inline-flex;align-items:center;gap:6px;font:600 0.76rem/1 'Instrument Sans';padding:9px 13px;border-radius:100px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);cursor:pointer;transition:all .18s;}
+.dm-btn:hover{border-color:var(--ember-1);color:var(--ember-2);}
+.dm-btn.primary{background:linear-gradient(120deg,#ff8a3d,#ff5a3d);color:#2a0e02;border-color:transparent;}
+.dm-btn.on{background:rgba(232,85,42,0.12);border-color:var(--ember-2);color:var(--ember-3);}
+.empty{color:var(--stone);font-size:0.9rem;padding:14px 0;}
+
+/* SHARE TILE */
+.tile-preview{border-radius:14px;overflow:hidden;border:1px solid var(--line);margin-bottom:18px;max-width:300px;}
+.tile-preview svg{display:block;width:100%;height:auto;}
+.share-actions{display:flex;flex-wrap:wrap;gap:10px;}
+
+/* TOAST */
+.toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff8ee;padding:13px 22px;border-radius:100px;font-size:0.86rem;font-weight:500;opacity:0;pointer-events:none;transition:all .3s;z-index:200;box-shadow:0 10px 30px rgba(0,0,0,0.3);}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+@media(max-width:1080px){.layout{grid-template-columns:284px minmax(0,1fr);gap:20px;}}
+@media(max-width:860px){
+  .layout{grid-template-columns:1fr;}
+  .left-col{position:static;}
+  .main{order:-1;}
+  .head-hint{display:none;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><img src="../assets/logo-mark.svg">aufguss<span class="dot">.</span>world</div>
+  <a href="index.html" class="back-link">← Strona główna</a>
+</header>
+
+<div class="wrap">
+  <div class="page-head">
+    <div>
+      <span class="tag">Kalendarz portalu</span>
+      <h1>Wydarzenia saunowe Europy</h1>
+    </div>
+    <div class="head-hint">Kliknij dzień, aby zobaczyć wszystkie wydarzenia i dodać je do swojego kalendarza.</div>
+  </div>
+
+  <div class="layout">
+    <div class="left-col">
+      <aside class="filter-side">
+        <h4>Zasięg wydarzeń</h4>
+        <div id="scopeOpts">
+          <div class="scope-opt active" data-scope="miedzynarodowe"><span class="sw" style="background:var(--intl)"></span><span class="nm">Międzynarodowe</span><span class="cnt"></span></div>
+          <div class="scope-opt" data-scope="krajowe"><span class="sw" style="background:var(--nat)"></span><span class="nm">Krajowe</span><span class="cnt"></span></div>
+          <div class="scope-opt" data-scope="lokalne"><span class="sw" style="background:var(--local)"></span><span class="nm">Lokalne</span><span class="cnt"></span></div>
+        </div>
+        <div class="subfilter" id="subfilter"></div>
+      </aside>
+      <div class="legend">
+        <h4>Zasięg wydarzenia</h4>
+        <div class="legend-row"><span class="sw intl"></span> Międzynarodowe — turnieje rangi WM</div>
+        <div class="legend-row"><span class="sw nat"></span> Krajowe — mistrzostwa i szkolenia</div>
+        <div class="legend-row"><span class="sw local"></span> Lokalne — ceremonie i noce aufguss</div>
+      </div>
+    </div>
+
+    <div class="main">
+      <div class="month-nav">
+        <button id="prevM">‹</button>
+        <span class="label" id="monthLabel"></span>
+        <button id="nextM">›</button>
+      </div>
+      <div class="cal">
+        <div class="cal-dow" id="dow"></div>
+        <div class="cal-grid" id="grid"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: wydarzenia dnia -->
+<div class="modal-bg" id="dayModal" onclick="if(event.target===this)closeModal('dayModal')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('dayModal')">×</button>
+    <h3 id="dmTitle"></h3>
+    <div class="modal-sub" id="dmSub"></div>
+    <div id="dmList"></div>
+  </div>
+</div>
+
+<!-- MODAL: kafelek do social media -->
+<div class="modal-bg" id="shareModal" onclick="if(event.target===this)closeModal('shareModal')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('shareModal')">×</button>
+    <h3>Udostępnij wydarzenie</h3>
+    <div class="modal-sub">Gotowy kafelek 1080×1080 — pobierz i wrzuć na Instagram, Facebook czy Stories.</div>
+    <div class="tile-preview" id="tilePreview"></div>
+    <div class="share-actions">
+      <button class="dm-btn primary" id="dlTile">⬇ Pobierz grafikę (1080×1080)</button>
+      <a class="dm-btn" id="fbShare" target="_blank" rel="noopener">📘 Udostępnij na Facebooku</a>
+      <button class="dm-btn" id="webShare">↗ Udostępnij…</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="../data/events-data.js"></script>
+<script>
+const EVENTS = window.AUFGUSS_EVENTS || [];
+const scopeClass = { miedzynarodowe:'intl', krajowe:'nat', lokalne:'local' };
+const typeMeta = {
+  ceremonia:   { ic:'🔥', label:'Ceremonia aufguss' },
+  'noc-aufguss':{ ic:'🌙', label:'Noc aufguss' },
+  szkolenie:   { ic:'🎓', label:'Szkolenie' },
+  turniej:     { ic:'🏆', label:'Turniej' },
+};
+const MONTHS = ['Styczeń','Luty','Marzec','Kwiecień','Maj','Czerwiec','Lipiec','Sierpień','Wrzesień','Październik','Listopad','Grudzień'];
+const DOW = ['Pon','Wt','Śr','Czw','Pt','Sob','Ndz'];
+
+let view = new Date(2026, 2, 1); // start: marzec 2026 (najwięcej danych)
+let scope = 'miedzynarodowe';          // domyślnie po wejściu: międzynarodowe
+let selCountries = new Set();          // wybrane kraje (krajowe / lokalne)
+let selVenues = new Set();             // wybrane obiekty (lokalne)
+let selectedKey = '2026-03-15';
+
+// pomocnicze: kraje i obiekty dostępne w danym zasięgu
+function countriesFor(sc){ return [...new Set(EVENTS.filter(e=>e.scope===sc).map(e=>e.venue.country))].sort(); }
+function venuesFor(sc, country){
+  const seen = new Map();
+  EVENTS.filter(e=>e.scope===sc && e.venue.country===country).forEach(e=>seen.set(e.venue.name, e.venue));
+  return [...seen.values()];
+}
+
+const dowEl = document.getElementById('dow');
+DOW.forEach(d=>{ const s=document.createElement('span'); s.textContent=d; dowEl.appendChild(s); });
+
+function ymd(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function parse(s){ const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d); }
+
+function passesFilter(e){
+  if(e.scope !== scope) return false;
+  if(scope === 'miedzynarodowe') return true;
+  if(scope === 'krajowe') return selCountries.has(e.venue.country);
+  if(scope === 'lokalne') return selCountries.has(e.venue.country) && selVenues.has(e.venue.name);
+  return false;
+}
+function eventsOnDay(key){
+  const day = parse(key);
+  return EVENTS.filter(e=> passesFilter(e) && day >= parse(e.start) && day <= parse(e.end));
+}
+function dayPart(e, key){
+  if(e.start===e.end) return 'single';
+  if(key===e.start) return 'start';
+  if(key===e.end) return 'end';
+  return 'mid';
+}
+
+function renderGrid(){
+  const grid = document.getElementById('grid');
+  grid.innerHTML='';
+  document.getElementById('monthLabel').textContent = MONTHS[view.getMonth()]+' '+view.getFullYear();
+  const first = new Date(view.getFullYear(), view.getMonth(), 1);
+  let startOffset = (first.getDay()+6)%7; // poniedziałek = 0
+  const start = new Date(first); start.setDate(1-startOffset);
+  const todayKey = ymd(new Date());
+  for(let i=0;i<42;i++){
+    const d = new Date(start); d.setDate(start.getDate()+i);
+    const key = ymd(d);
+    const out = d.getMonth()!==view.getMonth();
+    const cell = document.createElement('div');
+    cell.className = 'cal-cell'+(out?' out':'')+(key===selectedKey?' selected':'')+(key===todayKey?' today':'');
+    cell.dataset.key = key;
+    cell.innerHTML = `<span class="daynum">${d.getDate()}</span>`;
+    const evs = eventsOnDay(key);
+    evs.slice(0,3).forEach(e=>{
+      const part = dayPart(e,key);
+      const div = document.createElement('div');
+      div.className = `ev ${scopeClass[e.scope]}`+(part==='mid'||part==='end'?' span-mid':'');
+      const showIc = part==='single'||part==='start';
+      div.innerHTML = (showIc?`<span class="ic">${typeMeta[e.type].ic}</span>`:'') + (part==='mid'?'· · ·':(part==='end'?'…'+e.title:e.title));
+      cell.appendChild(div);
+    });
+    if(evs.length>3){ const m=document.createElement('div'); m.className='more'; m.textContent=`+${evs.length-3} więcej`; cell.appendChild(m); }
+    cell.addEventListener('click', ()=>{ selectedKey=key; renderGrid(); openDayModal(key); });
+    grid.appendChild(cell);
+  }
+}
+
+// ── STAN UŻYTKOWNIKA (prototyp: localStorage) ──────────────────
+const userStore = JSON.parse(localStorage.getItem('aufguss_user')||'{"interested":{},"reminders":{}}');
+function saveUser(){ localStorage.setItem('aufguss_user', JSON.stringify(userStore)); }
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),2600); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+function plural(n){ return n===1?'wydarzenie':(n%10>=2&&n%10<=4&&!(n>=12&&n<=14)?'wydarzenia':'wydarzeń'); }
+function fmtRange(e){
+  const s=parse(e.start), en=parse(e.end);
+  if(e.start===e.end) return `${s.getDate()} ${MONTHS[s.getMonth()].toLowerCase()} ${s.getFullYear()}`;
+  return `${s.getDate()}–${en.getDate()} ${MONTHS[en.getMonth()].toLowerCase()} ${en.getFullYear()}`;
+}
+
+// ── DODAJ DO KALENDARZA (ICS + Google) ─────────────────────────
+function icsDate(s){ return s.replace(/-/g,''); }
+function endExclusive(e){ const d=parse(e.end); d.setDate(d.getDate()+1); return ymd(d).replace(/-/g,''); }
+function buildICS(e){
+  return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//aufguss.world//kalendarz//PL','BEGIN:VEVENT',
+    'UID:event-'+e.id+'@aufguss.world','DTSTART;VALUE=DATE:'+icsDate(e.start),'DTEND;VALUE=DATE:'+endExclusive(e),
+    'SUMMARY:'+e.title,'LOCATION:'+e.venue.name+', '+e.venue.city+', '+e.venue.country,
+    'DESCRIPTION:'+typeMeta[e.type].label+' — aufguss.world','END:VEVENT','END:VCALENDAR'].join('\r\n');
+}
+function downloadICS(e){
+  const blob=new Blob([buildICS(e)],{type:'text/calendar;charset=utf-8'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='aufguss-'+e.id+'.ics'; a.click();
+  URL.revokeObjectURL(a.href); toast('Pobrano plik .ics — dodaj do swojego kalendarza');
+}
+function gcalLink(e){
+  const p=new URLSearchParams({action:'TEMPLATE',text:e.title,dates:icsDate(e.start)+'/'+endExclusive(e),
+    details:typeMeta[e.type].label+' — aufguss.world',location:e.venue.name+', '+e.venue.city});
+  return 'https://calendar.google.com/calendar/render?'+p.toString();
+}
+
+// ── MODAL DNIA ─────────────────────────────────────────────────
+function openDayModal(key){
+  const d=parse(key);
+  const dow=['Niedziela','Poniedziałek','Wtorek','Środa','Czwartek','Piątek','Sobota'][d.getDay()];
+  const evs=eventsOnDay(key);
+  document.getElementById('dmTitle').textContent=`${d.getDate()} ${MONTHS[d.getMonth()].toLowerCase()} ${d.getFullYear()}`;
+  document.getElementById('dmSub').textContent=`${dow} · ${evs.length} ${plural(evs.length)}`;
+  const list=document.getElementById('dmList');
+  if(!evs.length){ list.innerHTML=`<div class="empty">Brak wydarzeń tego dnia dla wybranych filtrów.</div>`; }
+  else{
+    list.innerHTML='';
+    evs.forEach(e=>{
+      const sc=scopeClass[e.scope];
+      const intd=!!userStore.interested[e.id], rem=!!userStore.reminders[e.id];
+      const card=document.createElement('div'); card.className=`dm-ev ${sc}`;
+      card.innerHTML=`
+        <span class="etype">${typeMeta[e.type].ic} ${typeMeta[e.type].label}</span>
+        <h5>${e.title}</h5>
+        <div class="venue"><img src="https://flagcdn.com/20x15/${e.venue.flag}.png"> <a href="object.html">${e.venue.name}</a>, ${e.venue.city} · ${fmtRange(e)}</div>
+        <div class="masters">${e.masters.map(m=>`<a class="m-pill" href="saunamaster.html"><b>${m.name}</b> · ${m.role}</a>`).join('')}</div>
+        <div class="dm-actions">
+          <button class="dm-btn int ${intd?'on':''}">${intd?'♥ Interesuje mnie':'♡ Zainteresowany/a'}</button>
+          <a class="dm-btn" href="${gcalLink(e)}" target="_blank" rel="noopener">📅 Google Calendar</a>
+          <button class="dm-btn ics">⬇ .ics</button>
+          <button class="dm-btn rem ${rem?'on':''}">${rem?'🔔 Przypomnienie wł.':'🔕 Przypomnij'}</button>
+          <button class="dm-btn share">↗ Udostępnij</button>
+        </div>`;
+      card.querySelector('.int').addEventListener('click',()=>{ userStore.interested[e.id]=!userStore.interested[e.id]; saveUser(); openDayModal(key); toast(userStore.interested[e.id]?'Dodano do zainteresowań':'Usunięto z zainteresowań'); });
+      card.querySelector('.ics').addEventListener('click',()=>downloadICS(e));
+      card.querySelector('.rem').addEventListener('click',()=>{ userStore.reminders[e.id]=!userStore.reminders[e.id]; saveUser(); openDayModal(key); toast(userStore.reminders[e.id]?'Przypomnienie ustawione':'Przypomnienie wyłączone'); });
+      card.querySelector('.share').addEventListener('click',()=>openShare(e));
+      list.appendChild(card);
+    });
+  }
+  document.getElementById('dayModal').classList.add('open');
+}
+
+// ── KAFELEK DO SOCIAL MEDIA (SVG → PNG) ────────────────────────
+function escapeXml(s){ return String(s).replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c])); }
+function shareSVG(e){
+  const col  = e.scope==='miedzynarodowe'?'#c43a13':e.scope==='krajowe'?'#b5560f':'#d6491f';
+  const col2 = e.scope==='miedzynarodowe'?'#ff7a3d':e.scope==='krajowe'?'#ff8a3d':'#ffb56b';
+  const words=e.title.split(' '); let lines=[],cur='';
+  words.forEach(w=>{ if((cur+' '+w).trim().length>17){ if(cur)lines.push(cur.trim()); cur=w; } else cur+=' '+w; });
+  if(cur.trim())lines.push(cur.trim()); lines=lines.slice(0,3);
+  const titleSpans=lines.map((l,i)=>`<text x="92" y="${440+i*88}" font-family="Georgia, serif" font-size="74" fill="#fffaf2" font-weight="500">${escapeXml(l)}</text>`).join('');
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 1080 1080">
+    <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2a1208"/><stop offset="0.62" stop-color="${col}"/><stop offset="1" stop-color="${col2}"/></linearGradient></defs>
+    <rect width="1080" height="1080" fill="url(#g)"/>
+    <circle cx="900" cy="180" r="240" fill="rgba(255,205,150,0.16)"/>
+    <text x="92" y="150" font-family="Georgia, serif" font-size="42" fill="#fffaf2" font-weight="600">aufguss<tspan fill="${col2}">.</tspan>world</text>
+    <text x="92" y="300" font-family="Arial, sans-serif" font-size="30" letter-spacing="5" fill="${col2}">${escapeXml(typeMeta[e.type].label.toUpperCase())}</text>
+    ${titleSpans}
+    <text x="92" y="812" font-family="Arial, sans-serif" font-size="37" fill="#ffe6cc">Miejsce:  ${escapeXml(e.venue.name)}, ${escapeXml(e.venue.city)}</text>
+    <text x="92" y="872" font-family="Arial, sans-serif" font-size="37" fill="#ffe6cc">Termin:  ${escapeXml(fmtRange(e))}</text>
+    <rect x="92" y="958" width="320" height="3" fill="${col2}"/>
+    <text x="92" y="1010" font-family="Arial, sans-serif" font-size="27" fill="rgba(255,250,242,0.75)">Pełny kalendarz wydarzeń na aufguss.world</text>
+  </svg>`;
+}
+let shareEvent=null;
+function openShare(e){
+  shareEvent=e;
+  document.getElementById('tilePreview').innerHTML=shareSVG(e);
+  document.getElementById('fbShare').href='https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent('https://aufguss.world/wydarzenie/'+e.id);
+  closeModal('dayModal');
+  document.getElementById('shareModal').classList.add('open');
+}
+document.getElementById('dlTile').addEventListener('click',()=>{
+  if(!shareEvent)return;
+  const blob=new Blob([shareSVG(shareEvent)],{type:'image/svg+xml'}); const url=URL.createObjectURL(blob);
+  const img=new Image();
+  img.onload=()=>{ const cv=document.createElement('canvas'); cv.width=1080; cv.height=1080; cv.getContext('2d').drawImage(img,0,0); URL.revokeObjectURL(url);
+    cv.toBlob(b=>{ const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='aufguss-event-'+shareEvent.id+'.png'; a.click(); URL.revokeObjectURL(a.href); toast('Pobrano kafelek PNG 1080×1080'); }); };
+  img.onerror=()=>toast('Nie udało się wygenerować grafiki'); img.src=url;
+});
+document.getElementById('webShare').addEventListener('click',async()=>{
+  if(!shareEvent)return; const url='https://aufguss.world/wydarzenie/'+shareEvent.id;
+  if(navigator.share){ try{ await navigator.share({title:shareEvent.title,text:'Zobacz to wydarzenie na aufguss.world',url}); }catch(_){} }
+  else { try{ await navigator.clipboard.writeText(url); toast('Link skopiowany do schowka'); }catch(_){ toast('Skopiuj link: '+url); } }
+});
+
+// liczniki przy zasięgach
+function updateScopeCounts(){
+  document.querySelectorAll('.scope-opt').forEach(opt=>{
+    const sc = opt.dataset.scope;
+    opt.querySelector('.cnt').textContent = EVENTS.filter(e=>e.scope===sc).length;
+  });
+}
+
+// dynamiczny pod-filtr zależny od zasięgu
+function renderSubfilter(){
+  const box = document.getElementById('subfilter');
+  if(scope === 'miedzynarodowe'){
+    box.innerHTML = `<div class="hint">Wydarzenia o randze światowej i europejskiej — turnieje, puchary, mistrzostwa kontynentalne. Bez dodatkowego filtrowania.</div>`;
+    return;
+  }
+  if(scope === 'krajowe'){
+    const countries = countriesFor('krajowe');
+    box.innerHTML = `<div class="sub-label">Kraj</div>` + countries.map(c=>{
+      const fl = EVENTS.find(e=>e.scope==='krajowe'&&e.venue.country===c).venue.flag;
+      const n = EVENTS.filter(e=>e.scope==='krajowe'&&e.venue.country===c).length;
+      return `<label class="f-row"><input type="checkbox" data-country="${c}" ${selCountries.has(c)?'checked':''}><img src="https://flagcdn.com/20x15/${fl}.png"> ${c}<span class="n">${n}</span></label>`;
+    }).join('');
+    box.querySelectorAll('input[data-country]').forEach(cb=>{
+      cb.addEventListener('change', ()=>{
+        const c = cb.dataset.country;
+        cb.checked ? selCountries.add(c) : selCountries.delete(c);
+        refresh();
+      });
+    });
+    return;
+  }
+  if(scope === 'lokalne'){
+    const countries = countriesFor('lokalne');
+    let html = `<div class="sub-label">Krok 1 — wybierz kraj</div>`;
+    countries.forEach(c=>{
+      const fl = EVENTS.find(e=>e.scope==='lokalne'&&e.venue.country===c).venue.flag;
+      const venues = venuesFor('lokalne', c);
+      const open = selCountries.has(c);
+      html += `<div class="venue-group">
+        <label class="f-row"><input type="checkbox" data-country="${c}" ${open?'checked':''}><img src="https://flagcdn.com/20x15/${fl}.png"> ${c}<span class="n">${venues.length} ob.</span></label>`;
+      if(open){
+        html += `<div class="venue-list">`;
+        venues.forEach(v=>{
+          const n = EVENTS.filter(e=>e.scope==='lokalne'&&e.venue.name===v.name).length;
+          html += `<label class="f-row"><input type="checkbox" data-venue="${v.name}" ${selVenues.has(v.name)?'checked':''}>${v.name}<span class="city">${v.city}</span><span class="n">${n}</span></label>`;
+        });
+        html += `</div>`;
+      }
+      html += `</div>`;
+    });
+    if(!selCountries.size) html += `<div class="hint" style="margin-top:8px">Krok 2 — po wybraniu kraju zaznacz obiekty, których wydarzenia chcesz zobaczyć.</div>`;
+    box.innerHTML = html;
+    box.querySelectorAll('input[data-country]').forEach(cb=>{
+      cb.addEventListener('change', ()=>{
+        const c = cb.dataset.country;
+        if(cb.checked){ selCountries.add(c); venuesFor('lokalne', c).forEach(v=>selVenues.add(v.name)); }
+        else { selCountries.delete(c); venuesFor('lokalne', c).forEach(v=>selVenues.delete(v.name)); }
+        renderSubfilter(); renderGrid();
+      });
+    });
+    box.querySelectorAll('input[data-venue]').forEach(cb=>{
+      cb.addEventListener('change', ()=>{
+        const v = cb.dataset.venue;
+        cb.checked ? selVenues.add(v) : selVenues.delete(v);
+        renderGrid();
+      });
+    });
+  }
+}
+
+function setScope(sc){
+  scope = sc;
+  document.querySelectorAll('.scope-opt').forEach(o=>o.classList.toggle('active', o.dataset.scope===sc));
+  // domyślne zaznaczenia przy wejściu w zasięg
+  if(sc === 'krajowe'){ selCountries = new Set(countriesFor('krajowe')); }
+  if(sc === 'lokalne'){ selCountries = new Set(); selVenues = new Set(); }
+  renderSubfilter(); renderGrid();
+}
+
+function refresh(){ renderGrid(); }
+
+document.querySelectorAll('.scope-opt').forEach(opt=> opt.addEventListener('click', ()=> setScope(opt.dataset.scope)));
+document.getElementById('prevM').addEventListener('click', ()=>{ view.setMonth(view.getMonth()-1); renderGrid(); });
+document.getElementById('nextM').addEventListener('click', ()=>{ view.setMonth(view.getMonth()+1); renderGrid(); });
+
+// auto-filtr po przyjściu z karty obiektu: calendar.html?venue=Nazwa
+const venueParam = new URLSearchParams(location.search).get('venue');
+if(venueParam){
+  const ev = EVENTS.find(e=>e.venue.name===venueParam && e.scope==='lokalne')
+          || EVENTS.find(e=>e.venue.name===venueParam);
+  if(ev){
+    scope = 'lokalne';
+    selCountries = new Set([ev.venue.country]);
+    selVenues = new Set([venueParam]);
+    document.querySelectorAll('.scope-opt').forEach(o=>o.classList.toggle('active', o.dataset.scope==='lokalne'));
+    view = new Date(parse(ev.start).getFullYear(), parse(ev.start).getMonth(), 1);
+  }
+}
+
+updateScopeCounts();
+renderSubfilter();
+renderGrid();
+</script>
+</body>
+</html>

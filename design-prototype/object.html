@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Satama Sauna Resort — obiekt | aufguss.world</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{
+  --ember-1:#ff7a3d;--ember-2:#e8552a;--ember-3:#d6491f;
+  --bg:#fbf5ea;--surface:#ffffff;--surface-2:#f3e8d6;
+  --ink:#2a1b10;--ink-dim:#6b5a47;--stone:#8a7960;
+  --line:rgba(42,27,16,0.1);--line-strong:rgba(42,27,16,0.18);
+  --intl:#c43a13;--nat:#b5560f;--local:#9c6c00;
+  --ok:#4f8a3d;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--ink);font-family:'Instrument Sans',sans-serif;}
+h1,h2,h3{font-family:'Fraunces',serif;font-weight:400;}
+em{font-style:italic;color:var(--ember-3);}
+a{color:inherit;text-decoration:none;}
+
+header{display:flex;align-items:center;justify-content:space-between;padding:16px 5vw;border-bottom:1px solid var(--line);background:var(--surface);position:sticky;top:0;z-index:30;}
+.logo{font-family:'Fraunces',serif;font-size:1.25rem;display:flex;align-items:center;gap:9px;}
+.logo img{width:26px;height:26px;}
+.logo .dot{color:var(--ember-2);font-style:italic;}
+.back-link{font-size:0.8rem;color:var(--ink-dim);}
+.back-link:hover{color:var(--ember-2);}
+
+.wrap{max-width:1180px;margin:0 auto;padding:0 clamp(20px,4vw,48px) 90px;}
+
+/* HERO BANNER */
+.hero-banner{position:relative;height:clamp(280px,42vh,420px);margin:0 calc(-1*clamp(20px,4vw,48px));overflow:hidden;display:flex;align-items:flex-end;
+  background:linear-gradient(120deg,#3a1c10,#7a3618 55%,#c9651f 120%);}
+.hero-banner .ph{position:absolute;inset:0;background:
+  radial-gradient(900px 400px at 75% 15%,rgba(255,170,100,0.4),transparent 60%),
+  radial-gradient(700px 400px at 15% 90%,rgba(255,90,60,0.3),transparent 60%);}
+.hero-banner .ph::after{content:'🌲  🛶  ♨️';position:absolute;top:24px;right:34px;font-size:1.4rem;opacity:0.5;letter-spacing:10px;}
+.hero-inner{position:relative;z-index:2;width:100%;max-width:1180px;margin:0 auto;padding:30px clamp(20px,4vw,48px);color:#fff6ea;}
+.hero-inner .crumb{font-size:0.74rem;letter-spacing:0.14em;text-transform:uppercase;color:#ffd2a8;margin-bottom:12px;}
+.hero-inner h1{font-size:clamp(2.2rem,4.5vw,3.4rem);line-height:1.02;margin-bottom:12px;color:#fffaf2;}
+.hero-loc{display:flex;flex-wrap:wrap;align-items:center;gap:8px 18px;font-size:0.96rem;color:#f3dcc4;}
+.hero-loc span{display:inline-flex;align-items:center;gap:7px;}
+.hero-loc img{width:20px;border-radius:2px;}
+.class-row{display:flex;align-items:center;gap:10px;margin-top:18px;}
+.buckets{display:flex;gap:3px;}
+.bucket{width:26px;height:26px;}
+.bucket.full path{fill:#ffb56b;stroke:#fff6ea;}
+.bucket.empty path{fill:rgba(255,246,234,0.12);stroke:rgba(255,246,234,0.5);}
+.class-row .lbl{font-size:0.82rem;color:#ffd2a8;}
+
+/* SECTION */
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:22px;}
+.sec-head h2{font-size:clamp(1.5rem,2.6vw,2.05rem);}
+.sec-head .count{font-size:0.82rem;color:var(--stone);}
+section.block{margin:46px 0;}
+
+.lead{color:var(--ink-dim);line-height:1.8;font-size:1.05rem;max-width:760px;margin:26px 0 0;}
+
+/* FACTS */
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-top:30px;}
+.fact{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px 20px;}
+.fact .lbl{font-size:0.68rem;text-transform:uppercase;letter-spacing:0.09em;color:var(--stone);margin-bottom:8px;display:flex;align-items:center;gap:7px;}
+.fact .val{font-size:0.98rem;font-weight:600;color:var(--ink);line-height:1.4;}
+.fact .val small{font-weight:400;color:var(--ink-dim);font-size:0.84rem;}
+
+/* AMENITIES */
+.amen-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;}
+.amen{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;font-size:0.92rem;}
+.amen .mark{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0;font-weight:700;}
+.amen.yes .mark{background:rgba(79,138,61,0.15);color:var(--ok);}
+.amen.no .mark{background:var(--surface-2);color:var(--stone);}
+.amen.no{color:var(--stone);}
+
+/* GALLERY */
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;}
+.tile{aspect-ratio:4/3;border-radius:14px;overflow:hidden;position:relative;cursor:pointer;display:flex;align-items:flex-end;padding:12px;color:#fff6ea;font-size:0.78rem;font-weight:600;transition:transform .25s;}
+.tile:hover{transform:scale(1.02);}
+.tile::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(42,15,5,0.45),transparent 55%);}
+.tile span{position:relative;z-index:1;}
+.g1{background:linear-gradient(150deg,#ffd9a8,#ff8a3d);}
+.g2{background:linear-gradient(150deg,#ff8a3d,#e8552a);}
+.g3{background:linear-gradient(150deg,#3a1c10,#7a3618);}
+.g4{background:linear-gradient(150deg,#e8552a,#a8320f);}
+.g5{background:linear-gradient(150deg,#ffc178,#d6491f);}
+.g6{background:linear-gradient(150deg,#7a3618,#c9651f);}
+
+/* MASTERS */
+.masters-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px;}
+.m-card{display:flex;align-items:center;gap:13px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:13px 15px;transition:border-color .2s,box-shadow .2s,transform .2s;}
+.m-card:hover{border-color:rgba(255,122,61,0.4);box-shadow:0 10px 24px rgba(42,27,16,0.08);transform:translateY(-2px);}
+.m-card .av{width:50px;height:50px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:1.1rem;color:#fff6ea;background:linear-gradient(150deg,#ffd9a8,#ff8a3d);}
+.m-card h4{font-size:0.94rem;font-weight:600;margin-bottom:3px;}
+.m-card .role{font-size:0.74rem;color:var(--stone);display:flex;align-items:center;gap:6px;}
+.m-card .role img{width:15px;border-radius:2px;}
+
+/* EVENTS */
+.shows{display:flex;flex-direction:column;gap:12px;}
+.show{display:grid;grid-template-columns:62px 1fr auto;gap:18px;align-items:center;background:var(--surface);border:1px solid var(--line);border-left:3px solid;border-radius:14px;padding:14px 18px;transition:box-shadow .2s,transform .2s;}
+.show:hover{box-shadow:0 10px 26px rgba(42,27,16,0.08);transform:translateX(3px);}
+.show.intl{border-left-color:var(--intl);}.show.nat{border-left-color:var(--nat);}.show.local{border-left-color:var(--local);}
+.show .date{text-align:center;}
+.show .date .d{font-family:'Fraunces',serif;font-size:1.55rem;line-height:1;}
+.show .date .m{font-size:0.66rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--stone);}
+.show .mid h4{font-size:0.96rem;font-weight:600;margin-bottom:4px;}
+.show .mid .who{font-size:0.78rem;color:var(--ink-dim);}
+.show .scope-tag{font-size:0.66rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;padding:5px 11px;border-radius:100px;white-space:nowrap;}
+.scope-tag.intl{background:rgba(196,58,19,0.1);color:var(--intl);}
+.scope-tag.nat{background:rgba(255,140,60,0.16);color:var(--nat);}
+.scope-tag.local{background:rgba(255,191,40,0.18);color:var(--local);}
+
+/* REVIEWS */
+.rev-summary{display:flex;align-items:center;gap:20px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px 26px;margin-bottom:22px;flex-wrap:wrap;}
+.rev-summary .big{font-family:'Fraunces',serif;font-size:3rem;line-height:1;color:var(--ember-3);}
+.rev-summary .sub{font-size:0.84rem;color:var(--ink-dim);}
+.review{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin-bottom:14px;}
+.review .top{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
+.review .av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:0.9rem;color:#fff6ea;background:linear-gradient(150deg,#ff8a3d,#e8552a);}
+.review .who{font-weight:600;font-size:0.92rem;}
+.review .date{font-size:0.74rem;color:var(--stone);}
+.review .mini-buckets{display:flex;gap:2px;margin-left:auto;}
+.review .mini-buckets .bucket{width:18px;height:18px;}
+.review .mini-buckets .bucket.full path{fill:var(--ember-1);stroke:#fff;}
+.review .mini-buckets .bucket.empty path{fill:#eee;stroke:var(--line-strong);}
+.review p{color:var(--ink-dim);line-height:1.6;font-size:0.92rem;}
+
+.add-review{background:var(--surface-2);border:1px dashed var(--line-strong);border-radius:16px;padding:22px;margin-top:8px;}
+.add-review h4{font-size:1.05rem;font-weight:600;font-family:'Instrument Sans';margin-bottom:14px;}
+.add-review .field{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px;}
+.add-review input,.add-review textarea{font-family:inherit;font-size:0.9rem;padding:11px 14px;border:1px solid var(--line-strong);border-radius:10px;background:var(--surface);color:var(--ink);outline:none;width:100%;}
+.add-review input{flex:1;min-width:180px;width:auto;}
+.add-review textarea{resize:vertical;min-height:80px;}
+.rate-pick{display:flex;align-items:center;gap:8px;margin-bottom:12px;font-size:0.86rem;color:var(--ink-dim);}
+.rate-pick .bucket{width:26px;height:26px;cursor:pointer;}
+.rate-pick .bucket path{fill:#eee;stroke:var(--line-strong);transition:all .15s;}
+.rate-pick .bucket.lit path{fill:var(--ember-1);stroke:var(--ember-3);}
+.btn{display:inline-flex;align-items:center;gap:9px;padding:13px 24px;font-size:0.76rem;letter-spacing:0.08em;text-transform:uppercase;font-weight:600;border-radius:100px;cursor:pointer;border:none;background:linear-gradient(120deg,#ff8a3d,#ff5a3d);color:#2a0e02;box-shadow:0 8px 24px rgba(255,90,50,0.3);transition:transform .3s;}
+.btn:hover{transform:translateY(-2px);}
+
+/* VENUE ACTIONS (Aufgussplan, WWW) */
+.venue-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px;}
+.v-action{display:inline-flex;align-items:center;gap:9px;padding:12px 20px;border-radius:100px;font-size:0.84rem;font-weight:600;cursor:pointer;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);transition:all .2s;}
+.v-action:hover{border-color:var(--ember-1);color:var(--ember-2);transform:translateY(-2px);}
+.v-action.primary{background:linear-gradient(120deg,#ff8a3d,#ff5a3d);color:#2a0e02;border-color:transparent;box-shadow:0 8px 22px rgba(255,90,50,0.28);}
+.v-action .ic{font-size:1.05rem;}
+
+/* PRICING */
+.price-wrap{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.price-card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px 24px;}
+.price-card .lbl{font-size:0.68rem;text-transform:uppercase;letter-spacing:0.09em;color:var(--stone);margin-bottom:10px;display:flex;align-items:center;gap:7px;}
+.price-card .amount{font-family:'Fraunces',serif;font-size:2.2rem;color:var(--ink);line-height:1;}
+.price-card .amount small{font-size:0.9rem;color:var(--ink-dim);font-family:'Instrument Sans';}
+.price-card .note{font-size:0.8rem;color:var(--ink-dim);margin-top:8px;}
+.cards-list{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;}
+.card-chip{display:inline-flex;align-items:center;gap:6px;font-size:0.78rem;font-weight:600;padding:7px 13px;border-radius:100px;background:rgba(79,138,61,0.12);color:var(--ok);}
+.card-chip.off{background:var(--surface-2);color:var(--stone);font-weight:400;}
+.cards-na{font-size:0.84rem;color:var(--stone);line-height:1.5;}
+
+/* MODAL (podgląd Aufgussplanu) */
+.modal-bg{position:fixed;inset:0;background:rgba(30,16,8,0.6);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;z-index:100;padding:24px;}
+.modal-bg.open{display:flex;}
+.modal{background:var(--surface);border-radius:20px;max-width:560px;width:100%;max-height:86vh;overflow:auto;padding:26px;position:relative;box-shadow:0 30px 80px rgba(0,0,0,0.4);}
+.modal h3{font-size:1.4rem;margin-bottom:6px;}
+.modal .sub{font-size:0.84rem;color:var(--ink-dim);margin-bottom:18px;}
+.modal .close{position:absolute;top:16px;right:18px;font-size:1.4rem;cursor:pointer;color:var(--stone);background:none;border:none;}
+.plan-sheet{background:linear-gradient(160deg,#fff,#f6ece0);border:1px solid var(--line);border-radius:12px;padding:20px;}
+.plan-row{display:grid;grid-template-columns:50px 1fr 56px;gap:12px;padding:10px 4px;border-bottom:1px dashed var(--line);font-size:0.86rem;align-items:center;}
+.plan-row:last-child{border-bottom:none;}
+.plan-row .t{font-family:'Fraunces',serif;color:var(--ember-3);font-size:0.92rem;}
+.plan-row .th{font-weight:600;line-height:1.3;}
+.plan-row .sa{font-size:0.72rem;color:var(--stone);margin-top:2px;}
+.plan-row .tmp{font-size:0.72rem;font-weight:600;color:var(--nat);text-align:right;}
+.plan-note{font-size:0.74rem;color:var(--stone);margin-top:14px;text-align:center;}
+
+/* SHOW MORE */
+.show-more-btn{display:block;margin:18px auto 0;padding:11px 26px;border-radius:100px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);font:600 0.8rem/1 'Instrument Sans';letter-spacing:0.04em;text-transform:uppercase;cursor:pointer;transition:all .2s;}
+.show-more-btn:hover{border-color:var(--ember-1);color:var(--ember-2);}
+
+/* CEREMONIES-INCLUDED BADGE */
+.cer-badge{display:inline-flex;align-items:center;gap:8px;margin-top:14px;padding:8px 14px;border-radius:10px;font-size:0.82rem;font-weight:600;}
+.cer-badge.in{background:rgba(79,138,61,0.14);color:var(--ok);}
+.cer-badge.extra{background:rgba(255,140,60,0.16);color:var(--nat);}
+
+/* LOCATION MAP */
+.loc-wrap{display:grid;grid-template-columns:1.4fr 1fr;gap:20px;align-items:stretch;}
+#venueMap{height:340px;border-radius:18px;border:1px solid var(--line);overflow:hidden;z-index:0;}
+.loc-side{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px 24px;display:flex;flex-direction:column;justify-content:center;gap:10px;}
+.loc-side .addr{font-size:1.05rem;font-weight:600;line-height:1.5;}
+.loc-side .coord{font-size:0.82rem;color:var(--stone);}
+.loc-side a{margin-top:8px;align-self:flex-start;}
+.pin-marker{width:28px;height:28px;border-radius:50% 50% 50% 0;background:linear-gradient(135deg,var(--ember-1),var(--ember-3));transform:rotate(-45deg);box-shadow:0 4px 14px rgba(42,27,16,0.4);border:2px solid #fff8ee;}
+
+@media(max-width:760px){ .loc-wrap{grid-template-columns:1fr;} }
+@media(max-width:640px){ .price-wrap{grid-template-columns:1fr;} }
+@media(max-width:560px){
+  .show{grid-template-columns:52px 1fr;}
+  .show .scope-tag{grid-column:2;justify-self:start;margin-top:4px;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><img src="../assets/logo-mark.svg">aufguss<span class="dot">.</span>world</div>
+  <a href="map.html" class="back-link">← Mapa obiektów</a>
+</header>
+
+<div class="hero-banner">
+  <div class="ph"></div>
+  <div class="hero-inner">
+    <div class="crumb">Obiekt saunowy</div>
+    <h1>Satama Sauna Resort</h1>
+    <div class="hero-loc">
+      <span><img src="https://flagcdn.com/20x15/de.png"> Wendisch-Rietz, Brandenburg, Niemcy</span>
+      <span>🌊 nad jeziorem Scharmützelsee</span>
+    </div>
+    <div class="class-row">
+      <div class="buckets" id="classBuckets"></div>
+      <span class="lbl">Klasa obiektu — 5/5</span>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <p class="lead">Jeden z najbardziej rozpoznawalnych obiektów aufguss na świecie — kameralny resort saunowy położony w naturze, nad jeziorem Scharmützelsee w Brandenburgii. Słynie z mistrzowskich ceremonii aufguss i gości saunamistrzów z całego świata.</p>
+
+  <div class="venue-actions">
+    <button class="v-action primary" onclick="document.getElementById('planModal').classList.add('open')"><span class="ic">📋</span> Plan ceremonii</button>
+    <a class="v-action" href="https://www.satama-saunapark.de" target="_blank" rel="noopener"><span class="ic">🌐</span> Strona obiektu</a>
+    <a class="v-action" href="#ceny"><span class="ic">🎟️</span> Bilety i ceny</a>
+  </div>
+
+  <section class="block">
+    <div class="sec-head"><h2>Najważniejsze informacje</h2></div>
+    <div class="facts">
+      <div class="fact"><div class="lbl">📍 Lokalizacja</div><div class="val">Wendisch-Rietz<br><small>Brandenburg, Niemcy</small></div></div>
+      <div class="fact"><div class="lbl">🏞️ Typ obiektu</div><div class="val">Kameralny resort w naturze<br><small>nad jeziorem — nie aquapark</small></div></div>
+      <div class="fact"><div class="lbl">👙 Zasady saunowania</div><div class="val">Bez stroju<br><small>klasyczne, tekstil tylko w strefie basenowej</small></div></div>
+      <div class="fact"><div class="lbl">🏊 Baseny</div><div class="val">Tak<br><small>baseny + kąpiel w jeziorze</small></div></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="sec-head"><h2>Lokalizacja</h2><span class="count">dokładne położenie na mapie portalu</span></div>
+    <div class="loc-wrap">
+      <div id="venueMap"></div>
+      <div class="loc-side">
+        <div class="addr"><img src="https://flagcdn.com/20x15/de.png" style="width:18px;border-radius:2px;vertical-align:-2px"> Satama Sauna Resort<br>Wendisch-Rietz, Brandenburg</div>
+        <div class="coord">52.21502° N, 14.01027° E · nad jeziorem Scharmützelsee</div>
+        <a class="v-action" href="map.html"><span class="ic">🗺️</span> Pokaż na pełnej mapie</a>
+        <a class="v-action" href="https://maps.app.goo.gl/gDt9Cc6jHeA1L3p88" target="_blank" rel="noopener"><span class="ic">🧭</span> Wskazówki dojazdu</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="sec-head"><h2>Co znajdziesz w obiekcie</h2></div>
+    <div class="amen-grid" id="amenGrid"></div>
+  </section>
+
+  <section class="block" id="ceny">
+    <div class="sec-head"><h2>Bilety i ceny</h2><span class="count">dane podawane przez obiekt</span></div>
+    <div class="price-wrap">
+      <div class="price-card" id="priceModel"></div>
+      <div class="price-card" id="benefitCards"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="sec-head"><h2>Galeria</h2><span class="count">obiekt, sauny i ceremonie</span></div>
+    <div class="tiles">
+      <div class="tile g1"><span>Sauna główna</span></div>
+      <div class="tile g3"><span>Jezioro Scharmützelsee</span></div>
+      <div class="tile g2"><span>Ceremonia aufguss</span></div>
+      <div class="tile g5"><span>Strefa SPA</span></div>
+      <div class="tile g6"><span>Banya</span></div>
+      <div class="tile g4"><span>Sauna zewnętrzna</span></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="sec-head"><h2>Saunamistrzowie obiektu</h2><span class="count" id="mastersCount"></span></div>
+    <div class="masters-row" id="mastersRow"></div>
+  </section>
+
+  <section class="block">
+    <div class="sec-head"><h2>Najbliższe wydarzenia</h2><span class="count" id="eventsCount"></span></div>
+    <div class="shows" id="shows"></div>
+    <a class="v-action" id="fullCalLink" style="margin-top:18px;"><span class="ic">📅</span> Pełny kalendarz wydarzeń obiektu</a>
+  </section>
+
+  <section class="block">
+    <div class="sec-head"><h2>Opinie społeczności</h2></div>
+    <div class="rev-summary">
+      <div class="big">4.8</div>
+      <div>
+        <div class="mini-buckets" id="avgBuckets"></div>
+        <div class="sub">na podstawie 128 opinii saunowiczów</div>
+      </div>
+    </div>
+    <div id="reviews"></div>
+    <div class="add-review">
+      <h4>Dodaj swoją opinię</h4>
+      <div class="rate-pick">Twoja ocena: <div class="buckets" id="ratePick"></div></div>
+      <div class="field"><input type="text" placeholder="Imię / pseudonim"></div>
+      <textarea placeholder="Jak wspominasz wizytę w tym obiekcie?"></textarea>
+      <div style="margin-top:12px;"><button class="btn" onclick="alert('To prototyp — wysyłka opinii pojawi się w wersji z backendem.')">Opublikuj opinię</button></div>
+    </div>
+  </section>
+
+</div>
+
+<!-- MODAL: podgląd Aufgussplanu (plik dodawany przez obiekt) -->
+<div class="modal-bg" id="planModal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal">
+    <button class="close" onclick="document.getElementById('planModal').classList.remove('open')">×</button>
+    <h3>Plan ceremonii</h3>
+    <div class="sub">Satama Sauna Resort &amp; SPA · plan dzienny (od 28.04.2025)</div>
+    <div class="plan-sheet" id="planSheet"></div>
+    <div class="plan-note">Zmiany zastrzeżone · w święta obowiązuje plan sobotni. Obiekt wgrywa własny plan ceremonii (PDF / grafika) w panelu zarządzania kartą obiektu.</div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="../data/events-data.js"></script>
+<script>
+const VENUE_NAME = "Satama Sauna Resort";
+const EVENTS = window.AUFGUSS_EVENTS || [];
+const scopeClass = { miedzynarodowe:'intl', krajowe:'nat', lokalne:'local' };
+const scopeLabel = { miedzynarodowe:'Międzynarodowe', krajowe:'Krajowe', lokalne:'Lokalne' };
+const MONTHS = ['sty','lut','mar','kwi','maj','cze','lip','sie','wrz','paź','lis','gru'];
+function parse(s){ const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d); }
+
+const BKT='M5.5,8 Q12,2.5 18.5,8 M4.5,8 L19.5,8 L17.6,19 Q12,21.5 6.4,19 Z M9,8 L9.6,19 M15,8 L14.4,19';
+function bucketSVG(cls){ return `<svg class="bucket ${cls}" viewBox="0 0 24 24"><path d="${BKT}" stroke-width="1.3" fill="none" stroke-linejoin="round" stroke-linecap="round"/></svg>`; }
+function bucket(full){ return bucketSVG(full?'full':'empty'); }
+function bucketRow(n, total=5){ let s=''; for(let i=0;i<total;i++) s+=bucket(i<n); return s; }
+
+// klasa obiektu
+document.getElementById('classBuckets').innerHTML = bucketRow(5);
+document.getElementById('avgBuckets').innerHTML = bucketRow(5);
+
+// udogodnienia (tak/nie)
+const amenities = [
+  {k:'Sauny suche', v:true},
+  {k:'Sauny parowe', v:true},
+  {k:'Banya', v:true},
+  {k:'Zabiegi SPA', v:true},
+  {k:'Jacuzzi', v:true},
+  {k:'Baseny', v:true},
+];
+document.getElementById('amenGrid').innerHTML = amenities.map(a=>
+  `<div class="amen ${a.v?'yes':'no'}"><span class="mark">${a.v?'✓':'—'}</span> ${a.k}</div>`
+).join('');
+
+// saunamistrzowie obiektu — z tego samego zbioru wydarzeń (rezydenci + goście tego obiektu)
+const masterMap = new Map();
+EVENTS.filter(e=>e.venue.name===VENUE_NAME).forEach(e=>{
+  e.masters.forEach(m=>{
+    const cur = masterMap.get(m.name);
+    // rezydent ma priorytet nad gościnnym
+    if(!cur || (m.role==='rezydent'||m.role==='rezydentka')) masterMap.set(m.name, {name:m.name, role:m.role, flag:e.venue.flag});
+  });
+});
+const masters = [...masterMap.values()];
+document.getElementById('mastersCount').textContent = `${masters.length} powiązanych z obiektem`;
+document.getElementById('mastersRow').innerHTML = masters.map(m=>{
+  const initials = m.name.split(' ').map(n=>n[0]).join('');
+  return `<a class="m-card" href="saunamaster.html">
+    <div class="av">${initials}</div>
+    <div><h4>${m.name}</h4><div class="role">${m.role}</div></div>
+  </a>`;
+}).join('');
+
+// najbliższe wydarzenia obiektu
+const myEvents = EVENTS.filter(e=>e.venue.name===VENUE_NAME).sort((a,b)=>parse(a.start)-parse(b.start));
+document.getElementById('eventsCount').textContent = `${myEvents.length} w kalendarzu obiektu`;
+document.getElementById('fullCalLink').href = `calendar.html?venue=${encodeURIComponent(VENUE_NAME)}`;
+document.getElementById('shows').innerHTML = myEvents.map(e=>{
+  const d = parse(e.start);
+  const names = e.masters.map(m=>m.name).join(', ');
+  return `<div class="show ${scopeClass[e.scope]}">
+    <div class="date"><div class="d">${d.getDate()}</div><div class="m">${MONTHS[d.getMonth()]}</div></div>
+    <div class="mid"><h4>${e.title}</h4><div class="who">${names}</div></div>
+    <div class="scope-tag ${scopeClass[e.scope]}">${scopeLabel[e.scope]}</div>
+  </div>`;
+}).join('') || '<div style="color:var(--stone)">Brak zaplanowanych wydarzeń.</div>';
+
+// przykładowe opinie
+const reviews = [
+  {who:'Marek W.', date:'maj 2026', r:5, t:'Najlepsze ceremonie aufguss, jakie widziałem w Europie. Klimat nad jeziorem nie do podrobienia, obsługa na najwyższym poziomie.'},
+  {who:'Anna K.', date:'kwiecień 2026', r:5, t:'Magiczne miejsce. Spędziłam tu cały dzień i czas płynął inaczej. Banya rewelacyjna, saunamistrzowie prawdziwi artyści.'},
+  {who:'Tomasz P.', date:'marzec 2026', r:4, t:'Świetny obiekt, choć w weekendy bywa tłoczno. Warto rezerwować ceremonie z wyprzedzeniem.'},
+];
+document.getElementById('reviews').innerHTML = reviews.map(rv=>{
+  const initials = rv.who.split(' ').map(n=>n[0]).join('');
+  return `<div class="review">
+    <div class="top">
+      <div class="av">${initials}</div>
+      <div><div class="who">${rv.who}</div><div class="date">${rv.date}</div></div>
+      <div class="mini-buckets">${bucketRow(rv.r)}</div>
+    </div>
+    <p>${rv.t}</p>
+  </div>`;
+}).join('');
+
+// ── BILETY I CENY ──────────────────────────────────────────────
+// obiekt sam wybiera model prezentacji ceny: 'day' (za dzień) lub 'hour' (za godzinę)
+const PRICING = {
+  model: 'day',                 // Satama: cena za dzień pobytu
+  amount: 'od 39 €',
+  unit: 'dzień pobytu',
+  note: 'Bilet całodniowy, wstęp do wszystkich stref saunowych i ceremonii.',
+  country: 'Niemcy',
+  ceremoniesIncluded: true,     // czy ceremonie aufguss są w cenie biletu (w NL / Aquapark Wrocław bywają płatne osobno)
+  // karty partnerskie — istotne głównie dla obiektów w Polsce
+  benefitCards: [],             // np. dla obiektu w PL: ['Multisport','Medicover','PZU Sport','FitProfit']
+};
+const unitLabel = PRICING.model==='day' ? 'za dzień pobytu' : 'za godzinę pobytu';
+const cer = PRICING.ceremoniesIncluded
+  ? `<div class="cer-badge in">✓ Ceremonie aufguss w cenie biletu</div>`
+  : `<div class="cer-badge extra">＋ Ceremonie aufguss płatne dodatkowo</div>`;
+document.getElementById('priceModel').innerHTML = `
+  <div class="lbl">🎟️ Średnia cena ${unitLabel}</div>
+  <div class="amount">${PRICING.amount} <small>/ ${PRICING.unit}</small></div>
+  ${cer}`;
+
+const bc = document.getElementById('benefitCards');
+if(PRICING.country==='Polska' && PRICING.benefitCards.length){
+  bc.innerHTML = `<div class="lbl">💳 Karty partnerskie</div>
+    <div class="cards-list">${PRICING.benefitCards.map(c=>`<span class="card-chip">✓ ${c}</span>`).join('')}</div>`;
+} else {
+  bc.innerHTML = `<div class="lbl">💳 Karty partnerskie</div>
+    <div class="cards-na">Obiekt nie honoruje kart partnerskich.</div>`;
+}
+
+// ── AUFGUSSPLAN (przykładowy plan w modalu) ────────────────────
+const plan = [
+  {t:'11:00', th:'Kräuterstube', sa:'Traumzauberbaude', tmp:'80°C'},
+  {t:'12:00', th:'Wenik-Aufguss', sa:'Sibirische Banja', tmp:'70°C'},
+  {t:'12–13', th:'Godzina ciszy (bez aufguss)', sa:'Tuli & Maa', tmp:'90/120°C'},
+  {t:'13:00', th:'Traumzauberbaudenzeit', sa:'Traumzauberbaude', tmp:'80°C'},
+  {t:'14:00', th:'Well-Tainment-Zeit', sa:'SATAMA-Theater', tmp:'85°C'},
+  {t:'14–15', th:'Godzina ciszy (bez aufguss)', sa:'Tiroler Stube', tmp:'50°C'},
+  {t:'15:00', th:'Traumzauberbaudenzeit', sa:'Traumzauberbaude', tmp:'80°C'},
+  {t:'16:00', th:'Wenik-Aufguss', sa:'Sibirische Banja', tmp:'70°C'},
+  {t:'17:00', th:'Well-Tainment-Zeit', sa:'SATAMA-Theater', tmp:'85°C'},
+  {t:'18:00', th:'Rytuał dymny (Räucher)', sa:'Sibirische Banja', tmp:'70°C'},
+  {t:'18–19', th:'Godzina ciszy (bez aufguss)', sa:'Tiroler Stube', tmp:'50°C'},
+  {t:'18:30', th:'SATAMA Klangreise — podróż dźwiękowa', sa:'Banja 1.OG / Traumzauberbaude', tmp:'cisza'},
+  {t:'19:00', th:'Traumzauberbaudenzeit', sa:'SATAMA-Theater / Sibirische Banja', tmp:'80°C'},
+  {t:'20:00', th:'Well-Tainment (Pt–Sob) / Wenik-Aufguss (Nd–Czw)', sa:'SATAMA-Theater / Banja', tmp:'85/70°C'},
+  {t:'20–21', th:'Godzina ciszy (bez aufguss)', sa:'Tuli & Maa', tmp:'90/120°C'},
+  {t:'21:00', th:'Schlafmützenzeit', sa:'Traumzauberbaude', tmp:'80°C'},
+  {t:'22:00', th:'Aufguss Nocnego Stróża', sa:'Sibirische Banja', tmp:'70°C'},
+];
+document.getElementById('planSheet').innerHTML = plan.map(p=>
+  `<div class="plan-row"><span class="t">${p.t}</span><div><div class="th">${p.th}</div><div class="sa">${p.sa}</div></div><span class="tmp">${p.tmp}</span></div>`
+).join('');
+
+// interaktywny wybór oceny w formularzu
+const ratePick = document.getElementById('ratePick');
+let picked = 0;
+function renderPick(){ ratePick.innerHTML = ''; for(let i=1;i<=5;i++){ const wrap=document.createElement('div'); wrap.innerHTML=bucketSVG(i<=picked?'lit':''); const svg=wrap.firstChild; svg.addEventListener('click',()=>{picked=i;renderPick();}); ratePick.appendChild(svg);} }
+renderPick();
+
+// ── MAPA LOKALIZACJI (Leaflet) ─────────────────────────────────
+const VENUE_COORDS = [52.21502, 14.01027];
+const vmap = L.map('venueMap', { zoomControl:true, scrollWheelZoom:false, attributionControl:false }).setView(VENUE_COORDS, 12);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{maxZoom:18}).addTo(vmap);
+L.marker(VENUE_COORDS, { icon: L.divIcon({ className:'', html:'<div class="pin-marker"></div>', iconSize:[28,28], iconAnchor:[14,26] }) })
+  .addTo(vmap).bindPopup('<b>Satama Sauna Resort</b><br>Wendisch-Rietz').openPopup();
+
+// ── „POKAŻ WIĘCEJ" dla sekcji z wieloma elementami ─────────────
+function setupReveal(container, limit, labelMore, labelLess){
+  const items=[...container.children]; if(items.length<=limit) return;
+  const extra=items.slice(limit); extra.forEach(el=>el.style.display='none');
+  const btn=document.createElement('button'); btn.className='show-more-btn'; btn.textContent=labelMore;
+  let open=false;
+  btn.addEventListener('click',()=>{ open=!open; extra.forEach(el=>el.style.display=open?'':'none'); btn.textContent=open?labelLess:labelMore; if(vmap) vmap.invalidateSize(); });
+  container.after(btn);
+}
+setupReveal(document.querySelector('.tiles'), 4, 'Pokaż całą galerię', 'Zwiń galerię');
+setupReveal(document.getElementById('shows'), 3, `Pokaż wszystkie wydarzenia (${myEvents.length})`, 'Zwiń wydarzenia');
+setupReveal(document.getElementById('reviews'), 2, 'Zobacz wszystkie opinie (128)', 'Zwiń opinie');
+</script>
+</body>
+</html>

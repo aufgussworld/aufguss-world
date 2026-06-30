@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maciej Piczura — saunamistrz | aufguss.world</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ember-1:#ff7a3d;--ember-2:#e8552a;--ember-3:#d6491f;
+  --bg:#fbf5ea;--surface:#ffffff;--surface-2:#f3e8d6;
+  --ink:#2a1b10;--ink-dim:#6b5a47;--stone:#8a7960;
+  --line:rgba(42,27,16,0.1);--line-strong:rgba(42,27,16,0.18);
+  --intl:#c43a13;--nat:#b5560f;--local:#9c6c00;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--ink);font-family:'Instrument Sans',sans-serif;}
+h1,h2,h3{font-family:'Fraunces',serif;font-weight:400;}
+em{font-style:italic;color:var(--ember-3);}
+a{color:inherit;text-decoration:none;}
+
+header{display:flex;align-items:center;justify-content:space-between;padding:16px 5vw;border-bottom:1px solid var(--line);background:var(--surface);position:sticky;top:0;z-index:30;}
+.logo{font-family:'Fraunces',serif;font-size:1.25rem;display:flex;align-items:center;gap:9px;}
+.logo img{width:26px;height:26px;}
+.logo .dot{color:var(--ember-2);font-style:italic;}
+.back-link{font-size:0.8rem;color:var(--ink-dim);}
+.back-link:hover{color:var(--ember-2);}
+
+.wrap{max-width:1180px;margin:0 auto;padding:36px clamp(20px,4vw,48px) 90px;}
+
+/* PROFILE HERO */
+.profile-hero{display:grid;grid-template-columns:320px 1fr;gap:40px;align-items:start;margin-bottom:48px;}
+.photo-card{position:relative;border-radius:24px;overflow:hidden;background:var(--surface-2);box-shadow:0 18px 50px rgba(42,27,16,0.12);aspect-ratio:4/5;}
+.photo-card img{width:100%;height:100%;object-fit:cover;display:block;}
+.photo-fallback{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:4rem;color:#fff6ea;background:linear-gradient(150deg,#ffd9a8,#ff8a3d 55%,#e8552a);}
+.rank-ribbon{position:absolute;top:16px;left:16px;display:inline-flex;align-items:center;gap:8px;background:linear-gradient(120deg,#ff8a3d,#e8552a);color:#fff6ea;padding:8px 14px;border-radius:100px;font-size:0.78rem;font-weight:600;box-shadow:0 6px 18px rgba(42,27,16,0.3);}
+.rank-ribbon .lvl{font-family:'Fraunces',serif;}
+.photo-flag{position:absolute;bottom:16px;right:16px;width:38px;border-radius:4px;box-shadow:0 3px 10px rgba(0,0,0,0.35);}
+
+.p-info .kicker{font-size:0.74rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--ember-2);font-weight:600;margin-bottom:10px;display:block;}
+.p-info h1{font-size:clamp(2.2rem,4vw,3.2rem);line-height:1.02;margin-bottom:14px;}
+.p-meta{display:flex;flex-wrap:wrap;gap:8px 20px;color:var(--ink-dim);font-size:0.92rem;margin-bottom:22px;}
+.p-meta span{display:inline-flex;align-items:center;gap:7px;}
+.p-meta img{width:18px;border-radius:2px;}
+.p-meta b{color:var(--ink);font-weight:600;}
+.venue-link{border-bottom:1px solid rgba(232,85,42,0.4);transition:border-color .2s,color .2s;}
+.venue-link b{color:var(--ember-2);}
+.venue-link:hover{border-color:var(--ember-2);}
+.venue-link:hover b{color:var(--ember-3);}
+.fact a.venue-link{display:inline-block;}
+
+.skills{display:flex;flex-wrap:wrap;gap:9px;margin-bottom:24px;}
+.skill{display:inline-flex;align-items:center;gap:7px;padding:8px 14px;border-radius:100px;font-size:0.8rem;font-weight:600;border:1px solid transparent;}
+.skill.active{background:rgba(255,122,61,0.12);color:var(--ember-3);border-color:rgba(255,122,61,0.35);}
+.skill.inactive{background:transparent;color:var(--stone);border-color:var(--line-strong);font-weight:400;}
+.skill .ic{font-size:0.95rem;}
+
+.quote{border-left:3px solid var(--ember-1);padding:6px 0 6px 18px;font-family:'Fraunces',serif;font-style:italic;font-size:1.15rem;line-height:1.5;color:var(--ink);max-width:560px;margin-bottom:26px;}
+.p-actions{display:flex;gap:12px;flex-wrap:wrap;}
+.btn{display:inline-flex;align-items:center;gap:9px;padding:13px 24px;font-size:0.76rem;letter-spacing:0.08em;text-transform:uppercase;font-weight:600;border-radius:100px;cursor:pointer;border:none;transition:transform .3s,box-shadow .3s,border-color .3s;}
+.btn-fire{background:linear-gradient(120deg,#ff8a3d,#ff5a3d);color:#2a0e02;box-shadow:0 8px 24px rgba(255,90,50,0.3);}
+.btn-fire:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(255,90,50,0.42);}
+.btn-ghost{border:1px solid var(--line-strong);color:var(--ink);background:var(--surface);}
+.btn-ghost:hover{border-color:var(--ember-1);color:var(--ember-2);}
+
+/* QUICK FACTS */
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px;margin-bottom:56px;}
+.fact{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px 20px;}
+.fact .lbl{font-size:0.68rem;text-transform:uppercase;letter-spacing:0.09em;color:var(--stone);margin-bottom:8px;display:flex;align-items:center;gap:7px;}
+.fact .val{font-size:0.96rem;font-weight:600;color:var(--ink);line-height:1.4;}
+.fact .val .tag{display:inline-block;font-size:0.74rem;font-weight:500;background:var(--surface-2);color:var(--ink-dim);padding:3px 10px;border-radius:100px;margin:3px 4px 0 0;}
+
+/* SECTION */
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:24px;}
+.sec-head h2{font-size:clamp(1.5rem,2.6vw,2.1rem);}
+.sec-head .count{font-size:0.82rem;color:var(--stone);}
+section.block{margin-bottom:56px;}
+
+/* BIO + ACHIEVEMENTS */
+.bio-grid{display:grid;grid-template-columns:1.1fr 0.9fr;gap:40px;align-items:start;}
+.bio p{color:var(--ink-dim);line-height:1.8;margin-bottom:16px;font-size:1.02rem;}
+.timeline{position:relative;padding-left:26px;}
+.timeline::before{content:'';position:absolute;left:7px;top:6px;bottom:6px;width:2px;background:linear-gradient(var(--ember-1),var(--surface-2));}
+.tl-item{position:relative;margin-bottom:22px;}
+.tl-item::before{content:'';position:absolute;left:-23px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--ember-2);border:2px solid var(--bg);}
+.tl-item .yr{font-family:'Fraunces',serif;font-size:1.05rem;color:var(--ember-3);margin-bottom:2px;}
+.tl-item .ev{font-size:0.92rem;color:var(--ink);font-weight:500;}
+.tl-item .pl{font-size:0.8rem;color:var(--stone);margin-top:2px;}
+.medal{margin-right:6px;}
+
+/* UPCOMING */
+.shows{display:flex;flex-direction:column;gap:12px;}
+.show{display:grid;grid-template-columns:64px 1fr auto;gap:18px;align-items:center;background:var(--surface);border:1px solid var(--line);border-left:3px solid;border-radius:14px;padding:14px 18px;transition:box-shadow .2s,transform .2s;}
+.show:hover{box-shadow:0 10px 26px rgba(42,27,16,0.08);transform:translateX(3px);}
+.show.intl{border-left-color:var(--intl);}.show.nat{border-left-color:var(--nat);}.show.local{border-left-color:var(--local);}
+.show .date{text-align:center;}
+.show .date .d{font-family:'Fraunces',serif;font-size:1.6rem;line-height:1;color:var(--ink);}
+.show .date .m{font-size:0.68rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--stone);}
+.show .mid h4{font-size:0.98rem;font-weight:600;margin-bottom:4px;}
+.show .mid .v{font-size:0.8rem;color:var(--ink-dim);display:flex;align-items:center;gap:6px;}
+.show .mid .v img{width:16px;border-radius:2px;}
+.show .role{font-size:0.72rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;padding:5px 12px;border-radius:100px;background:var(--surface-2);color:var(--ink-dim);white-space:nowrap;}
+
+/* GALLERY (a'la sauna Instagram, z podziałem na wydarzenia) */
+.album{margin-bottom:30px;}
+.album-head{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.album-head .scope-dot{width:10px;height:10px;border-radius:50%;}
+.album-head h4{font-size:1.05rem;font-weight:600;font-family:'Instrument Sans';}
+.album-head .meta{font-size:0.76rem;color:var(--stone);margin-left:auto;}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;}
+.tile{aspect-ratio:1;border-radius:12px;overflow:hidden;position:relative;cursor:pointer;display:flex;align-items:flex-end;padding:10px;color:#fff6ea;font-size:0.72rem;font-weight:600;transition:transform .25s;}
+.tile:hover{transform:scale(1.02);}
+.tile::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(42,15,5,0.45),transparent 60%);}
+.tile span{position:relative;z-index:1;}
+.t1{background:linear-gradient(150deg,#ffd9a8,#ff8a3d);}
+.t2{background:linear-gradient(150deg,#ff8a3d,#e8552a);}
+.t3{background:linear-gradient(150deg,#e8552a,#a8320f);}
+.t4{background:linear-gradient(150deg,#ffc178,#d6491f);}
+.tile.more{background:var(--surface-2);color:var(--ink-dim);align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:1.1rem;}
+.show-more-btn{display:block;margin:18px auto 0;padding:11px 26px;border-radius:100px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);font:600 0.8rem/1 'Instrument Sans';letter-spacing:0.04em;text-transform:uppercase;cursor:pointer;transition:all .2s;}
+.show-more-btn:hover{border-color:var(--ember-1);color:var(--ember-2);}
+
+@media(max-width:860px){
+  .profile-hero{grid-template-columns:1fr;gap:26px;}
+  .photo-card{max-width:300px;aspect-ratio:4/5;}
+  .bio-grid{grid-template-columns:1fr;gap:30px;}
+}
+@media(max-width:560px){
+  .show{grid-template-columns:54px 1fr;}
+  .show .role{grid-column:2;justify-self:start;margin-top:4px;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><img src="../assets/logo-mark.svg">aufguss<span class="dot">.</span>world</div>
+  <a href="index.html" class="back-link">← Społeczność</a>
+</header>
+
+<div class="wrap">
+
+  <div class="profile-hero">
+    <div class="photo-card">
+      <span class="rank-ribbon"><span class="lvl">X</span> Pro Master</span>
+      <img src="../assets/saunamaster-maciej.jpg?v=4" alt="Maciej Piczura" decoding="sync"
+           onerror="this.outerHTML='<div class=\'photo-fallback\'>MP</div>'">
+    </div>
+    <div class="p-info">
+      <span class="kicker">Profil saunamistrza</span>
+      <h1>Maciej Piczura</h1>
+      <div class="p-meta">
+        <span><img src="https://flagcdn.com/20x15/pl.png"> Pochodzenie: <b>Ciche, Podhale</b></span>
+        <span>🏠 Obiekt macierzysty: <a href="object.html" class="venue-link"><b>Chochołowskie Termy</b></a></span>
+        <span>🎂 <b>26 lat</b></span>
+      </div>
+      <div class="skills">
+        <span class="skill active"><span class="ic">🎭</span> Zawodnik</span>
+        <span class="skill active"><span class="ic">🎓</span> Trener Aufguss</span>
+        <span class="skill inactive"><span class="ic">⚖️</span> Sędzia <span style="opacity:.7;font-size:0.72rem">— brak</span></span>
+      </div>
+      <blockquote class="quote">„Najważniejsze, żeby publiczność poczuła emocje — żeby był kontakt między mną a gośćmi. Sauna to styl życia, nie zawody."</blockquote>
+      <div class="p-actions">
+        <a href="calendar.html" class="btn btn-fire">📅 Kalendarz występów</a>
+        <a href="#galeria" class="btn btn-ghost">Zobacz galerię</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="facts">
+    <div class="fact"><div class="lbl">📍 Obiekt macierzysty</div><div class="val"><a href="object.html" class="venue-link"><b>Chochołowskie Termy</b></a><br><span style="font-weight:400;color:var(--ink-dim);font-size:0.84rem">Chochołów, Polska</span></div></div>
+    <div class="fact"><div class="lbl">🌿 Ulubione aromaty</div><div class="val" style="font-weight:400"><span class="tag">Cedr syberyjski</span><span class="tag">Mięta pieprzowa</span><span class="tag">Pomarańcza & imbir</span></div></div>
+    <div class="fact"><div class="lbl">🎭 Ulubiony styl ceremonii</div><div class="val" style="font-weight:400"><span class="tag">Freestyle</span><span class="tag">Modern Classic</span></div></div>
+    <div class="fact"><div class="lbl">⭐ Ulubiony turniej</div><div class="val">The Battle of Gladiators<br><span style="font-weight:400;color:var(--ink-dim);font-size:0.84rem">Termy Rzymskie, Czeladź</span></div></div>
+  </div>
+
+  <section class="block">
+    <div class="bio-grid">
+      <div class="bio">
+        <div class="sec-head"><h2>Bio</h2></div>
+        <p>26-letni saunamistrz rodem z <em>Ciche</em> na Podhalu, na co dzień związany z obiektem <em>Chochołowskie Termy</em>. Jeden z najbardziej rozpoznawalnych zawodników polskiej i międzynarodowej sceny aufguss — zamienił rytuał z ręcznikiem w prawdziwe widowisko, łączące choreografię, muzykę i opowieść.</p>
+        <p>Mistrz Świata Aufguss, wielokrotny medalista turniejów rangi światowej i finalista Mistrzostw Polski. Jako <em>Aufguss Master Trainer</em> dzieli się wiedzą na warsztatach, pomagając kolejnym saunamistrzom wejść na arenę międzynarodową. Poza rywalizacją powtarza, że sauna to przede wszystkim styl życia i kontakt z drugim człowiekiem.</p>
+      </div>
+      <div class="achievements">
+        <div class="sec-head"><h2>Osiągnięcia</h2></div>
+        <div class="timeline">
+          <div class="tl-item"><div class="yr">2024</div><div class="ev"><span class="medal">🥇</span>Mistrz Świata Aufguss WCF</div><div class="pl">The Battle of Gladiators — Termy Rzymskie, Czeladź</div></div>
+          <div class="tl-item"><div class="yr">2023</div><div class="ev"><span class="medal">🥇</span>Mistrz Świata Aufguss WCF</div><div class="pl">The Battle of Gladiators</div></div>
+          <div class="tl-item"><div class="yr">2022</div><div class="ev"><span class="medal">🥇</span>Mistrz Świata Aufguss WM</div><div class="pl">Thermen Bussloo, Voorst (Holandia)</div></div>
+          <div class="tl-item"><div class="yr">2022</div><div class="ev"><span class="medal">🥈</span>Wicemistrz & Nagroda Publiczności</div><div class="pl">Mistrzostwa Polski Saunamistrzów</div></div>
+          <div class="tl-item"><div class="yr">2025</div><div class="ev"><span class="medal">🎖️</span>6. miejsce — Modern Classic Cup Poland</div></div>
+          <div class="tl-item"><div class="yr">TV</div><div class="ev"><span class="medal">⭐</span>Uczestnik „Mam Talent" (TVN)</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="sec-head"><h2>Najbliższe występy</h2><span class="count" id="showsCount"></span></div>
+    <div class="shows" id="shows"></div>
+  </section>
+
+  <section class="block" id="galeria">
+    <div class="sec-head"><h2>Galeria</h2><span class="count">z podziałem na wydarzenia — saunowy feed Macieja</span></div>
+    <div id="albums"></div>
+  </section>
+
+</div>
+
+<script src="../data/events-data.js"></script>
+<script>
+const MASTER = "Maciej Piczura";
+const EVENTS = window.AUFGUSS_EVENTS || [];
+const scopeClass = { miedzynarodowe:'intl', krajowe:'nat', lokalne:'local' };
+const scopeColor = { miedzynarodowe:'var(--intl)', krajowe:'var(--nat)', lokalne:'var(--local)' };
+const MONTHS = ['sty','lut','mar','kwi','maj','cze','lip','sie','wrz','paź','lis','gru'];
+function parse(s){ const [y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d); }
+
+// występy = wydarzenia, w których występuje ten saunamistrz (ten sam zbiór co kalendarz)
+const myEvents = EVENTS
+  .filter(e=>e.masters.some(m=>m.name===MASTER))
+  .sort((a,b)=>parse(a.start)-parse(b.start));
+
+const showsEl = document.getElementById('shows');
+document.getElementById('showsCount').textContent = `${myEvents.length} wydarzeń w kalendarzu`;
+myEvents.forEach(e=>{
+  const role = e.masters.find(m=>m.name===MASTER).role;
+  const d = parse(e.start);
+  const el = document.createElement('div');
+  el.className = `show ${scopeClass[e.scope]}`;
+  el.innerHTML = `
+    <div class="date"><div class="d">${d.getDate()}</div><div class="m">${MONTHS[d.getMonth()]}</div></div>
+    <div class="mid"><h4>${e.title}</h4><div class="v"><img src="https://flagcdn.com/20x15/${e.venue.flag}.png"> ${e.venue.name}, ${e.venue.city}</div></div>
+    <div class="role">${role}</div>`;
+  showsEl.appendChild(el);
+});
+
+// galeria — albumy pogrupowane po wydarzeniu (placeholdery; docelowo zdjęcia z występów)
+const albums = [
+  { title:"The Battle of Gladiators 2024", scope:"miedzynarodowe", venue:"Termy Rzymskie, Czeladź", photos:9, classes:['t3','t2','t4','t1'] },
+  { title:"Aufguss WM — Thermen Bussloo 2022", scope:"miedzynarodowe", venue:"Voorst, Holandia", photos:12, classes:['t2','t4','t1','t3'] },
+  { title:"Noc aufguss — Show pod Tatrami", scope:"lokalne", venue:"Chochołowskie Termy", photos:6, classes:['t1','t4','t2'] },
+  { title:"Ceremonie autorskie", scope:"lokalne", venue:"Chochołowskie Termy", photos:21, classes:['t4','t1','t3','t2'] },
+];
+const albumsEl = document.getElementById('albums');
+albums.forEach(a=>{
+  const tiles = a.classes.map((c,i)=>`<div class="tile ${c}"><span>${a.title.split(' ').slice(0,2).join(' ')}</span></div>`).join('');
+  const more = a.photos>a.classes.length ? `<div class="tile more">+${a.photos-a.classes.length}</div>` : '';
+  const block = document.createElement('div');
+  block.className='album';
+  block.innerHTML = `
+    <div class="album-head">
+      <span class="scope-dot" style="background:${scopeColor[a.scope]}"></span>
+      <h4>${a.title}</h4>
+      <span class="meta">${a.venue} · ${a.photos} zdjęć</span>
+    </div>
+    <div class="tiles">${tiles}${more}</div>`;
+  albumsEl.appendChild(block);
+});
+
+// ── „POKAŻ WIĘCEJ" dla list, które będą rosły ──────────────────
+function setupReveal(container, limit, labelMore, labelLess){
+  const items=[...container.children]; if(items.length<=limit) return;
+  const extra=items.slice(limit); extra.forEach(el=>el.style.display='none');
+  const btn=document.createElement('button'); btn.className='show-more-btn'; btn.textContent=labelMore;
+  let open=false;
+  btn.addEventListener('click',()=>{ open=!open; extra.forEach(el=>el.style.display=open?'':'none'); btn.textContent=open?labelLess:labelMore; });
+  container.after(btn);
+}
+setupReveal(showsEl, 3, `Pokaż wszystkie występy (${myEvents.length})`, 'Zwiń występy');
+setupReveal(albumsEl, 2, 'Pokaż całą galerię', 'Zwiń galerię');
+</script>
+</body>
+</html>

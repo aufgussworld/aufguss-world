@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mapa obiektów — aufguss.world</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{
+  --ember-1:#ff7a3d;--ember-2:#e8552a;--ember-3:#d6491f;
+  --bg:#fbf5ea;--surface:#ffffff;--surface-2:#f3e8d6;
+  --ink:#2a1b10;--ink-dim:#6b5a47;--stone:#8a7960;
+  --line:rgba(42,27,16,0.1);--line-strong:rgba(42,27,16,0.18);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--ink);font-family:'Instrument Sans',sans-serif;}
+h1,h2,h3{font-family:'Fraunces',serif;font-weight:400;}
+a{color:inherit;text-decoration:none;}
+
+header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 5vw;border-bottom:1px solid var(--line);
+  background:var(--surface);
+}
+.logo{font-family:'Fraunces',serif;font-size:1.25rem;display:flex;align-items:center;gap:9px;}
+.logo img{width:26px;height:26px;}
+.logo .dot{color:var(--ember-2);font-style:italic;}
+.back-link{font-size:0.8rem;color:var(--ink-dim);display:flex;align-items:center;gap:8px;}
+.back-link:hover{color:var(--ember-2);}
+
+.layout{display:grid;grid-template-columns:380px 1fr;height:calc(100vh - 61px);}
+
+.sidebar{
+  background:var(--surface);
+  border-right:1px solid var(--line);
+  display:flex;flex-direction:column;
+  overflow:hidden;
+}
+.sidebar-head{padding:22px 22px 18px;border-bottom:1px solid var(--line);}
+.sidebar-head h2{font-size:1.3rem;margin-bottom:4px;}
+.sidebar-head .count{font-size:0.78rem;color:var(--ink-dim);margin-bottom:16px;}
+
+.filter-list{display:flex;flex-direction:column;gap:2px;}
+.filter-row{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 10px;border-radius:9px;cursor:pointer;
+  transition:background .15s;font-size:0.85rem;
+  user-select:none;
+}
+.filter-row:hover{background:var(--surface-2);}
+.filter-row.all-row{font-weight:600;border-bottom:1px solid var(--line);margin-bottom:4px;padding-bottom:10px;}
+.filter-row input{
+  appearance:none;width:17px;height:17px;border-radius:5px;
+  border:1.5px solid var(--line-strong);background:var(--surface);
+  cursor:pointer;flex-shrink:0;position:relative;transition:all .15s;
+}
+.filter-row input:checked{background:var(--ember-1);border-color:var(--ember-1);}
+.filter-row input:checked::after{
+  content:'';position:absolute;left:5px;top:1px;width:4px;height:9px;
+  border:solid white;border-width:0 2px 2px 0;transform:rotate(45deg);
+}
+.filter-row .n{margin-left:auto;font-size:0.72rem;color:var(--stone);background:var(--surface-2);padding:2px 8px;border-radius:100px;}
+
+.card-list{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;}
+.card-list::-webkit-scrollbar{width:6px;}
+.card-list::-webkit-scrollbar-thumb{background:rgba(255,122,61,0.35);border-radius:10px;}
+
+.obj-card{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:15px 17px;
+  cursor:pointer;
+  transition:border-color .25s, transform .25s, background .25s, box-shadow .25s;
+  position:relative;
+}
+.obj-card:hover, .obj-card.highlight{
+  border-color:var(--ember-1);
+  background:linear-gradient(135deg, rgba(255,122,61,0.1), var(--surface));
+  transform:translateX(4px);
+  box-shadow:0 8px 20px rgba(42,27,16,0.08);
+}
+.obj-card .top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;gap:8px;}
+.obj-card h4{font-size:0.96rem;font-weight:600;font-family:'Instrument Sans';line-height:1.3;}
+.obj-card .flag{width:18px;border-radius:2px;flex-shrink:0;margin-top:2px;}
+.obj-card .city{font-size:0.78rem;color:var(--stone);margin-bottom:8px;}
+.obj-card .tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;}
+.obj-card .tag-pill{font-size:0.66rem;padding:3px 9px;border-radius:100px;background:var(--surface-2);color:var(--ink-dim);}
+.obj-card .next-event{margin-top:6px;font-size:0.74rem;color:var(--ember-3);display:flex;align-items:center;gap:6px;}
+.empty-state{padding:40px 20px;text-align:center;color:var(--stone);font-size:0.85rem;}
+
+#map{height:100%;width:100%;background:#dfe6e0;}
+
+.leaflet-popup-content-wrapper{background:var(--surface);color:var(--ink);border-radius:14px;border:1px solid var(--line-strong);box-shadow:0 12px 30px rgba(42,27,16,0.18);}
+.leaflet-popup-tip{background:var(--surface);}
+.leaflet-popup-content{font-family:'Instrument Sans';margin:14px 16px;}
+.leaflet-popup-content h4{font-family:'Fraunces',serif;font-size:1.1rem;margin-bottom:6px;}
+.leaflet-popup-content p{font-size:0.78rem;color:var(--ink-dim);margin-bottom:8px;}
+.leaflet-popup-content a{color:var(--ember-2);font-size:0.76rem;font-weight:600;}
+.leaflet-control-zoom a{background:var(--surface)!important;color:var(--ink)!important;border-color:var(--line)!important;}
+
+.pin-marker{
+  width:30px;height:30px;border-radius:50% 50% 50% 0;
+  background:linear-gradient(135deg, var(--ember-1), var(--ember-3));
+  transform:rotate(-45deg);
+  box-shadow:0 4px 14px rgba(42,27,16,0.4);
+  border:2px solid #fff8ee;
+  transition:transform .25s, box-shadow .25s;
+}
+.pin-marker.active{transform:rotate(-45deg) scale(1.3);box-shadow:0 0 0 8px rgba(255,122,61,0.3), 0 4px 18px rgba(42,27,16,0.5);}
+
+/* ── RESPONSYWNOŚĆ ── */
+@media(max-width:1100px){ .layout{grid-template-columns:320px 1fr;} }
+@media(max-width:820px){
+  header{flex-wrap:wrap;gap:6px;padding:12px 5vw;}
+  .back-link{font-size:0.78rem;}
+  .layout{grid-template-columns:1fr;height:auto;}
+  #map{height:50vh;min-height:300px;order:-1;}
+  .sidebar{border-right:none;border-top:1px solid var(--line);overflow:visible;max-height:none;}
+  .card-list{overflow:visible;max-height:none;}
+  .sidebar-head{position:sticky;top:0;background:var(--surface);z-index:5;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo"><img src="../assets/logo-mark.svg">aufguss<span class="dot">.</span>world</div>
+  <a href="index.html" class="back-link">← Wróć do strony głównej</a>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <h2>Obiekty saunowe</h2>
+      <div class="count" id="sidebarCount">107 obiektów</div>
+      <div class="filter-list" id="filterList"></div>
+    </div>
+    <div class="card-list" id="cardList"></div>
+  </aside>
+  <div id="map"></div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="../data/objects-data.js"></script>
+<script>
+const objects = window.AUFGUSS_OBJECTS || [];
+const countries = [...new Set(objects.map(o=>o.country))];
+let selected = new Set(countries); // all selected by default
+
+const map = L.map('map', { zoomControl:true, attributionControl:false }).setView([50.5, 12], 5);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { maxZoom:18 }).addTo(map);
+
+const markerLayer = L.layerGroup().addTo(map);
+const markers = {};
+
+function pinIcon(active){
+  return L.divIcon({ className:'', html:`<div class="pin-marker${active?' active':''}"></div>`, iconSize:[30,30], iconAnchor:[15,28] });
+}
+
+function setHighlight(id, on){
+  const card = document.getElementById('card-'+id);
+  if(card) card.classList.toggle('highlight', on);
+  const m = markers[id];
+  if(m) m.setIcon(pinIcon(on));
+}
+
+function rebuildMarkers(){
+  markerLayer.clearLayers();
+  Object.keys(markers).forEach(k=>delete markers[k]);
+  objects.filter(o=>selected.has(o.country)).forEach(o=>{
+    const m = L.marker([o.lat,o.lng], { icon: pinIcon(false) });
+    m.bindPopup(`<h4>${o.name}</h4><p>${o.city ? o.city+', ' : ''}${o.country}</p><a href="#">Zobacz wizytówkę →</a>`);
+    m.on('mouseover', ()=> setHighlight(o.id, true));
+    m.on('mouseout', ()=> setHighlight(o.id, false));
+    m.on('click', ()=> { document.getElementById('card-'+o.id)?.scrollIntoView({behavior:'smooth', block:'center'}); });
+    m.addTo(markerLayer);
+    markers[o.id] = m;
+  });
+}
+
+const cardList = document.getElementById('cardList');
+const sidebarCount = document.getElementById('sidebarCount');
+
+function renderCards(){
+  cardList.innerHTML='';
+  const visible = objects.filter(o=>selected.has(o.country));
+  sidebarCount.textContent = `${visible.length} obiektów`;
+  if(!visible.length){
+    cardList.innerHTML = `<div class="empty-state">Brak obiektów dla wybranych krajów.</div>`;
+    return;
+  }
+  visible.forEach(o=>{
+    const el = document.createElement('div');
+    el.className='obj-card';
+    el.id='card-'+o.id;
+    el.innerHTML = `
+      <div class="top"><h4>${o.name}</h4><img class="flag" src="https://flagcdn.com/20x15/${o.flag}.png"></div>
+      <div class="city">${o.city ? o.city+', ' : ''}${o.country}</div>
+      ${o.tags.length ? `<div class="tags">${o.tags.map(t=>`<span class="tag-pill">${t}</span>`).join('')}</div>` : ''}
+      <div class="next-event">● ${o.next}</div>
+    `;
+    el.addEventListener('mouseenter', ()=>{ setHighlight(o.id, true); markers[o.id]?.openPopup(); });
+    el.addEventListener('mouseleave', ()=>{ setHighlight(o.id, false); });
+    el.addEventListener('click', ()=>{ map.flyTo([o.lat,o.lng], 9, {duration:0.8}); markers[o.id]?.openPopup(); });
+    cardList.appendChild(el);
+  });
+}
+
+function refresh(){ rebuildMarkers(); renderCards(); }
+
+const filterList = document.getElementById('filterList');
+
+function buildAllRow(){
+  const row = document.createElement('label');
+  row.className='filter-row all-row';
+  row.innerHTML = `<input type="checkbox" id="allCheck"><span>Wszystkie kraje</span>`;
+  filterList.appendChild(row);
+  const cb = row.querySelector('input');
+  cb.checked = selected.size === countries.length;
+  cb.addEventListener('change', ()=>{
+    if(cb.checked){ selected = new Set(countries); } else { selected = new Set(); }
+    syncCheckboxes();
+    refresh();
+  });
+  return cb;
+}
+
+const countryCheckboxes = [];
+function buildCountryRows(){
+  countries.forEach(c=>{
+    const count = objects.filter(o=>o.country===c).length;
+    const row = document.createElement('label');
+    row.className='filter-row';
+    row.innerHTML = `<input type="checkbox" checked><span>${c}</span><span class="n">${count}</span>`;
+    filterList.appendChild(row);
+    const cb = row.querySelector('input');
+    countryCheckboxes.push({cb, country:c});
+    cb.addEventListener('change', ()=>{
+      if(cb.checked) selected.add(c); else selected.delete(c);
+      allCheck.checked = selected.size === countries.length;
+      refresh();
+    });
+  });
+}
+
+function syncCheckboxes(){
+  countryCheckboxes.forEach(({cb,country})=>{ cb.checked = selected.has(country); });
+}
+
+const allCheck = buildAllRow();
+buildCountryRows();
+refresh();
+</script>
+</body>
+</html>
