@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700&display=swap" rel="stylesheet">
 <style>
+.brand{height:40px;width:auto;display:block;}
 :root{
   --ember-1:#ff7a3d;--ember-2:#e8552a;--ember-3:#d6491f;
   --bg:#fbf5ea;--surface:#ffffff;--surface-2:#f3e8d6;
@@ -65,6 +66,10 @@ header{display:flex;align-items:center;justify-content:space-between;padding:16p
 .btn-fire:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(255,90,50,0.42);}
 .btn-ghost{border:1px solid var(--line-strong);color:var(--ink);background:var(--surface);}
 .btn-ghost:hover{border-color:var(--ember-1);color:var(--ember-2);}
+.btn svg{width:17px;height:17px;}
+.p-soc{width:46px;height:46px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line-strong);color:var(--ember-3);background:var(--surface);transition:all .2s;}
+.p-soc svg{width:20px;height:20px;}
+.p-soc:hover{background:linear-gradient(120deg,#ff8a3d,#e8552a);color:#fff;border-color:transparent;transform:translateY(-2px);}
 
 /* QUICK FACTS */
 .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px;margin-bottom:56px;}
@@ -137,7 +142,7 @@ section.block{margin-bottom:56px;}
 <body>
 
 <header>
-  <div class="logo"><img src="../assets/logo-mark.svg">aufguss<span class="dot">.</span>world</div>
+  <a href="index.html"><img class="brand" src="../assets/brand-logo-trim.png" alt="aufguss.world"></a>
   <a href="index.html" class="back-link">← Społeczność</a>
 </header>
 
@@ -164,8 +169,10 @@ section.block{margin-bottom:56px;}
       </div>
       <blockquote class="quote">„Najważniejsze, żeby publiczność poczuła emocje — żeby był kontakt między mną a gośćmi. Sauna to styl życia, nie zawody."</blockquote>
       <div class="p-actions">
-        <a href="calendar.html" class="btn btn-fire">📅 Kalendarz występów</a>
+        <a href="calendar.html" class="btn btn-fire"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="17" rx="2"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/></svg> Kalendarz występów</a>
         <a href="#galeria" class="btn btn-ghost">Zobacz galerię</a>
+        <a href="https://facebook.com" target="_blank" rel="noopener" class="p-soc" title="Facebook" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 22v-8h2.8l.42-3.2H13.5V8.75c0-.93.26-1.56 1.6-1.56h1.7V4.3c-.3-.04-1.3-.13-2.48-.13-2.46 0-4.14 1.5-4.14 4.26v2.34H7.4V14h2.28v8z"/></svg></a>
+        <a href="https://instagram.com" target="_blank" rel="noopener" class="p-soc" title="Instagram" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5.2"/><circle cx="12" cy="12" r="4"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none"/></svg></a>
       </div>
     </div>
   </div>

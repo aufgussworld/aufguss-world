@@ -26,8 +26,8 @@ a{color:inherit;text-decoration:none;}
 header{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:24px;
   padding:14px 5vw;backdrop-filter:blur(10px);background:rgba(251,245,234,0.66);border-bottom:1px solid transparent;transition:background .3s,padding .3s,border-color .3s;}
 header.scrolled{background:rgba(251,245,234,0.97);padding:9px 5vw;border-bottom:1px solid var(--line);}
-.brand{height:40px;width:auto;display:block;}
-header.scrolled .brand{height:34px;}
+.brand{height:56px;width:auto;display:block;transition:height .3s ease;}
+header.scrolled .brand{height:36px;}
 nav{display:flex;gap:30px;font-size:0.8rem;letter-spacing:0.04em;text-transform:uppercase;}
 nav a{position:relative;opacity:0.75;transition:opacity .25s;color:var(--ink);white-space:nowrap;}
 nav a:hover{opacity:1;}
@@ -76,11 +76,21 @@ nav a:hover::after{width:100%;}
 /* SEARCH */
 .hero-search{position:relative;max-width:640px;}
 .hs-bar{display:flex;align-items:stretch;background:rgba(255,250,242,0.97);border-radius:100px;padding:6px;box-shadow:0 20px 50px rgba(20,8,2,0.45);}
-.hs-scope{border:none;background:transparent;font-family:inherit;font-size:0.86rem;font-weight:600;color:var(--ink);padding:0 14px 0 18px;cursor:pointer;outline:none;border-right:1px solid var(--line);}
-.hs-input{flex:1;border:none;background:transparent;font-family:inherit;font-size:0.98rem;color:var(--ink);padding:14px 16px;outline:none;}
+.hs-scope-dd{position:relative;flex-shrink:0;border-right:1px solid var(--line);display:flex;}
+.hs-scope-btn{display:flex;align-items:center;gap:7px;border:none;background:transparent;font-family:inherit;font-size:0.86rem;font-weight:600;color:var(--ink);padding:0 14px 0 18px;cursor:pointer;white-space:nowrap;}
+.hs-scope-btn svg{width:13px;height:13px;opacity:0.5;transition:transform .2s;}
+.hs-scope-dd.open .hs-scope-btn svg{transform:rotate(180deg);}
+.hs-scope-menu{position:absolute;top:calc(100% + 12px);left:0;min-width:200px;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:0 20px 50px rgba(20,8,2,0.3);padding:7px;opacity:0;visibility:hidden;transform:translateY(-6px);transition:all .18s;z-index:6;}
+.hs-scope-dd.open .hs-scope-menu{opacity:1;visibility:visible;transform:translateY(0);}
+.hs-scope-opt{padding:10px 13px;border-radius:9px;font-size:0.86rem;font-weight:500;color:var(--ink);cursor:pointer;transition:background .15s;}
+.hs-scope-opt:hover{background:var(--surface-2);}
+.hs-scope-opt.active{background:rgba(255,122,61,0.12);color:var(--ember-3);font-weight:600;}
+.hs-input{flex:1;min-width:0;border:none;background:transparent;font-family:inherit;font-size:0.98rem;color:var(--ink);padding:14px 16px;outline:none;}
 .hs-input::placeholder{color:var(--stone);}
-.hs-btn{border:none;background:linear-gradient(120deg,#ff8a3d,#ff5a3d);color:#2a0e02;width:52px;border-radius:100px;font-size:1.1rem;cursor:pointer;transition:transform .2s;flex-shrink:0;}
+.hs-btn{border:none;background:linear-gradient(120deg,#ff8a3d,#ff5a3d);color:#2a0e02;width:52px;border-radius:100px;cursor:pointer;transition:transform .2s;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
 .hs-btn:hover{transform:scale(1.05);}
+.hs-btn svg{width:20px;height:20px;}
+.hs-res .ico svg{width:18px;height:18px;color:var(--ember-3);}
 .hs-results{position:absolute;top:calc(100% + 10px);left:0;right:0;background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:0 24px 60px rgba(20,8,2,0.35);padding:8px;max-height:360px;overflow:auto;display:none;}
 .hs-results.show{display:block;}
 .hs-res{display:flex;align-items:center;gap:12px;padding:11px 13px;border-radius:12px;cursor:pointer;color:var(--ink);}
@@ -175,8 +185,12 @@ section{position:relative;z-index:2;padding:120px 5vw;}
 .rank-advanced{background:rgba(255,140,60,0.16);color:#b5560f;}
 .rank-expert{background:rgba(232,85,42,0.14);color:#c43a13;}
 .rank-promaster{background:linear-gradient(120deg,#ff8a3d,#e8552a);color:#fff6ea;}
-.master-cal{margin-top:auto;display:flex;align-items:center;gap:8px;font-size:0.76rem;font-weight:600;color:var(--ember-2);padding-top:11px;border-top:1px solid var(--line);}
-.master-cal.disabled{color:var(--stone);font-weight:400;}
+.master-actions{margin-top:auto;display:flex;align-items:center;gap:8px;padding-top:11px;border-top:1px solid var(--line);}
+.soc{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;background:var(--surface-2);color:var(--ember-3);transition:all .2s;flex-shrink:0;}
+.soc svg{width:16px;height:16px;}
+.soc:hover{background:linear-gradient(120deg,#ff8a3d,#e8552a);color:#fff;transform:translateY(-2px);}
+.soc.cal{margin-right:auto;width:auto;padding:0 13px;gap:7px;font-size:0.74rem;font-weight:600;}
+.master-card h4 a{color:inherit;}
 
 /* NEWS */
 .news-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
@@ -196,6 +210,7 @@ section{position:relative;z-index:2;padding:120px 5vw;}
 .news-card .more{font-size:0.78rem;font-weight:600;color:var(--ember-2);}
 .news-card .fb{width:30px;height:30px;border-radius:50%;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:0.9rem;color:var(--ink-dim);transition:all .2s;}
 .news-card .fb:hover{background:#1877f2;color:#fff;}
+.news-card .fb svg{width:15px;height:15px;}
 
 /* SHOP / NEWSLETTER */
 .shop-ph{max-width:1200px;margin:0 auto;border:1px dashed var(--line-strong);border-radius:24px;padding:60px;text-align:center;color:var(--ink-dim);background:var(--surface);}
@@ -227,8 +242,8 @@ footer{padding:70px 5vw 40px;position:relative;z-index:2;background:#241608;colo
 @media(max-width:560px){
   .brand{height:32px;}
   .hs-bar{flex-wrap:wrap;border-radius:20px;}
-  .hs-scope{border-right:none;padding:10px 14px 4px;width:100%;}
-  .hs-input{padding:8px 14px;}
+  .hs-scope-dd{border-right:none;width:100%;border-bottom:1px solid var(--line);}
+  .hs-input{padding:10px 14px;}
   .slider-arrow{display:none;}
   #europeMap{height:380px;}
   .footer-grid{grid-template-columns:1fr;gap:26px;}
@@ -280,14 +295,22 @@ footer{padding:70px 5vw 40px;position:relative;z-index:2;background:#241608;colo
       <p class="lead">Obiekty, saunamistrzowie, turnieje i ceremonie — znajdź to, czego szukasz w europejskiej społeczności aufguss.</p>
       <form class="hero-search" id="heroSearch" autocomplete="off" onsubmit="return false">
         <div class="hs-bar">
-          <select class="hs-scope" id="hsScope">
-            <option value="all">Wszystko</option>
-            <option value="Obiekt">Obiekty</option>
-            <option value="Saunamistrz">Saunamistrzowie</option>
-            <option value="Wydarzenie">Wydarzenia</option>
-          </select>
+          <div class="hs-scope-dd" id="hsScopeDd">
+            <button type="button" class="hs-scope-btn" id="hsScopeBtn">
+              <span id="hsScopeLabel">Wszystko</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            <div class="hs-scope-menu" id="hsScopeMenu">
+              <div class="hs-scope-opt active" data-val="all">Wszystko</div>
+              <div class="hs-scope-opt" data-val="Obiekt">Obiekty</div>
+              <div class="hs-scope-opt" data-val="Saunamistrz">Saunamistrzowie</div>
+              <div class="hs-scope-opt" data-val="Wydarzenie">Wydarzenia</div>
+            </div>
+          </div>
           <input class="hs-input" id="hsInput" type="text" placeholder="Szukaj obiektu, saunamistrza, wydarzenia…">
-          <button class="hs-btn" id="hsBtn" type="button">🔍</button>
+          <button class="hs-btn" id="hsBtn" type="button" aria-label="Szukaj">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          </button>
         </div>
         <div class="hs-results" id="hsResults"></div>
       </form>
@@ -488,45 +511,67 @@ const mastersData = [
   {name:'Lukas Weber', role:'Niemcy · Pro Master', url:'saunamaster.html'},
   {name:'Petra Nováková', role:'Czechy · Advanced', url:'saunamaster.html'},
 ];
+// ikony SVG (bez emoji — spójne, skalowalne)
+const ICO={
+  Obiekt:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6-5.3-6-10a6 6 0 0 1 12 0c0 4.7-6 10-6 10z"/><circle cx="12" cy="11" r="2.3"/></svg>',
+  Saunamistrz:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>',
+  Wydarzenie:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="17" rx="2"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/></svg>',
+};
 const searchIndex = [
-  ...OBJECTS.map(o=>({type:'Obiekt', ico:'🏠', name:o.name, sub:(o.city?o.city+', ':'')+o.country, url:'object.html'})),
-  ...mastersData.map(m=>({type:'Saunamistrz', ico:'🧖', name:m.name, sub:m.role, url:m.url})),
-  ...EVENTS.map(e=>({type:'Wydarzenie', ico:'🗓', name:e.title, sub:e.venue.name+', '+e.venue.city, url:'calendar.html'})),
+  ...OBJECTS.map(o=>({type:'Obiekt', name:o.name, sub:(o.city?o.city+', ':'')+o.country, url:'object.html'})),
+  ...mastersData.map(m=>({type:'Saunamistrz', name:m.name, sub:m.role, url:m.url})),
+  ...EVENTS.map(e=>({type:'Wydarzenie', name:e.title, sub:e.venue.name+', '+e.venue.city, url:'calendar.html'})),
 ];
-const hsInput=document.getElementById('hsInput'), hsScope=document.getElementById('hsScope'), hsResults=document.getElementById('hsResults');
+const hsInput=document.getElementById('hsInput'), hsResults=document.getElementById('hsResults');
+let hsScopeVal='all';
+// custom dropdown zakresu
+const hsScopeDd=document.getElementById('hsScopeDd'), hsScopeLabel=document.getElementById('hsScopeLabel');
+document.getElementById('hsScopeBtn').addEventListener('click', e=>{ e.stopPropagation(); hsScopeDd.classList.toggle('open'); });
+document.querySelectorAll('.hs-scope-opt').forEach(opt=>opt.addEventListener('click', ()=>{
+  document.querySelectorAll('.hs-scope-opt').forEach(o=>o.classList.remove('active'));
+  opt.classList.add('active');
+  hsScopeVal=opt.dataset.val; hsScopeLabel.textContent=opt.textContent;
+  hsScopeDd.classList.remove('open'); runSearch();
+}));
 function runSearch(){
-  const q=hsInput.value.trim().toLowerCase(), sc=hsScope.value;
+  const q=hsInput.value.trim().toLowerCase();
   if(q.length<2){ hsResults.classList.remove('show'); return; }
-  let res=searchIndex.filter(it=>(sc==='all'||it.type===sc) && (it.name.toLowerCase().includes(q)||it.sub.toLowerCase().includes(q)));
-  res=res.slice(0,8);
+  let res=searchIndex.filter(it=>(hsScopeVal==='all'||it.type===hsScopeVal) && (it.name.toLowerCase().includes(q)||it.sub.toLowerCase().includes(q))).slice(0,8);
   if(!res.length){ hsResults.innerHTML=`<div class="hs-empty">Brak wyników dla „${hsInput.value}"</div>`; }
-  else hsResults.innerHTML=res.map(r=>`<a class="hs-res" href="${r.url}"><span class="ico">${r.ico}</span><span><div class="tt">${r.name}</div><div class="sb">${r.sub}</div></span><span class="badge">${r.type}</span></a>`).join('');
+  else hsResults.innerHTML=res.map(r=>`<a class="hs-res" href="${r.url}"><span class="ico">${ICO[r.type]}</span><span><div class="tt">${r.name}</div><div class="sb">${r.sub}</div></span><span class="badge">${r.type}</span></a>`).join('');
   hsResults.classList.add('show');
 }
 hsInput.addEventListener('input', runSearch);
-hsScope.addEventListener('change', runSearch);
 document.getElementById('hsBtn').addEventListener('click', runSearch);
-document.addEventListener('click', e=>{ if(!e.target.closest('.hero-search')) hsResults.classList.remove('show'); });
+document.addEventListener('click', e=>{ if(!e.target.closest('.hero-search')){ hsResults.classList.remove('show'); hsScopeDd.classList.remove('open'); } });
 
 // ===== SPOŁECZNOŚĆ (slider kart) =====
 const rankStyles={rookie:{cls:'rank-rookie',lvl:'I'},advanced:{cls:'rank-advanced',lvl:'IV'},expert:{cls:'rank-expert',lvl:'VII'},promaster:{cls:'rank-promaster',lvl:'X'}};
+// logotypy SVG (glyphy w kolorystyce portalu przez currentColor)
+const SVG_CAL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="17" rx="2"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/></svg>';
+const SVG_FB='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 22v-8h2.8l.42-3.2H13.5V8.75c0-.93.26-1.56 1.6-1.56h1.7V4.3c-.3-.04-1.3-.13-2.48-.13-2.46 0-4.14 1.5-4.14 4.26v2.34H7.4V14h2.28v8z"/></svg>';
+const SVG_IG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5.2"/><circle cx="12" cy="12" r="4"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none"/></svg>';
 const masters=[
-  {name:'Maciej Piczura', role:'Polska · Mistrz Świata', flag:'pl', rank:'promaster', rankLabel:'Pro Master', cal:true},
-  {name:'Robert Zídek', role:'Czechy · 3× Mistrz Świata', flag:'cz', rank:'promaster', rankLabel:'Pro Master', cal:true},
-  {name:'Arek Dan', role:'Polska · Rezydent 3 obiektów', flag:'pl', rank:'expert', rankLabel:'Steam Expert', cal:true},
-  {name:'Jeremi Dygas', role:'Polska · Finalista MP', flag:'pl', rank:'expert', rankLabel:'Steam Expert', cal:true},
-  {name:'Lukas Weber', role:'Niemcy · Mistrz kraju 2023', flag:'de', rank:'promaster', rankLabel:'Pro Master', cal:true},
-  {name:'Sanne de Vries', role:'Holandia · Sędzia WAC', flag:'nl', rank:'advanced', rankLabel:'Advanced', cal:false},
-  {name:'Petra Nováková', role:'Czechy · Rezydentka', flag:'cz', rank:'advanced', rankLabel:'Advanced', cal:true},
-  {name:'Tomasz Kowal', role:'Polska · Sędzia PTS', flag:'pl', rank:'advanced', rankLabel:'Advanced', cal:true},
+  {name:'Maciej Piczura', role:'Polska · Mistrz Świata', flag:'pl', rank:'promaster', rankLabel:'Pro Master', fb:true, ig:true},
+  {name:'Robert Zídek', role:'Czechy · 3× Mistrz Świata', flag:'cz', rank:'promaster', rankLabel:'Pro Master', fb:true, ig:true},
+  {name:'Arek Dan', role:'Polska · Rezydent 3 obiektów', flag:'pl', rank:'expert', rankLabel:'Steam Expert', fb:true, ig:false},
+  {name:'Jeremi Dygas', role:'Polska · Finalista MP', flag:'pl', rank:'expert', rankLabel:'Steam Expert', fb:false, ig:true},
+  {name:'Lukas Weber', role:'Niemcy · Mistrz kraju 2023', flag:'de', rank:'promaster', rankLabel:'Pro Master', fb:true, ig:true},
+  {name:'Sanne de Vries', role:'Holandia · Sędzia WAC', flag:'nl', rank:'advanced', rankLabel:'Advanced', fb:true, ig:false},
+  {name:'Petra Nováková', role:'Czechy · Rezydentka', flag:'cz', rank:'advanced', rankLabel:'Advanced', fb:false, ig:true},
+  {name:'Tomasz Kowal', role:'Polska · Sędzia PTS', flag:'pl', rank:'advanced', rankLabel:'Advanced', fb:true, ig:true},
 ];
 const track=document.getElementById('mastersTrack');
 [...masters,...masters].forEach(m=>{
-  const rs=rankStyles[m.rank]; const el=document.createElement('a'); el.href='saunamaster.html'; el.className='master-card';
-  el.innerHTML=`<div class="ph">${m.name.split(' ').map(n=>n[0]).join('')}<img class="flag" src="https://flagcdn.com/40x30/${m.flag}.png"></div>
-    <div class="info"><h4>${m.name}</h4><div class="role">${m.role}</div>
+  const rs=rankStyles[m.rank]; const el=document.createElement('div'); el.className='master-card';
+  el.innerHTML=`<a class="ph" href="saunamaster.html">${m.name.split(' ').map(n=>n[0]).join('')}<img class="flag" src="https://flagcdn.com/40x30/${m.flag}.png"></a>
+    <div class="info"><h4><a href="saunamaster.html">${m.name}</a></h4><div class="role">${m.role}</div>
     <span class="master-rank ${rs.cls}"><span class="lvl">${rs.lvl}</span> ${m.rankLabel}</span>
-    ${m.cal?`<span class="master-cal">📅 Kalendarz saunamistrza →</span>`:`<span class="master-cal disabled">Brak kalendarza</span>`}</div>`;
+    <div class="master-actions">
+      <a class="soc cal" href="saunamaster.html" title="Kalendarz występów">${SVG_CAL} Kalendarz</a>
+      ${m.fb?`<a class="soc" href="#" title="Facebook" aria-label="Facebook">${SVG_FB}</a>`:''}
+      ${m.ig?`<a class="soc" href="#" title="Instagram" aria-label="Instagram">${SVG_IG}</a>`:''}
+    </div></div>`;
   track.appendChild(el);
 });
 
@@ -543,40 +588,38 @@ document.getElementById('newsGrid').innerHTML=news.map(n=>`
       <div class="date">${n.date}</div>
       <h3>${n.title}</h3>
       <p>${n.excerpt}</p>
-      <div class="foot"><a href="#" class="more">Czytaj więcej →</a><a href="#" class="fb" title="Udostępnij na Facebooku">f</a></div>
+      <div class="foot"><a href="#" class="more">Czytaj więcej →</a><a href="#" class="fb" title="Udostępnij na Facebooku" aria-label="Udostępnij na Facebooku">${SVG_FB}</a></div>
     </div>
   </article>`).join('');
 
 // ===== MAPA-CHOROPLETH =====
-const countryData={
-  PL:{group:'Polska',n:31}, DE:{group:'Niemcy',n:31},
-  NL:{group:'Holandia + Belgia',n:17}, BE:{group:'Holandia + Belgia',n:17},
-  CZ:{group:'Czechy + Słowacja',n:10}, SK:{group:'Czechy + Słowacja',n:10},
-  AT:{group:'Austria + Szwajcaria',n:9}, CH:{group:'Austria + Szwajcaria',n:9},
-  IT:{group:'Włochy',n:5},
-  SE:{group:'Skandynawia',n:2}, NO:{group:'Skandynawia',n:2}, DK:{group:'Skandynawia',n:2}, FI:{group:'Skandynawia',n:2},
-  HU:{group:'Węgry + Rumunia',n:2}, RO:{group:'Węgry + Rumunia',n:2},
-};
+// countryData budowane z realnych danych — każdy obiekt ma już swoje państwo (reverse-geokodowanie)
+const nameToISO={Polska:'PL',Niemcy:'DE',Holandia:'NL',Belgia:'BE',Czechy:'CZ',Słowacja:'SK',Austria:'AT',Szwajcaria:'CH',Włochy:'IT',Szwecja:'SE',Norwegia:'NO',Dania:'DK',Finlandia:'FI',Węgry:'HU',Rumunia:'RO',Francja:'FR'};
+const nameToFlag={Polska:'pl',Niemcy:'de',Holandia:'nl',Belgia:'be',Czechy:'cz',Słowacja:'sk',Austria:'at',Szwajcaria:'ch',Włochy:'it',Szwecja:'se',Norwegia:'no',Dania:'dk',Finlandia:'fi',Węgry:'hu',Rumunia:'ro',Francja:'fr'};
+const counts={}; OBJECTS.forEach(o=>counts[o.country]=(counts[o.country]||0)+1);
+const countryData={}; Object.entries(counts).forEach(([name,n])=>{ const iso=nameToISO[name]; if(iso) countryData[iso]={name,n}; });
+const MAXN=Math.max(1,...Object.values(counts));
 const readout=document.getElementById('mapReadout');
-function gotoCountry(group){ location.href='map.html?country='+encodeURIComponent(group); }
-// kolor kraju liczony bezpośrednio z liczby obiektów (jasny piasek -> ember)
-const C_LIGHT=[244,220,188], C_DARK=[224,74,32], MAXN=31;
-const hex=v=>('0'+Math.round(v).toString(16)).slice(-2);
-function colorFor(n){ const t=Math.pow(Math.min(n,MAXN)/MAXN,0.6); return '#'+[0,1,2].map(i=>hex(C_LIGHT[i]+(C_DARK[i]-C_LIGHT[i])*t)).join(''); }
-const fillValues=Object.fromEntries(Object.entries(countryData).map(([c,d])=>[c,colorFor(d.n)]));
+function gotoCountry(name){ location.href='map.html?country='+encodeURIComponent(name); }
+const C_LIGHT=[244,220,188], C_DARK=[224,74,32];
+const hx=v=>('0'+Math.round(v).toString(16)).slice(-2);
+function colorFor(n){ const t=Math.pow(Math.min(n,MAXN)/MAXN,0.6); return '#'+[0,1,2].map(i=>hx(C_LIGHT[i]+(C_DARK[i]-C_LIGHT[i])*t)).join(''); }
 const map=new jsVectorMap({
   selector:'#europeMap', map:'world_merc', zoomButtons:false, zoomOnScroll:false, draggable:false, backgroundColor:'transparent',
   regionStyle:{ initial:{fill:'#ece0cb',stroke:'#d8c6a8',strokeWidth:0.5}, hover:{fill:'#ff7a3d',fillOpacity:1,cursor:'pointer',stroke:'#7a3618',strokeWidth:1} },
-  onRegionTooltipShow(ev,tt,code){ const d=countryData[code]; tt.text(d?`${d.group} — ${d.n} obiektów`:(map.regions[code]?.config?.name||code)+' — wkrótce', true); },
-  onRegionOver(ev,code){ const d=countryData[code]; readout.innerHTML=d?`<b>${d.group}</b> — ${d.n} obiektów · kliknij, aby zobaczyć`:`${map.regions[code]?.config?.name||code} — wkrótce`; },
+  onRegionTooltipShow(ev,tt,code){ const d=countryData[code]; tt.text(d?`${d.name} — ${d.n} ${d.n===1?'obiekt':'obiektów'}`:(map.regions[code]?.config?.name||code)+' — wkrótce', true); },
+  onRegionOver(ev,code){ const d=countryData[code]; readout.innerHTML=d?`<b>${d.name}</b> — ${d.n} ${d.n===1?'obiekt':'obiektów'} · kliknij, aby zobaczyć`:`${map.regions[code]?.config?.name||code} — wkrótce`; },
   onRegionOut(){ readout.innerHTML='Najedź lub kliknij kraj →'; },
-  onRegionClick(ev,code){ const d=countryData[code]; if(d) gotoCountry(d.group); },
+  onRegionClick(ev,code){ const d=countryData[code]; if(d) gotoCountry(d.name); },
 });
 // pokoloruj kraje wg liczby obiektów (initial.fill => zachowane po hover-out)
 function paintCountries(){
   Object.entries(countryData).forEach(([code,d])=>{
     const sh=map.regions[code]?.element.shape;
-    if(sh){ const c=colorFor(d.n); sh.style.initial.fill=c; sh.setStyle('fill',c); }
+    if(sh){ const c=colorFor(d.n); sh.style.initial.fill=c; sh.setStyle('fill',c);
+      const nd=sh.node;
+      if(nd && !nd._bound){ nd._bound=true; nd.style.cursor='pointer'; nd.addEventListener('click',()=>gotoCountry(d.name)); }
+    }
   });
 }
 function focusEurope(){ try{ map.setFocus({coords:[57,14],scale:2.7,animate:false}); }catch(e){} }
@@ -584,16 +627,14 @@ setTimeout(()=>{ focusEurope(); paintCountries(); },120);
 setTimeout(()=>{ focusEurope(); paintCountries(); },500);
 window.addEventListener('resize',()=>setTimeout(focusEurope,60));
 
-// lista krajów (agregacja grup)
-const groups={}; Object.values(countryData).forEach(d=>groups[d.group]=d.n);
-const maxN=Math.max(...Object.values(groups));
-const flagByGroup={'Polska':'pl','Niemcy':'de','Holandia + Belgia':'nl','Czechy + Słowacja':'cz','Austria + Szwajcaria':'at','Włochy':'it','Skandynawia':'se','Węgry + Rumunia':'hu'};
-document.getElementById('countryList').innerHTML=Object.entries(groups).sort((a,b)=>b[1]-a[1]).map(([g,n])=>`
-  <div class="country-row" onclick="location.href='map.html?country='+encodeURIComponent('${g.replace(/'/g,"\\'")}')">
-    <img src="https://flagcdn.com/20x15/${flagByGroup[g]}.png"> ${g}
-    <span class="bar" style="width:${Math.round(n/maxN*70)+10}px"></span>
+// lista krajów (z realnych danych, malejąco)
+document.getElementById('countryList').innerHTML=Object.entries(counts).sort((a,b)=>b[1]-a[1]).map(([name,n])=>`
+  <div class="country-row" data-country="${name}">
+    <img src="https://flagcdn.com/20x15/${nameToFlag[name]||'eu'}.png"> ${name}
+    <span class="bar" style="width:${Math.round(n/MAXN*70)+10}px"></span>
     <span class="n">${n}</span>
   </div>`).join('');
+document.querySelectorAll('#countryList .country-row').forEach(r=>r.addEventListener('click',()=>gotoCountry(r.dataset.country)));
 </script>
 </body>
 </html>
