@@ -117,16 +117,38 @@ header{
 }
 .pin-marker.active{transform:rotate(-45deg) scale(1.3);box-shadow:0 0 0 8px rgba(255,122,61,0.3), 0 4px 18px rgba(42,27,16,0.5);}
 
+/* ── PANELE (krok kraje -> obiekty) ── */
+.panel{display:none;flex-direction:column;height:100%;overflow:hidden;}
+.panel.active{display:flex;animation:panelIn .4s cubic-bezier(.2,.8,.2,1);}
+@keyframes panelIn{from{opacity:0;transform:translateX(14px);}to{opacity:1;transform:none;}}
+.country-picker{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:7px;}
+.country-picker::-webkit-scrollbar{width:6px;}
+.country-picker::-webkit-scrollbar-thumb{background:rgba(255,122,61,0.35);border-radius:10px;}
+.cp-row{display:flex;align-items:center;gap:11px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;cursor:pointer;transition:border-color .18s,background .18s,transform .18s;background:var(--surface);}
+.cp-row:hover{border-color:var(--ember-1);background:var(--surface-2);transform:translateX(3px);}
+.cp-row img{width:24px;border-radius:3px;box-shadow:0 1px 3px rgba(0,0,0,0.15);}
+.cp-row .nm{font-weight:600;font-size:0.92rem;}
+.cp-row .n{margin-left:auto;font-weight:700;color:var(--ember-3);font-size:0.9rem;}
+.cp-row .chev{color:var(--stone);font-size:1.1rem;margin-left:4px;}
+.cp-all{background:linear-gradient(120deg,rgba(255,138,61,0.12),var(--surface));border-color:rgba(255,122,61,0.35);}
+.cp-all .nm{font-weight:700;}
+.obj-head{padding:18px 20px;border-bottom:1px solid var(--line);flex-shrink:0;}
+.obj-head h2{font-size:1.3rem;margin-bottom:3px;}
+.back-btn{display:inline-flex;align-items:center;gap:6px;background:none;border:none;color:var(--ember-2);font:600 0.8rem/1 'Instrument Sans';cursor:pointer;margin-bottom:13px;padding:5px 0;transition:color .2s;}
+.back-btn:hover{color:var(--ember-3);}
+.back-btn svg{width:15px;height:15px;}
+
 /* ── RESPONSYWNOŚĆ ── */
 @media(max-width:1100px){ .layout{grid-template-columns:320px 1fr;} }
 @media(max-width:820px){
   header{flex-wrap:wrap;gap:6px;padding:12px 5vw;}
   .back-link{font-size:0.78rem;}
   .layout{grid-template-columns:1fr;height:auto;}
-  #map{height:50vh;min-height:300px;order:-1;}
+  #map{height:48vh;min-height:300px;order:-1;}
   .sidebar{border-right:none;border-top:1px solid var(--line);overflow:visible;max-height:none;}
-  .card-list{overflow:visible;max-height:none;}
-  .sidebar-head{position:sticky;top:0;background:var(--surface);z-index:5;}
+  .panel{height:auto;overflow:visible;}
+  .country-picker,.card-list{overflow:visible;max-height:none;}
+  .sidebar-head,.obj-head{position:sticky;top:0;background:var(--surface);z-index:5;}
 }
 </style>
 </head>
@@ -139,12 +161,23 @@ header{
 
 <div class="layout">
   <aside class="sidebar">
-    <div class="sidebar-head">
-      <h2>Obiekty saunowe</h2>
-      <div class="count" id="sidebarCount">107 obiektów</div>
-      <div class="filter-list" id="filterList"></div>
-    </div>
-    <div class="card-list" id="cardList"></div>
+    <!-- KROK 1: wybór kraju -->
+    <section class="panel panel-countries active" id="panelCountries">
+      <div class="sidebar-head">
+        <h2>Obiekty saunowe</h2>
+        <div class="count" id="countriesCount"></div>
+      </div>
+      <div class="country-picker" id="countryPicker"></div>
+    </section>
+    <!-- KROK 2: obiekty wybranego kraju -->
+    <section class="panel panel-objects" id="panelObjects">
+      <div class="obj-head">
+        <button class="back-btn" id="backBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg> Wszystkie kraje</button>
+        <h2 id="objTitle"></h2>
+        <div class="count" id="objCount"></div>
+      </div>
+      <div class="card-list" id="cardList"></div>
+    </section>
   </aside>
   <div id="map"></div>
 </div>
@@ -207,14 +240,12 @@ function cardSocials(o){
 }
 
 const cardList = document.getElementById('cardList');
-const sidebarCount = document.getElementById('sidebarCount');
 
 function renderCards(){
   cardList.innerHTML='';
   const visible = objects.filter(o=>selected.has(o.country));
-  sidebarCount.textContent = `${visible.length} obiektów`;
   if(!visible.length){
-    cardList.innerHTML = `<div class="empty-state">Brak obiektów dla wybranych krajów.</div>`;
+    cardList.innerHTML = `<div class="empty-state">Brak obiektów.</div>`;
     return;
   }
   visible.forEach(o=>{
@@ -237,63 +268,45 @@ function renderCards(){
 
 function refresh(){ rebuildMarkers(); renderCards(); }
 
-const filterList = document.getElementById('filterList');
+// ── FLOW: wybór kraju -> obiekty ──
+const flagByCountry={}; objects.forEach(o=>flagByCountry[o.country]=o.flag);
+const panelCountries=document.getElementById('panelCountries');
+const panelObjects=document.getElementById('panelObjects');
+document.getElementById('countriesCount').textContent=`${objects.length} obiektów w ${countries.length} krajach`;
+function plural(n){ return n===1?'obiekt':(n%10>=2&&n%10<=4&&(n<12||n>14)?'obiekty':'obiektów'); }
 
-function buildAllRow(){
-  const row = document.createElement('label');
-  row.className='filter-row all-row';
-  row.innerHTML = `<input type="checkbox" id="allCheck"><span>Wszystkie kraje</span>`;
-  filterList.appendChild(row);
-  const cb = row.querySelector('input');
-  cb.checked = selected.size === countries.length;
-  cb.addEventListener('change', ()=>{
-    if(cb.checked){ selected = new Set(countries); } else { selected = new Set(); }
-    syncCheckboxes();
-    refresh();
-  });
-  return cb;
+function buildPicker(){
+  const picker=document.getElementById('countryPicker');
+  const rows=countries.map(c=>({c,n:objects.filter(o=>o.country===c).length})).sort((a,b)=>b.n-a.n);
+  let html=`<div class="cp-row cp-all" data-all="1"><span class="nm">Wszystkie obiekty</span><span class="n">${objects.length}</span><span class="chev">›</span></div>`;
+  html+=rows.map(r=>`<div class="cp-row" data-country="${r.c}"><img src="https://flagcdn.com/20x15/${flagByCountry[r.c]||'eu'}.png" alt=""><span class="nm">${r.c}</span><span class="n">${r.n}</span><span class="chev">›</span></div>`).join('');
+  picker.innerHTML=html;
+  picker.querySelectorAll('.cp-row').forEach(row=>row.addEventListener('click',()=> selectCountry(row.dataset.all?null:row.dataset.country)));
 }
 
-const countryCheckboxes = [];
-function buildCountryRows(){
-  countries.forEach(c=>{
-    const count = objects.filter(o=>o.country===c).length;
-    const row = document.createElement('label');
-    row.className='filter-row';
-    row.innerHTML = `<input type="checkbox" checked><span>${c}</span><span class="n">${count}</span>`;
-    filterList.appendChild(row);
-    const cb = row.querySelector('input');
-    countryCheckboxes.push({cb, country:c});
-    cb.addEventListener('change', ()=>{
-      if(cb.checked) selected.add(c); else selected.delete(c);
-      allCheck.checked = selected.size === countries.length;
-      refresh();
-    });
-  });
+function selectCountry(name){
+  if(name){ selected=new Set([name]); document.getElementById('objTitle').textContent=name; }
+  else { selected=new Set(countries); document.getElementById('objTitle').textContent='Wszystkie obiekty'; }
+  refresh();
+  const cnt=objects.filter(o=>selected.has(o.country)).length;
+  document.getElementById('objCount').textContent=`${cnt} ${plural(cnt)}`;
+  panelCountries.classList.remove('active'); panelObjects.classList.add('active');
+  cardList.scrollTop=0;
+  setTimeout(()=>{ map.invalidateSize(); const pts=objects.filter(o=>selected.has(o.country)).map(o=>[o.lat,o.lng]); if(pts.length) map.fitBounds(pts,{padding:[55,55],maxZoom:name?9:6}); },70);
 }
-
-function syncCheckboxes(){
-  countryCheckboxes.forEach(({cb,country})=>{ cb.checked = selected.has(country); });
+function backToCountries(){
+  panelObjects.classList.remove('active'); panelCountries.classList.add('active');
+  selected=new Set(countries); rebuildMarkers();
+  setTimeout(()=>{ map.invalidateSize(); map.setView([50.5,12],5); },70);
 }
+document.getElementById('backBtn').addEventListener('click', backToCountries);
 
-const allCheck = buildAllRow();
-buildCountryRows();
+buildPicker();
+selected=new Set(countries); rebuildMarkers(); // na ekranie wyboru mapa pokazuje wszystkie piny
 
-// auto-filtr z linku: map.html?country=Nazwa (ze strony głównej / karty obiektu)
-const cParam = new URLSearchParams(location.search).get('country');
-if(cParam && countries.includes(cParam)){
-  selected = new Set([cParam]);
-  allCheck.checked = false;
-  syncCheckboxes();
-}
-
-refresh();
-
-// jeśli przyszliśmy z filtrem kraju — dopasuj widok mapy do jego obiektów
-if(cParam && countries.includes(cParam)){
-  const pts = objects.filter(o=>o.country===cParam).map(o=>[o.lat,o.lng]);
-  if(pts.length) map.fitBounds(pts, { padding:[60,60], maxZoom:8 });
-}
+// wejście z linku ?country=Nazwa (ze strony głównej / karty obiektu) -> od razu obiekty
+const cParam=new URLSearchParams(location.search).get('country');
+if(cParam && countries.includes(cParam)) selectCountry(cParam);
 </script>
 </body>
 </html>

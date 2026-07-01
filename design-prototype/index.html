@@ -33,7 +33,10 @@ nav a{position:relative;opacity:0.75;transition:opacity .25s;color:var(--ink);wh
 nav a:hover{opacity:1;}
 nav a::after{content:'';position:absolute;left:0;bottom:-6px;width:0;height:1px;background:var(--ember-2);transition:width .3s;}
 nav a:hover::after{width:100%;}
-.header-right{display:flex;align-items:center;gap:16px;}
+.header-right{display:flex;align-items:center;gap:14px;}
+.btn-login{display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border:1px solid var(--line-strong);border-radius:100px;font-size:0.8rem;font-weight:600;color:var(--ink);background:var(--surface);transition:all .2s;white-space:nowrap;}
+.btn-login:hover{border-color:var(--ember-1);color:var(--ember-2);}
+.btn-login svg{width:15px;height:15px;}
 
 /* LANGUAGE DROPDOWN */
 .lang-dd{position:relative;}
@@ -153,16 +156,16 @@ section{position:relative;z-index:2;padding:120px 5vw;}
 
 /* MAP SECTION (choropleth) */
 .map-section{background:linear-gradient(180deg,var(--surface-2),var(--bg));}
-.map-wrap{display:grid;grid-template-columns:1.5fr 1fr;gap:44px;align-items:center;max-width:1200px;margin:0 auto;}
+.map-wrap{display:grid;grid-template-columns:1.55fr 1fr;gap:40px;align-items:stretch;max-width:1200px;margin:0 auto;}
 .map-box{background:var(--surface);border:1px solid var(--line);border-radius:26px;padding:8px;position:relative;overflow:hidden;box-shadow:0 20px 60px rgba(42,27,16,0.08);}
 #europeMap{height:540px;width:100%;}
-.map-side h3{font-size:1.7rem;margin-bottom:16px;font-weight:420;color:var(--ink);}
-.map-side p{color:var(--ink-dim);line-height:1.7;margin-bottom:24px;}
-.map-readout{font-size:0.92rem;color:var(--ink-dim);min-height:26px;margin-bottom:20px;padding:12px 16px;background:var(--surface);border:1px solid var(--line);border-radius:12px;}
-.map-readout b{color:var(--ember-2);font-weight:600;}
-.country-list{display:flex;flex-direction:column;gap:4px;margin-bottom:26px;}
-.country-row{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;cursor:pointer;transition:background .18s;font-size:0.88rem;}
-.country-row:hover{background:var(--surface-2);}
+.map-side{display:flex;flex-direction:column;height:556px;}
+.map-side-label{font-size:0.88rem;color:var(--ink-dim);line-height:1.6;margin-bottom:16px;}
+.country-list{display:flex;flex-direction:column;gap:5px;flex:1;overflow-y:auto;padding-right:4px;}
+.country-list::-webkit-scrollbar{width:6px;}
+.country-list::-webkit-scrollbar-thumb{background:rgba(255,122,61,0.3);border-radius:10px;}
+.country-row{display:flex;align-items:center;gap:10px;padding:10px 13px;border:1px solid var(--line);border-radius:11px;background:var(--surface);cursor:pointer;transition:all .18s;font-size:0.88rem;}
+.country-row:hover{border-color:var(--ember-1);background:var(--surface-2);transform:translateX(3px);}
 .country-row img{width:20px;border-radius:2px;}
 .country-row .n{margin-left:auto;font-weight:600;color:var(--ember-3);}
 .country-row .bar{height:6px;border-radius:3px;background:linear-gradient(90deg,var(--ember-1),var(--ember-3));}
@@ -234,6 +237,8 @@ footer{padding:70px 5vw 40px;position:relative;z-index:2;background:#241608;colo
 @media(max-width:1000px){
   nav{display:none;}
   .map-wrap{grid-template-columns:1fr;}
+  .map-side{height:auto;}
+  .country-list{overflow:visible;max-height:none;}
   .events-row,.news-grid{grid-template-columns:1fr;}
   .footer-grid{grid-template-columns:1fr 1fr;}
   section{padding:80px 5vw;}
@@ -241,6 +246,9 @@ footer{padding:70px 5vw 40px;position:relative;z-index:2;background:#241608;colo
 }
 @media(max-width:560px){
   .brand{height:32px;}
+  .btn-login .ll{display:none;}
+  .btn-login{padding:9px;}
+  .header-right{gap:10px;}
   .hs-bar{flex-wrap:wrap;border-radius:20px;}
   .hs-scope-dd{border-right:none;width:100%;border-bottom:1px solid var(--line);}
   .hs-input{padding:10px 14px;}
@@ -280,6 +288,7 @@ footer{padding:70px 5vw 40px;position:relative;z-index:2;background:#241608;colo
         <div class="lang-soon">Wkrótce: CZ · IT</div>
       </div>
     </div>
+    <a href="#" class="btn-login"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg><span class="ll">Zaloguj się</span></a>
   </div>
 </header>
 
@@ -392,17 +401,15 @@ footer{padding:70px 5vw 40px;position:relative;z-index:2;background:#241608;colo
 <!-- MAPA -->
 <section id="mapa" class="map-section">
   <div class="section-head">
-    <div><span class="tag">Mapa obiektów</span><h2>Europa saunowa<br>kraj po kraju</h2></div>
+    <div><span class="tag">Baza obiektów</span><h2>Mapa obiektów saunowych</h2></div>
     <a href="map.html" class="section-link">Otwórz pełną mapę →</a>
   </div>
   <div class="map-wrap">
     <div class="map-box"><div id="europeMap"></div></div>
-    <div class="map-side">
-      <h3>Wybierz kraj, poznaj obiekty</h3>
-      <p>Kolor kraju odpowiada liczbie obiektów w naszej bazie. Kliknij państwo na mapie lub liście, a przejdziesz prosto do pełnej mapy odfiltrowanej dla tego regionu.</p>
-      <div class="map-readout" id="mapReadout">Najedź lub kliknij kraj →</div>
+    <aside class="map-side">
+      <div class="map-side-label">Kliknij kraj na mapie lub na liście — przejdziesz do pełnej mapy odfiltrowanej dla tego regionu.</div>
       <div class="country-list" id="countryList"></div>
-    </div>
+    </aside>
   </div>
 </section>
 
@@ -543,6 +550,9 @@ function runSearch(){
 }
 hsInput.addEventListener('input', runSearch);
 document.getElementById('hsBtn').addEventListener('click', runSearch);
+// zatrzymaj auto-przewijanie slidera, gdy użytkownik korzysta z wyszukiwarki
+hsInput.addEventListener('focus', ()=> clearInterval(timer));
+hsInput.addEventListener('blur', ()=>{ if(!hsInput.value.trim()) restart(); });
 document.addEventListener('click', e=>{ if(!e.target.closest('.hero-search')){ hsResults.classList.remove('show'); hsScopeDd.classList.remove('open'); } });
 
 // ===== SPOŁECZNOŚĆ (slider kart) =====
@@ -599,7 +609,6 @@ const nameToFlag={Polska:'pl',Niemcy:'de',Holandia:'nl',Belgia:'be',Czechy:'cz',
 const counts={}; OBJECTS.forEach(o=>counts[o.country]=(counts[o.country]||0)+1);
 const countryData={}; Object.entries(counts).forEach(([name,n])=>{ const iso=nameToISO[name]; if(iso) countryData[iso]={name,n}; });
 const MAXN=Math.max(1,...Object.values(counts));
-const readout=document.getElementById('mapReadout');
 function gotoCountry(name){ location.href='map.html?country='+encodeURIComponent(name); }
 const C_LIGHT=[244,220,188], C_DARK=[224,74,32];
 const hx=v=>('0'+Math.round(v).toString(16)).slice(-2);
@@ -608,8 +617,6 @@ const map=new jsVectorMap({
   selector:'#europeMap', map:'world_merc', zoomButtons:false, zoomOnScroll:false, draggable:false, backgroundColor:'transparent',
   regionStyle:{ initial:{fill:'#ece0cb',stroke:'#d8c6a8',strokeWidth:0.5}, hover:{fill:'#ff7a3d',fillOpacity:1,cursor:'pointer',stroke:'#7a3618',strokeWidth:1} },
   onRegionTooltipShow(ev,tt,code){ const d=countryData[code]; tt.text(d?`${d.name} — ${d.n} ${d.n===1?'obiekt':'obiektów'}`:(map.regions[code]?.config?.name||code)+' — wkrótce', true); },
-  onRegionOver(ev,code){ const d=countryData[code]; readout.innerHTML=d?`<b>${d.name}</b> — ${d.n} ${d.n===1?'obiekt':'obiektów'} · kliknij, aby zobaczyć`:`${map.regions[code]?.config?.name||code} — wkrótce`; },
-  onRegionOut(){ readout.innerHTML='Najedź lub kliknij kraj →'; },
   onRegionClick(ev,code){ const d=countryData[code]; if(d) gotoCountry(d.name); },
 });
 // pokoloruj kraje wg liczby obiektów (initial.fill => zachowane po hover-out)
