@@ -253,7 +253,22 @@ function syncCheckboxes(){
 
 const allCheck = buildAllRow();
 buildCountryRows();
+
+// auto-filtr z linku: map.html?country=Nazwa (ze strony głównej / karty obiektu)
+const cParam = new URLSearchParams(location.search).get('country');
+if(cParam && countries.includes(cParam)){
+  selected = new Set([cParam]);
+  allCheck.checked = false;
+  syncCheckboxes();
+}
+
 refresh();
+
+// jeśli przyszliśmy z filtrem kraju — dopasuj widok mapy do jego obiektów
+if(cParam && countries.includes(cParam)){
+  const pts = objects.filter(o=>o.country===cParam).map(o=>[o.lat,o.lng]);
+  if(pts.length) map.fitBounds(pts, { padding:[60,60], maxZoom:8 });
+}
 </script>
 </body>
 </html>

@@ -3,102 +3,48 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>aufguss.world — Portal turystyki saunowej</title>
+<title>aufguss.world — Global Aufguss Community Hub</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jsvectormap@1.4.4/dist/css/jsvectormap.min.css">
 <style>
 :root{
-  --ember-1:#ff7a3d;
-  --ember-2:#e8552a;
-  --ember-3:#d6491f;
-  --bg:#fbf5ea;
-  --surface:#ffffff;
-  --surface-2:#f3e8d6;
-  --ink:#2a1b10;
-  --ink-dim:#6b5a47;
-  --stone:#8a7960;
-  --line:rgba(42,27,16,0.1);
-  --line-strong:rgba(42,27,16,0.18);
-  --glow: radial-gradient(700px circle at var(--mx,50%) var(--my,10%), rgba(255,122,61,0.10), transparent 60%);
+  --ember-1:#ff7a3d;--ember-2:#e8552a;--ember-3:#d6491f;
+  --bg:#fbf5ea;--surface:#ffffff;--surface-2:#f3e8d6;
+  --ink:#2a1b10;--ink-dim:#6b5a47;--stone:#8a7960;
+  --line:rgba(42,27,16,0.1);--line-strong:rgba(42,27,16,0.18);
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 html{scroll-behavior:smooth;}
-body{
-  background:var(--bg);
-  color:var(--ink);
-  font-family:'Instrument Sans',sans-serif;
-  overflow-x:hidden;
-  position:relative;
-}
-body::before{
-  content:'';
-  position:fixed;inset:0;
-  background:var(--glow);
-  pointer-events:none;
-  z-index:1;
-  transition:background 0.1s ease-out;
-}
-.noise{
-  position:fixed;inset:0;
-  pointer-events:none;
-  opacity:0.025;
-  z-index:2;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-}
-h1,h2,h3,.display{font-family:'Fraunces',serif;font-weight:400;}
+body{background:var(--bg);color:var(--ink);font-family:'Instrument Sans',sans-serif;overflow-x:hidden;}
+h1,h2,h3{font-family:'Fraunces',serif;font-weight:400;}
 em{font-style:italic;font-weight:500;color:var(--ember-3);}
 a{color:inherit;text-decoration:none;}
 
 /* HEADER */
-header{
-  position:fixed;top:0;left:0;right:0;
-  z-index:50;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:18px 5vw;
-  backdrop-filter:blur(10px);
-  background:rgba(251,245,234,0.78);
-  border-bottom:1px solid transparent;
-  transition:background .3s, padding .3s, border-color .3s;
-}
-header.scrolled{background:rgba(251,245,234,0.96);padding:13px 5vw;border-bottom:1px solid var(--line);}
-.logo{font-family:'Fraunces',serif;font-size:1.4rem;letter-spacing:-0.01em;display:flex;align-items:center;gap:10px;}
-.logo img{width:30px;height:30px;}
-.logo .dot{color:var(--ember-2);font-style:italic;}
-nav{display:flex;gap:38px;font-size:0.82rem;letter-spacing:0.04em;text-transform:uppercase;}
-nav a{position:relative;opacity:0.7;transition:opacity .25s;color:var(--ink);}
+header{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:24px;
+  padding:14px 5vw;backdrop-filter:blur(10px);background:rgba(251,245,234,0.66);border-bottom:1px solid transparent;transition:background .3s,padding .3s,border-color .3s;}
+header.scrolled{background:rgba(251,245,234,0.97);padding:9px 5vw;border-bottom:1px solid var(--line);}
+.brand{height:40px;width:auto;display:block;}
+header.scrolled .brand{height:34px;}
+nav{display:flex;gap:30px;font-size:0.8rem;letter-spacing:0.04em;text-transform:uppercase;}
+nav a{position:relative;opacity:0.75;transition:opacity .25s;color:var(--ink);white-space:nowrap;}
 nav a:hover{opacity:1;}
 nav a::after{content:'';position:absolute;left:0;bottom:-6px;width:0;height:1px;background:var(--ember-2);transition:width .3s;}
 nav a:hover::after{width:100%;}
-.header-right{display:flex;align-items:center;gap:22px;}
+.header-right{display:flex;align-items:center;gap:16px;}
 
 /* LANGUAGE DROPDOWN */
 .lang-dd{position:relative;}
-.lang-trigger{
-  display:flex;align-items:center;gap:8px;
-  padding:9px 14px;border:1px solid var(--line-strong);border-radius:100px;
-  background:var(--surface);cursor:pointer;font-size:0.78rem;font-weight:500;
-  color:var(--ink);transition:border-color .2s;
-}
+.lang-trigger{display:flex;align-items:center;gap:8px;padding:9px 13px;border:1px solid var(--line-strong);border-radius:100px;background:var(--surface);cursor:pointer;font-size:0.78rem;font-weight:500;color:var(--ink);transition:border-color .2s;}
 .lang-trigger:hover{border-color:var(--ember-1);}
 .lang-trigger img{width:18px;border-radius:2px;}
 .lang-trigger .chev{font-size:0.6rem;opacity:0.5;transition:transform .25s;}
 .lang-dd.open .chev{transform:rotate(180deg);}
-.lang-menu{
-  position:absolute;top:calc(100% + 10px);right:0;
-  background:var(--surface);border:1px solid var(--line);border-radius:14px;
-  box-shadow:0 16px 40px rgba(42,27,16,0.14);
-  min-width:190px;padding:8px;
-  opacity:0;visibility:hidden;transform:translateY(-6px);
-  transition:all .2s ease;
-}
+.lang-menu{position:absolute;top:calc(100% + 10px);right:0;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:0 16px 40px rgba(42,27,16,0.14);min-width:190px;padding:8px;opacity:0;visibility:hidden;transform:translateY(-6px);transition:all .2s ease;}
 .lang-dd.open .lang-menu{opacity:1;visibility:visible;transform:translateY(0);}
-.lang-option{
-  display:flex;align-items:center;gap:10px;
-  padding:10px 12px;border-radius:9px;font-size:0.84rem;cursor:pointer;
-  transition:background .15s;
-}
+.lang-option{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:9px;font-size:0.84rem;cursor:pointer;transition:background .15s;}
 .lang-option:hover{background:var(--surface-2);}
 .lang-option img{width:20px;border-radius:2px;}
 .lang-option .code{font-weight:600;width:26px;}
@@ -108,195 +54,117 @@ nav a:hover::after{width:100%;}
 .lang-divider{height:1px;background:var(--line);margin:6px 4px;}
 .lang-soon{padding:8px 12px;font-size:0.68rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--stone);}
 
-/* HERO */
-.hero{
-  position:relative;
-  min-height:96vh;
-  display:flex;align-items:center;
-  padding:0 5vw;
-  overflow:hidden;
-  background:
-    radial-gradient(1200px 700px at 80% 10%, rgba(255,160,90,0.35), transparent 60%),
-    radial-gradient(900px 600px at 10% 90%, rgba(255,90,60,0.25), transparent 60%),
-    linear-gradient(165deg, #3a1c10, #7a3618 55%, #c9651f 110%);
-  color:#fbf0e2;
-}
-.ember-field{position:absolute;inset:0;z-index:0;}
-.ember-particle{
-  position:absolute;
-  bottom:-20px;
-  width:var(--s);height:var(--s);
-  border-radius:50%;
-  background:radial-gradient(circle, #ffd9a8, #ff8a3d 60%, transparent 75%);
-  opacity:0;
-  animation:rise var(--dur) ease-in var(--delay) infinite;
-  filter:blur(0.5px);
-}
-@keyframes rise{
-  0%{opacity:0;transform:translateY(0) translateX(0) scale(0.6);}
-  10%{opacity:0.9;}
-  80%{opacity:0.5;}
-  100%{opacity:0;transform:translateY(-100vh) translateX(var(--drift)) scale(1.3);}
-}
-.hero-inner{position:relative;z-index:2;max-width:1400px;margin:0 auto;width:100%;display:grid;grid-template-columns:1.15fr 0.85fr;gap:60px;align-items:center;padding-top:90px;}
-.kicker{display:inline-flex;align-items:center;gap:10px;font-size:0.74rem;letter-spacing:0.18em;text-transform:uppercase;color:#ffd2a8;margin-bottom:26px;opacity:0.95;}
-.kicker .pulse{width:7px;height:7px;border-radius:50%;background:#ffb56b;box-shadow:0 0 0 0 rgba(255,181,107,0.6);animation:pulse 2s infinite;}
-@keyframes pulse{
-  0%{box-shadow:0 0 0 0 rgba(255,181,107,0.55);}
-  70%{box-shadow:0 0 0 12px rgba(255,181,107,0);}
-  100%{box-shadow:0 0 0 0 rgba(255,181,107,0);}
-}
-.hero h1{
-  font-size:clamp(3rem,6vw,5.6rem);
-  line-height:0.98;
-  letter-spacing:-0.02em;
-  font-weight:340;
-  margin-bottom:28px;
-  color:#fffaf2;
-}
-.hero p.lead{font-size:1.08rem;line-height:1.65;color:#f3dcc4;max-width:480px;margin-bottom:38px;font-weight:400;}
-.hero-actions{display:flex;gap:16px;align-items:center;flex-wrap:wrap;}
-.btn{
-  display:inline-flex;align-items:center;gap:10px;
-  padding:16px 30px;
-  font-size:0.76rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:600;
-  border-radius:100px;
-  cursor:pointer;border:none;
-  transition:transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s;
-}
-.btn-fire{
-  background:linear-gradient(120deg, #ff8a3d, #ff5a3d);
-  color:#2a0e02;
-  box-shadow:0 8px 30px rgba(255,90,50,0.35);
-}
-.btn-fire:hover{transform:translateY(-3px) scale(1.02);box-shadow:0 14px 40px rgba(255,90,50,0.5);}
-.btn-ghost2{border:1px solid rgba(255,245,234,0.4);color:#fffaf2;background:transparent;}
+/* ===== HERO SLIDER ===== */
+.hero{position:relative;height:100vh;min-height:600px;overflow:hidden;background:#241208;}
+.slide{position:absolute;inset:0;opacity:0;visibility:hidden;transition:opacity 1.1s ease;display:flex;align-items:center;}
+.slide.active{opacity:1;visibility:visible;}
+.slide .media{position:absolute;inset:0;z-index:0;}
+.slide .media video,.slide .media img{width:100%;height:100%;object-fit:cover;display:block;}
+.slide .veil{position:absolute;inset:0;z-index:1;}
+.slide1 .veil{background:linear-gradient(180deg,rgba(20,10,4,0.55) 0%,rgba(20,10,4,0.25) 40%,rgba(20,10,4,0.75) 100%);}
+.slide-promo .media{background:linear-gradient(120deg,#2a1208,#7a3618 55%,#c9651f 125%);}
+.slide-promo .veil{background:radial-gradient(900px 500px at 78% 20%,rgba(255,180,110,0.28),transparent 60%),radial-gradient(700px 500px at 12% 95%,rgba(255,90,60,0.25),transparent 60%);}
+.slide-inner{position:relative;z-index:2;width:100%;max-width:1200px;margin:0 auto;padding:90px 5vw 0;color:#fff6ea;}
+
+/* slide 1 — video + search */
+.hero-eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:0.76rem;letter-spacing:0.2em;text-transform:uppercase;color:#ffd2a8;margin-bottom:22px;}
+.hero-eyebrow .pulse{width:7px;height:7px;border-radius:50%;background:#ffb56b;box-shadow:0 0 0 0 rgba(255,181,107,0.6);animation:pulse 2.2s infinite;}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,181,107,0.55);}70%{box-shadow:0 0 0 13px rgba(255,181,107,0);}100%{box-shadow:0 0 0 0 rgba(255,181,107,0);}}
+.slide1 h1{font-size:clamp(2.6rem,5.4vw,4.9rem);line-height:1.0;letter-spacing:-0.02em;font-weight:340;color:#fffaf2;max-width:16ch;margin-bottom:20px;text-shadow:0 2px 30px rgba(0,0,0,0.35);}
+.slide1 .lead{font-size:1.05rem;line-height:1.6;color:#f0dcc6;max-width:520px;margin-bottom:34px;}
+
+/* SEARCH */
+.hero-search{position:relative;max-width:640px;}
+.hs-bar{display:flex;align-items:stretch;background:rgba(255,250,242,0.97);border-radius:100px;padding:6px;box-shadow:0 20px 50px rgba(20,8,2,0.45);}
+.hs-scope{border:none;background:transparent;font-family:inherit;font-size:0.86rem;font-weight:600;color:var(--ink);padding:0 14px 0 18px;cursor:pointer;outline:none;border-right:1px solid var(--line);}
+.hs-input{flex:1;border:none;background:transparent;font-family:inherit;font-size:0.98rem;color:var(--ink);padding:14px 16px;outline:none;}
+.hs-input::placeholder{color:var(--stone);}
+.hs-btn{border:none;background:linear-gradient(120deg,#ff8a3d,#ff5a3d);color:#2a0e02;width:52px;border-radius:100px;font-size:1.1rem;cursor:pointer;transition:transform .2s;flex-shrink:0;}
+.hs-btn:hover{transform:scale(1.05);}
+.hs-results{position:absolute;top:calc(100% + 10px);left:0;right:0;background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:0 24px 60px rgba(20,8,2,0.35);padding:8px;max-height:360px;overflow:auto;display:none;}
+.hs-results.show{display:block;}
+.hs-res{display:flex;align-items:center;gap:12px;padding:11px 13px;border-radius:12px;cursor:pointer;color:var(--ink);}
+.hs-res:hover{background:var(--surface-2);}
+.hs-res .ico{width:34px;height:34px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1rem;background:var(--surface-2);}
+.hs-res .tt{font-size:0.92rem;font-weight:600;}
+.hs-res .sb{font-size:0.76rem;color:var(--stone);}
+.hs-res .badge{margin-left:auto;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;color:var(--ember-3);background:rgba(255,122,61,0.12);padding:3px 9px;border-radius:100px;}
+.hs-empty{padding:16px;color:var(--stone);font-size:0.86rem;text-align:center;}
+.hs-hint{margin-top:12px;font-size:0.78rem;color:#e3c6a8;}
+.hs-hint a{color:#ffd2a8;border-bottom:1px solid rgba(255,210,168,0.4);}
+
+/* slide promo (obiekt / turniej) */
+.promo-tag{display:inline-block;font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;font-weight:700;color:#2a0e02;background:#ffb56b;padding:5px 12px;border-radius:100px;margin-bottom:18px;}
+.promo-kicker{font-size:0.78rem;letter-spacing:0.16em;text-transform:uppercase;color:#ffd2a8;margin-bottom:14px;}
+.slide-promo h2{font-size:clamp(2.2rem,5vw,4.2rem);line-height:1.02;color:#fffaf2;max-width:15ch;margin-bottom:16px;}
+.promo-meta{display:flex;flex-wrap:wrap;gap:10px 22px;font-size:1rem;color:#f0dcc6;margin-bottom:30px;}
+.promo-meta span{display:inline-flex;align-items:center;gap:8px;}
+.promo-meta img{width:22px;border-radius:2px;}
+.promo-meta .buckets{color:#ffb56b;letter-spacing:2px;}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:15px 28px;font-size:0.76rem;letter-spacing:0.1em;text-transform:uppercase;font-weight:600;border-radius:100px;cursor:pointer;border:none;transition:transform .35s,box-shadow .35s;}
+.btn-fire{background:linear-gradient(120deg,#ff8a3d,#ff5a3d);color:#2a0e02;box-shadow:0 10px 30px rgba(255,90,50,0.4);}
+.btn-fire:hover{transform:translateY(-3px) scale(1.02);}
+.btn-ghost2{border:1px solid rgba(255,245,234,0.45);color:#fffaf2;background:transparent;}
 .btn-ghost2:hover{border-color:#ffb56b;background:rgba(255,181,107,0.12);}
+.sponsored{position:absolute;top:96px;right:5vw;z-index:3;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,246,234,0.6);border:1px solid rgba(255,246,234,0.25);padding:4px 10px;border-radius:100px;}
 
-.hero-stat-rail{display:flex;gap:34px;margin-top:54px;}
-.hero-stat-rail div{display:flex;flex-direction:column;}
-.hero-stat-rail .num{font-family:'Fraunces',serif;font-size:1.9rem;color:#ffb56b;}
-.hero-stat-rail .lbl{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:#e3c6a8;margin-top:4px;}
-
-/* hero visual: orbiting events */
-.hero-orb{position:relative;height:560px;display:flex;align-items:center;justify-content:center;}
-.orb-core{
-  width:220px;height:220px;border-radius:50%;
-  background:radial-gradient(circle at 35% 30%, #ffd9a8, #ff8a3d 45%, #e8552a 80%);
-  box-shadow:0 0 90px rgba(255,140,80,0.6), inset -20px -20px 50px rgba(0,0,0,0.25);
-  position:relative;z-index:2;
-  animation:breathe 6s ease-in-out infinite;
-}
-@keyframes breathe{0%,100%{transform:scale(1);}50%{transform:scale(1.035);}}
-.orbit{
-  position:absolute;
-  border:1px dashed rgba(255,245,234,0.22);
-  border-radius:50%;
-  top:50%;left:50%;
-  transform:translate(-50%,-50%);
-}
-.orbit.o1{width:340px;height:340px;animation:spin 38s linear infinite;}
-.orbit.o2{width:460px;height:460px;animation:spin 60s linear infinite reverse;}
-.orbit.o3{width:560px;height:560px;animation:spin 90s linear infinite;}
-@keyframes spin{from{transform:translate(-50%,-50%) rotate(0deg);}to{transform:translate(-50%,-50%) rotate(360deg);}}
-.event-chip{
-  position:absolute;top:-19px;left:50%;
-  transform:translateX(-50%);
-  background:#fff8ee;
-  color:var(--ink);
-  padding:9px 16px;border-radius:100px;
-  font-size:0.72rem;white-space:nowrap;
-  display:flex;align-items:center;gap:8px;
-  animation:counterspin 38s linear infinite;
-  box-shadow:0 8px 22px rgba(40,15,5,0.35);
-}
-.orbit.o2 .event-chip{animation-duration:60s;animation-direction:reverse;}
-.orbit.o3 .event-chip{animation-duration:90s;}
-@keyframes counterspin{from{transform:translateX(-50%) rotate(0deg);}to{transform:translateX(-50%) rotate(-360deg);}}
-.event-chip .flag{width:16px;height:12px;border-radius:2px;}
-.event-chip b{color:var(--ember-3);font-weight:600;}
-
-.scroll-cue{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:10px;font-size:0.68rem;letter-spacing:0.15em;text-transform:uppercase;color:#e3c6a8;z-index:3;}
-.scroll-cue .line{width:1px;height:34px;background:linear-gradient(#ffb56b,transparent);animation:slide 1.8s ease-in-out infinite;}
+/* slider controls */
+.slider-dots{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);z-index:5;display:flex;gap:10px;}
+.slider-dots button{width:9px;height:9px;border-radius:50%;border:none;background:rgba(255,246,234,0.4);cursor:pointer;transition:all .3s;padding:0;}
+.slider-dots button.active{background:#ffb56b;width:26px;border-radius:100px;}
+.slider-arrow{position:absolute;top:50%;transform:translateY(-50%);z-index:5;width:48px;height:48px;border-radius:50%;border:1px solid rgba(255,246,234,0.3);background:rgba(20,10,4,0.3);color:#fff6ea;font-size:1.3rem;cursor:pointer;backdrop-filter:blur(4px);transition:all .25s;display:flex;align-items:center;justify-content:center;}
+.slider-arrow:hover{background:rgba(255,138,61,0.5);border-color:transparent;}
+.slider-arrow.prev{left:2vw;}.slider-arrow.next{right:2vw;}
+.scroll-cue{position:absolute;bottom:26px;right:5vw;z-index:5;display:flex;flex-direction:column;align-items:center;gap:8px;font-size:0.64rem;letter-spacing:0.15em;text-transform:uppercase;color:#e3c6a8;}
+.scroll-cue .line{width:1px;height:30px;background:linear-gradient(#ffb56b,transparent);animation:slide 1.8s ease-in-out infinite;}
 @keyframes slide{0%{transform:scaleY(0);transform-origin:top;}50%{transform:scaleY(1);transform-origin:top;}51%{transform-origin:bottom;}100%{transform:scaleY(0);transform-origin:bottom;}}
 
-/* SECTION GENERIC */
-section{position:relative;z-index:2;padding:130px 5vw;}
-.section-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:56px;gap:30px;flex-wrap:wrap;}
+/* SECTIONS */
+section{position:relative;z-index:2;padding:120px 5vw;}
+.section-head{max-width:1200px;margin:0 auto 52px;display:flex;justify-content:space-between;align-items:flex-end;gap:30px;flex-wrap:wrap;}
 .section-head .tag{font-size:0.74rem;text-transform:uppercase;letter-spacing:0.18em;color:var(--ember-2);margin-bottom:14px;display:block;font-weight:600;}
-.section-head h2{font-size:clamp(2.1rem,3.6vw,3.4rem);font-weight:380;letter-spacing:-0.01em;color:var(--ink);}
+.section-head h2{font-size:clamp(2rem,3.4vw,3.2rem);font-weight:380;letter-spacing:-0.01em;color:var(--ink);}
 .section-link{font-size:0.8rem;text-transform:uppercase;letter-spacing:0.08em;border-bottom:1px solid var(--ember-2);padding-bottom:4px;color:var(--ember-2);white-space:nowrap;}
+.section-body{max-width:1200px;margin:0 auto;}
 
 /* EVENTS STRIP */
 .events-row{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
-.event-card{
-  background:var(--surface);
-  border:1px solid var(--line);
-  border-radius:22px;
-  padding:34px 30px;
-  position:relative;
-  overflow:hidden;
-  transition:transform .4s cubic-bezier(.2,.8,.2,1), border-color .4s, box-shadow .4s;
-  box-shadow:0 1px 0 rgba(42,27,16,0.02);
-}
-.event-card::before{
-  content:'';position:absolute;inset:0;
-  background:radial-gradient(420px circle at var(--mx,30%) var(--my,20%), rgba(255,122,61,0.14), transparent 65%);
-  opacity:0;transition:opacity .4s;
-}
+.event-card{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:32px 30px;transition:transform .4s,border-color .4s,box-shadow .4s;}
 .event-card:hover{transform:translateY(-8px);border-color:rgba(255,122,61,0.45);box-shadow:0 24px 50px rgba(42,27,16,0.1);}
-.event-card:hover::before{opacity:1;}
-.event-rank{display:inline-block;font-size:0.66rem;text-transform:uppercase;letter-spacing:0.1em;padding:5px 12px;border-radius:100px;margin-bottom:22px;font-weight:600;}
+.event-rank{display:inline-block;font-size:0.66rem;text-transform:uppercase;letter-spacing:0.1em;padding:5px 12px;border-radius:100px;margin-bottom:20px;font-weight:600;}
 .rank-intl{background:rgba(232,85,42,0.12);color:#c43a13;}
 .rank-nat{background:rgba(255,140,60,0.16);color:#b5560f;}
 .rank-local{background:rgba(255,191,40,0.18);color:#9c6c00;}
-.event-card .date{font-family:'Fraunces',serif;font-size:2.4rem;line-height:1;margin-bottom:14px;color:var(--ink);}
-.event-card .date span{font-size:1.1rem;color:var(--stone);font-family:'Instrument Sans',sans-serif;}
-.event-card h3{font-size:1.3rem;font-weight:450;margin-bottom:10px;line-height:1.25;color:var(--ink);}
+.event-card .date{font-family:'Fraunces',serif;font-size:2.3rem;line-height:1;margin-bottom:12px;color:var(--ink);}
+.event-card .date span{font-size:1.05rem;color:var(--stone);font-family:'Instrument Sans',sans-serif;}
+.event-card h3{font-size:1.25rem;font-weight:450;margin-bottom:10px;line-height:1.25;color:var(--ink);}
 .event-card .meta{font-size:0.82rem;color:var(--ink-dim);display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
 .event-card .meta .flag{width:18px;border-radius:2px;}
 
-/* MAP SECTION */
-.map-section{background:linear-gradient(180deg, var(--surface-2), var(--bg));}
-.map-wrap{
-  display:grid;grid-template-columns:1.4fr 1fr;gap:50px;align-items:center;
-}
-.map-box{
-  background:var(--surface);
-  border:1px solid var(--line);
-  border-radius:28px;
-  padding:10px;
-  position:relative;
-  overflow:hidden;
-  box-shadow:0 20px 60px rgba(42,27,16,0.08);
-}
-#europeMap{height:560px;width:100%;}
-.map-side h3{font-size:1.6rem;margin-bottom:18px;font-weight:420;color:var(--ink);}
-.map-side p{color:var(--ink-dim);line-height:1.7;margin-bottom:30px;}
-.country-pill-list{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:34px;}
-.country-pill{font-size:0.78rem;padding:8px 16px;border:1px solid var(--line-strong);border-radius:100px;display:flex;align-items:center;gap:8px;transition:all .25s;cursor:default;color:var(--ink-dim);}
-.country-pill.active{border-color:var(--ember-1);background:rgba(255,122,61,0.12);color:var(--ember-3);}
-.country-pill .n{opacity:0.6;font-size:0.7rem;}
-.map-hover-readout{font-size:0.85rem;color:var(--ink-dim);min-height:24px;margin-top:-6px;margin-bottom:24px;}
-.map-hover-readout b{color:var(--ember-2);font-weight:600;}
+/* MAP SECTION (choropleth) */
+.map-section{background:linear-gradient(180deg,var(--surface-2),var(--bg));}
+.map-wrap{display:grid;grid-template-columns:1.5fr 1fr;gap:44px;align-items:center;max-width:1200px;margin:0 auto;}
+.map-box{background:var(--surface);border:1px solid var(--line);border-radius:26px;padding:8px;position:relative;overflow:hidden;box-shadow:0 20px 60px rgba(42,27,16,0.08);}
+#europeMap{height:540px;width:100%;}
+.map-side h3{font-size:1.7rem;margin-bottom:16px;font-weight:420;color:var(--ink);}
+.map-side p{color:var(--ink-dim);line-height:1.7;margin-bottom:24px;}
+.map-readout{font-size:0.92rem;color:var(--ink-dim);min-height:26px;margin-bottom:20px;padding:12px 16px;background:var(--surface);border:1px solid var(--line);border-radius:12px;}
+.map-readout b{color:var(--ember-2);font-weight:600;}
+.country-list{display:flex;flex-direction:column;gap:4px;margin-bottom:26px;}
+.country-row{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;cursor:pointer;transition:background .18s;font-size:0.88rem;}
+.country-row:hover{background:var(--surface-2);}
+.country-row img{width:20px;border-radius:2px;}
+.country-row .n{margin-left:auto;font-weight:600;color:var(--ember-3);}
+.country-row .bar{height:6px;border-radius:3px;background:linear-gradient(90deg,var(--ember-1),var(--ember-3));}
 
 /* MASTERS */
 .masters-track-wrap{overflow:hidden;margin:0 -5vw;padding:0 5vw;}
-.masters-track{display:flex;gap:24px;animation:scrollX 38s linear infinite;width:max-content;}
+.masters-track{display:flex;gap:24px;animation:scrollX 42s linear infinite;width:max-content;}
 .masters-track:hover{animation-play-state:paused;}
 @keyframes scrollX{from{transform:translateX(0);}to{transform:translateX(-50%);}}
-.master-card{
-  width:236px;flex-shrink:0;
-  border-radius:20px;overflow:hidden;
-  position:relative;height:344px;
-  background:var(--surface);
-  border:1px solid var(--line);
-  box-shadow:0 6px 20px rgba(42,27,16,0.06);
-  transition:transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s, border-color .35s;
-  display:flex;flex-direction:column;
-}
+.master-card{width:236px;flex-shrink:0;border-radius:20px;overflow:hidden;height:344px;background:var(--surface);border:1px solid var(--line);box-shadow:0 6px 20px rgba(42,27,16,0.06);transition:transform .35s,box-shadow .35s,border-color .35s;display:flex;flex-direction:column;}
 .master-card:hover{transform:translateY(-6px);border-color:rgba(255,122,61,0.4);box-shadow:0 18px 40px rgba(42,27,16,0.12);}
-.master-card .ph{height:180px;background:linear-gradient(150deg, #ffd9a8, #ff8a3d);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:2.6rem;color:#fff6ea;position:relative;}
+.master-card .ph{height:180px;background:linear-gradient(150deg,#ffd9a8,#ff8a3d);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:2.6rem;color:#fff6ea;position:relative;}
 .master-card .ph .flag{position:absolute;top:12px;right:12px;width:26px;border-radius:3px;box-shadow:0 2px 8px rgba(0,0,0,0.25);}
 .master-card .info{padding:15px 17px;display:flex;flex-direction:column;flex:1;}
 .master-card h4{font-size:1rem;font-weight:500;margin-bottom:3px;color:var(--ink);}
@@ -309,71 +177,78 @@ section{position:relative;z-index:2;padding:130px 5vw;}
 .rank-promaster{background:linear-gradient(120deg,#ff8a3d,#e8552a);color:#fff6ea;}
 .master-cal{margin-top:auto;display:flex;align-items:center;gap:8px;font-size:0.76rem;font-weight:600;color:var(--ember-2);padding-top:11px;border-top:1px solid var(--line);}
 .master-cal.disabled{color:var(--stone);font-weight:400;}
-.master-cal:hover:not(.disabled){color:var(--ember-3);}
 
-/* ABOUT BAND */
-.about-band{display:flex;gap:60px;align-items:center;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--surface-2);}
-.about-band h3{font-size:clamp(1.7rem,2.6vw,2.5rem);max-width:340px;font-weight:400;line-height:1.25;flex-shrink:0;color:var(--ink);}
-.about-band p{color:var(--ink-dim);line-height:1.75;font-size:1rem;}
+/* NEWS */
+.news-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}
+.news-card{background:var(--surface);border:1px solid var(--line);border-radius:20px;overflow:hidden;display:flex;flex-direction:column;transition:transform .35s,box-shadow .35s,border-color .35s;}
+.news-card:hover{transform:translateY(-6px);border-color:rgba(255,122,61,0.4);box-shadow:0 18px 44px rgba(42,27,16,0.1);}
+.news-card .cover{height:170px;position:relative;display:flex;align-items:flex-end;padding:14px;}
+.news-card .cover::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(42,15,5,0.4),transparent 60%);}
+.nc1{background:linear-gradient(150deg,#ffd9a8,#ff8a3d);}
+.nc2{background:linear-gradient(150deg,#e8552a,#a8320f);}
+.nc3{background:linear-gradient(150deg,#7a3618,#c9651f);}
+.news-card .cat{position:relative;z-index:1;font-size:0.64rem;text-transform:uppercase;letter-spacing:0.08em;font-weight:700;color:#2a0e02;background:#ffb56b;padding:4px 11px;border-radius:100px;}
+.news-card .body{padding:18px 20px 20px;display:flex;flex-direction:column;flex:1;}
+.news-card .date{font-size:0.74rem;color:var(--stone);margin-bottom:8px;}
+.news-card h3{font-size:1.14rem;font-weight:500;line-height:1.3;margin-bottom:10px;color:var(--ink);}
+.news-card p{font-size:0.88rem;color:var(--ink-dim);line-height:1.55;margin-bottom:16px;flex:1;}
+.news-card .foot{display:flex;align-items:center;justify-content:space-between;}
+.news-card .more{font-size:0.78rem;font-weight:600;color:var(--ember-2);}
+.news-card .fb{width:30px;height:30px;border-radius:50%;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:0.9rem;color:var(--ink-dim);transition:all .2s;}
+.news-card .fb:hover{background:#1877f2;color:#fff;}
 
-/* NEWSLETTER */
+/* SHOP / NEWSLETTER */
+.shop-ph{max-width:1200px;margin:0 auto;border:1px dashed var(--line-strong);border-radius:24px;padding:60px;text-align:center;color:var(--ink-dim);background:var(--surface);}
 .newsletter{text-align:center;max-width:640px;margin:0 auto;}
-.newsletter h2{margin-bottom:18px;color:var(--ink);}
-.newsletter p{color:var(--ink-dim);margin-bottom:34px;}
-.newsletter-form{display:flex;gap:0;max-width:460px;margin:0 auto;}
-.newsletter-form input{flex:1;background:var(--surface);border:1px solid var(--line-strong);border-right:none;padding:16px 20px;color:var(--ink);font-family:'Instrument Sans';border-radius:100px 0 0 100px;outline:none;}
-.newsletter-form button{border-radius:0 100px 100px 0;padding:16px 30px;}
+.newsletter h2{margin-bottom:16px;color:var(--ink);}
+.newsletter p{color:var(--ink-dim);margin-bottom:30px;}
+.newsletter-form{display:flex;max-width:460px;margin:0 auto;}
+.newsletter-form input{flex:1;background:var(--surface);border:1px solid var(--line-strong);border-right:none;padding:15px 20px;color:var(--ink);font-family:'Instrument Sans';border-radius:100px 0 0 100px;outline:none;}
+.newsletter-form button{border-radius:0 100px 100px 0;padding:15px 28px;}
 
-footer{padding:70px 5vw 40px;border-top:1px solid var(--line);position:relative;z-index:2;background:#241608;color:#f3e0c8;}
-footer .logo{color:#fffaf2;}
-.footer-grid{display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr;gap:40px;margin-bottom:60px;}
+/* FOOTER */
+footer{padding:70px 5vw 40px;position:relative;z-index:2;background:#241608;color:#f3e0c8;}
+.footer-grid{max-width:1200px;margin:0 auto 54px;display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px;}
+.footer-brand{font-family:'Fraunces',serif;font-size:1.5rem;color:#fffaf2;}
+.footer-brand .dot{color:var(--ember-1);font-style:italic;}
 .footer-grid h5{font-size:0.74rem;text-transform:uppercase;letter-spacing:0.1em;color:#caa787;margin-bottom:18px;}
 .footer-grid a{display:block;font-size:0.88rem;color:#e3cdb1;margin-bottom:12px;}
 .footer-grid a:hover{color:#ffb56b;}
-.footer-bottom{display:flex;justify-content:space-between;align-items:center;font-size:0.78rem;color:#caa787;flex-wrap:wrap;gap:14px;border-top:1px solid rgba(255,245,234,0.1);padding-top:24px;}
+.footer-bottom{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;font-size:0.78rem;color:#caa787;flex-wrap:wrap;gap:14px;border-top:1px solid rgba(255,245,234,0.1);padding-top:24px;}
 
-@media(max-width:980px){
-  .hero-inner{grid-template-columns:1fr;}
-  .hero-orb{height:380px;}
-  .events-row{grid-template-columns:1fr;}
-  .map-wrap{grid-template-columns:1fr;}
-  .about-band{flex-direction:column;align-items:flex-start;gap:24px;}
-  .footer-grid{grid-template-columns:1fr 1fr;}
+@media(max-width:1000px){
   nav{display:none;}
-  section{padding:90px 5vw;}
+  .map-wrap{grid-template-columns:1fr;}
+  .events-row,.news-grid{grid-template-columns:1fr;}
+  .footer-grid{grid-template-columns:1fr 1fr;}
+  section{padding:80px 5vw;}
+  .slide-inner{padding-top:120px;}
 }
 @media(max-width:560px){
-  header{padding:13px 5vw;}
-  .logo{font-size:1.12rem;}
-  .logo img{width:23px;height:23px;}
-  .header-right{gap:10px;}
-  header .btn-fire{display:none;}
-  .hero{min-height:auto;padding-bottom:60px;}
-  .hero-inner{padding-top:80px;gap:40px;}
-  .hero-stat-rail{gap:22px;flex-wrap:wrap;}
-  section{padding:68px 5vw;}
+  .brand{height:32px;}
+  .hs-bar{flex-wrap:wrap;border-radius:20px;}
+  .hs-scope{border-right:none;padding:10px 14px 4px;width:100%;}
+  .hs-input{padding:8px 14px;}
+  .slider-arrow{display:none;}
   #europeMap{height:380px;}
-  .footer-grid{grid-template-columns:1fr;gap:28px;}
+  .footer-grid{grid-template-columns:1fr;gap:26px;}
   .newsletter-form{flex-direction:column;gap:10px;}
   .newsletter-form input{border-right:1px solid var(--line-strong);border-radius:100px;}
   .newsletter-form button{border-radius:100px;}
 }
-
-/* jsVectorMap region tint overrides — higher contrast */
-.jvm-region{transition:fill .25s ease;}
-.jvm-tooltip{background:var(--ink)!important;border:none!important;color:#fff8ee!important;font-family:'Instrument Sans';font-size:0.78rem!important;border-radius:8px!important;padding:8px 12px!important;}
+.jvm-region{transition:fill .25s ease;cursor:pointer;}
+.jvm-tooltip{background:var(--ink)!important;border:none!important;color:#fff8ee!important;font-family:'Instrument Sans';font-size:0.8rem!important;border-radius:8px!important;padding:8px 12px!important;}
 </style>
 </head>
 <body>
 
-<div class="noise"></div>
-
 <header id="siteHeader">
-  <div class="logo"><img src="../assets/logo-mark.svg" alt="aufguss.world">aufguss<span class="dot">.</span>world</div>
+  <a href="index.html"><img class="brand" src="../assets/brand-logo-trim.png" alt="aufguss.world — Global Aufguss Community Hub"></a>
   <nav>
-    <a href="#kalendarz">Kalendarz</a>
-    <a href="#mapa">Mapa obiektów</a>
+    <a href="calendar.html">Kalendarz</a>
+    <a href="map.html">Mapa obiektów</a>
     <a href="#spolecznosc">Społeczność</a>
+    <a href="#aktualnosci">Aktualności</a>
     <a href="#sklep">Sklep</a>
   </nav>
   <div class="header-right">
@@ -390,161 +265,172 @@ footer .logo{color:#fffaf2;}
         <div class="lang-soon">Wkrótce: CZ · IT</div>
       </div>
     </div>
-    <a href="#" class="btn btn-fire" style="padding:11px 22px;">Dołącz</a>
   </div>
 </header>
 
-<section class="hero">
-  <div class="ember-field" id="emberField"></div>
-  <div class="hero-inner">
-    <div>
-      <div class="kicker"><span class="pulse"></span> Pierwszy europejski portal turystyki saunowej</div>
-      <h1>Ciepło, które<br>łączy <em>saunamistrzów</em><br>całej Europy.</h1>
-      <p class="lead">Jedno miejsce zamiast dziesiątek profili na Facebooku. Kalendarz turniejów, mapa obiektów i społeczność Aufguss — wszystko żywe, wszystko na bieżąco.</p>
-      <div class="hero-actions">
-        <a href="#mapa" class="btn btn-fire">Odkryj mapę obiektów →</a>
-        <a href="calendar.html" class="btn btn-ghost2">Najbliższe turnieje</a>
-      </div>
-      <div class="hero-stat-rail">
-        <div><span class="num">107</span><span class="lbl">Obiektów w bazie</span></div>
-        <div><span class="num">8</span><span class="lbl">Grup krajów Europy</span></div>
-        <div><span class="num">4</span><span class="lbl">Języki portalu</span></div>
-      </div>
-    </div>
-    <div class="hero-orb">
-      <div class="orbit o1"><div class="event-chip"><img class="flag" src="https://flagcdn.com/20x15/nl.png">Aufguss WM <b>Eindhoven</b></div></div>
-      <div class="orbit o2"><div class="event-chip"><img class="flag" src="https://flagcdn.com/20x15/pl.png">PTS Classic <b>Słupsk</b></div></div>
-      <div class="orbit o3"><div class="event-chip"><img class="flag" src="https://flagcdn.com/20x15/de.png">Nocny Aufguss <b>Berlin</b></div></div>
-      <div class="orb-core"></div>
+<!-- ===== HERO SLIDER ===== -->
+<section class="hero" id="hero">
+  <!-- SLIDE 1: wideo + wyszukiwarka -->
+  <div class="slide slide1 active">
+    <div class="media"><video src="../assets/hero-bg.mp4" autoplay muted loop playsinline></video></div>
+    <div class="veil"></div>
+    <div class="slide-inner">
+      <div class="hero-eyebrow"><span class="pulse"></span> Global Aufguss Community Hub</div>
+      <h1>Cały świat aufguss w&nbsp;jednym miejscu.</h1>
+      <p class="lead">Obiekty, saunamistrzowie, turnieje i ceremonie — znajdź to, czego szukasz w europejskiej społeczności aufguss.</p>
+      <form class="hero-search" id="heroSearch" autocomplete="off" onsubmit="return false">
+        <div class="hs-bar">
+          <select class="hs-scope" id="hsScope">
+            <option value="all">Wszystko</option>
+            <option value="Obiekt">Obiekty</option>
+            <option value="Saunamistrz">Saunamistrzowie</option>
+            <option value="Wydarzenie">Wydarzenia</option>
+          </select>
+          <input class="hs-input" id="hsInput" type="text" placeholder="Szukaj obiektu, saunamistrza, wydarzenia…">
+          <button class="hs-btn" id="hsBtn" type="button">🔍</button>
+        </div>
+        <div class="hs-results" id="hsResults"></div>
+      </form>
+      <div class="hs-hint">np. <a href="object.html">Satama</a> · <a href="saunamaster.html">Maciej Piczura</a> · <a href="calendar.html">The Battle of Gladiators</a></div>
     </div>
   </div>
+
+  <!-- SLIDE 2: wyróżniony obiekt (monetyzacja) -->
+  <div class="slide slide-promo slide2">
+    <div class="media"></div>
+    <div class="veil"></div>
+    <span class="sponsored">Treść wyróżniona</span>
+    <div class="slide-inner">
+      <span class="promo-tag">Wyróżniony obiekt</span>
+      <div class="promo-kicker">Obiekt tygodnia na aufguss.world</div>
+      <h2>Satama Sauna Resort</h2>
+      <div class="promo-meta">
+        <span><img src="https://flagcdn.com/20x15/de.png"> Wendisch-Rietz, Brandenburg</span>
+        <span class="buckets">▮▮▮▮▮ 5/5</span>
+        <span>🌊 nad jeziorem Scharmützelsee</span>
+      </div>
+      <a href="object.html" class="btn btn-fire">Zobacz obiekt →</a>
+    </div>
+  </div>
+
+  <!-- SLIDE 3: promowany turniej (monetyzacja) -->
+  <div class="slide slide-promo slide3">
+    <div class="media"></div>
+    <div class="veil"></div>
+    <span class="sponsored">Promocja wydarzenia</span>
+    <div class="slide-inner">
+      <span class="promo-tag">Nadchodzący turniej</span>
+      <div class="promo-kicker">Mistrzostwa Świata Aufguss</div>
+      <h2>The Battle of Gladiators</h2>
+      <div class="promo-meta">
+        <span>🗓 6–9 marca 2026</span>
+        <span><img src="https://flagcdn.com/20x15/pl.png"> Termy Rzymskie, Czeladź</span>
+      </div>
+      <a href="calendar.html" class="btn btn-fire">Zobacz wydarzenie →</a>
+    </div>
+  </div>
+
+  <button class="slider-arrow prev" id="slidePrev" aria-label="Poprzedni">‹</button>
+  <button class="slider-arrow next" id="slideNext" aria-label="Następny">›</button>
+  <div class="slider-dots" id="sliderDots"></div>
   <div class="scroll-cue"><div class="line"></div>Przewiń</div>
 </section>
 
+<!-- KALENDARZ -->
 <section id="kalendarz">
   <div class="section-head">
-    <div>
-      <span class="tag">Kalendarz saunowy</span>
-      <h2>Co się dzieje<br>w najbliższych tygodniach</h2>
-    </div>
+    <div><span class="tag">Kalendarz saunowy</span><h2>Co się dzieje<br>w najbliższych tygodniach</h2></div>
     <a href="calendar.html" class="section-link">Pełny kalendarz →</a>
   </div>
-  <div class="events-row">
-    <div class="event-card">
-      <span class="event-rank rank-intl">Turniej międzynarodowy</span>
-      <div class="date">15<span>marca</span></div>
-      <h3>Mistrzostwa Świata Aufguss — Eindhoven</h3>
-      <div class="meta"><img class="flag" src="https://flagcdn.com/20x15/nl.png">Holandia · Thermaalbad</div>
-    </div>
-    <div class="event-card">
-      <span class="event-rank rank-nat">Turniej krajowy</span>
-      <div class="date">21<span>marca</span></div>
-      <h3>Mistrzostwa Polski PTS Classic — Słupsk</h3>
-      <div class="meta"><img class="flag" src="https://flagcdn.com/20x15/pl.png">Polska · Centrum SPA</div>
-    </div>
-    <div class="event-card">
-      <span class="event-rank rank-local">Wydarzenie obiektowe</span>
-      <div class="date">29<span>marca</span></div>
-      <h3>Nocna ceremonia Aufguss — Liquidrom</h3>
-      <div class="meta"><img class="flag" src="https://flagcdn.com/20x15/de.png">Niemcy · Berlin Mitte</div>
+  <div class="section-body">
+    <div class="events-row">
+      <a href="calendar.html" class="event-card">
+        <span class="event-rank rank-intl">Turniej międzynarodowy</span>
+        <div class="date">15<span>marca</span></div>
+        <h3>Mistrzostwa Świata Aufguss — Eindhoven</h3>
+        <div class="meta"><img class="flag" src="https://flagcdn.com/20x15/nl.png">Holandia · Thermaalbad</div>
+      </a>
+      <a href="calendar.html" class="event-card">
+        <span class="event-rank rank-nat">Turniej krajowy</span>
+        <div class="date">21<span>marca</span></div>
+        <h3>Mistrzostwa Polski PTS Classic — Słupsk</h3>
+        <div class="meta"><img class="flag" src="https://flagcdn.com/20x15/pl.png">Polska · Centrum SPA</div>
+      </a>
+      <a href="calendar.html" class="event-card">
+        <span class="event-rank rank-local">Wydarzenie obiektowe</span>
+        <div class="date">29<span>marca</span></div>
+        <h3>Nocna ceremonia Aufguss — Liquidrom</h3>
+        <div class="meta"><img class="flag" src="https://flagcdn.com/20x15/de.png">Niemcy · Berlin Mitte</div>
+      </a>
     </div>
   </div>
 </section>
 
+<!-- MAPA -->
 <section id="mapa" class="map-section">
   <div class="section-head">
-    <div>
-      <span class="tag">Mapa obiektów</span>
-      <h2>Europa widziana<br>oczami saunamistrza</h2>
-    </div>
+    <div><span class="tag">Mapa obiektów</span><h2>Europa saunowa<br>kraj po kraju</h2></div>
     <a href="map.html" class="section-link">Otwórz pełną mapę →</a>
   </div>
   <div class="map-wrap">
-    <div class="map-box">
-      <div id="europeMap"></div>
-    </div>
+    <div class="map-box"><div id="europeMap"></div></div>
     <div class="map-side">
-      <h3>Najedź na kraj, poczuj klimat</h3>
-      <p>Mapa rozjaśnia się tam, gdzie tętni życie saunowe. Każdy kraj kryje obiekty, wydarzenia i lokalnych saunamistrzów — pełny widok z filtrowalnymi kartami czeka na podstronie mapy.</p>
-      <div class="map-hover-readout" id="mapReadout">Najedź kursorem na mapę, aby zobaczyć kraj →</div>
-      <div class="country-pill-list">
-        <span class="country-pill active">🇵🇱 Polska <span class="n">31</span></span>
-        <span class="country-pill">🇩🇪 Niemcy <span class="n">31</span></span>
-        <span class="country-pill">🇳🇱 Holandia+BE <span class="n">17</span></span>
-        <span class="country-pill">🇨🇿 Czechy+SK <span class="n">10</span></span>
-        <span class="country-pill">🇦🇹 Austria+CH <span class="n">9</span></span>
-        <span class="country-pill">🇮🇹 Włochy <span class="n">5</span></span>
-      </div>
-      <a href="map.html" class="btn btn-fire">Pełna mapa obiektów →</a>
+      <h3>Wybierz kraj, poznaj obiekty</h3>
+      <p>Kolor kraju odpowiada liczbie obiektów w naszej bazie. Kliknij państwo na mapie lub liście, a przejdziesz prosto do pełnej mapy odfiltrowanej dla tego regionu.</p>
+      <div class="map-readout" id="mapReadout">Najedź lub kliknij kraj →</div>
+      <div class="country-list" id="countryList"></div>
     </div>
   </div>
 </section>
 
+<!-- SPOŁECZNOŚĆ -->
 <section id="spolecznosc">
   <div class="section-head">
-    <div>
-      <span class="tag">Społeczność</span>
-      <h2>Saunamistrzowie, którzy<br>tworzą atmosferę</h2>
-    </div>
-    <a href="#" class="section-link">Zobacz wszystkich →</a>
+    <div><span class="tag">Społeczność</span><h2>Saunamistrzowie, którzy<br>tworzą atmosferę</h2></div>
+    <a href="saunamaster.html" class="section-link">Zobacz profile →</a>
   </div>
-  <div class="masters-track-wrap">
-    <div class="masters-track" id="mastersTrack"></div>
-  </div>
+  <div class="masters-track-wrap"><div class="masters-track" id="mastersTrack"></div></div>
 </section>
 
-<section class="about-band">
-  <h3>Dlaczego <em>aufguss.world</em>?</h3>
-  <p>Informacje o turniejach i ceremoniach saunowych są dziś rozproszone po dziesiątkach profili w social mediach. Zbieramy je w jednym miejscu — z mapą obiektów, kalendarzem wydarzeń i profilami saunamistrzów — żeby każdy pasjonat Aufguss w Europie wiedział, gdzie i kiedy dzieje się coś wartego podróży.</p>
-</section>
-
-<section id="sklep">
+<!-- AKTUALNOŚCI -->
+<section id="aktualnosci">
   <div class="section-head">
-    <div>
-      <span class="tag">Sklep</span>
-      <h2>Niszowe produkty saunowe</h2>
-    </div>
+    <div><span class="tag">Aktualności</span><h2>Ze świata<br>aufguss</h2></div>
+    <a href="#" class="section-link">Wszystkie aktualności →</a>
   </div>
-  <div style="border:1px dashed var(--line-strong);border-radius:24px;padding:60px;text-align:center;color:var(--ink-dim);background:var(--surface);">
-    Sklep — uruchomienie wkrótce. Szlafroki, ręczniki Aufguss, wachlarze i olejki eteryczne od sprawdzonych europejskich marek.
+  <div class="section-body">
+    <div class="news-grid" id="newsGrid"></div>
   </div>
 </section>
 
-<section class="newsletter">
-  <span class="tag">Newsletter</span>
-  <h2>Bądź na bieżąco</h2>
-  <p>Nowe obiekty, turnieje i materiały — raz w tygodniu, bez spamu.</p>
-  <div class="newsletter-form">
-    <input type="email" placeholder="twój@email.com">
-    <button class="btn btn-fire">Zapisz się</button>
+<!-- SKLEP -->
+<section id="sklep">
+  <div class="section-head"><div><span class="tag">Sklep</span><h2>Niszowe produkty saunowe</h2></div></div>
+  <div class="shop-ph">Sklep — uruchomienie wkrótce. Szlafroki, ręczniki Aufguss, wachlarze i olejki eteryczne od sprawdzonych europejskich marek.</div>
+</section>
+
+<!-- NEWSLETTER -->
+<section class="newsletter-sec">
+  <div class="newsletter">
+    <span class="tag" style="color:var(--ember-2);font-size:0.74rem;text-transform:uppercase;letter-spacing:0.18em;font-weight:600;">Newsletter</span>
+    <h2 style="margin-top:12px;">Bądź na bieżąco</h2>
+    <p>Nowe obiekty, turnieje i aktualności — raz w tygodniu, bez spamu.</p>
+    <div class="newsletter-form">
+      <input type="email" placeholder="twój@email.com">
+      <button class="btn btn-fire">Zapisz się</button>
+    </div>
   </div>
 </section>
 
 <footer>
   <div class="footer-grid">
     <div>
-      <div class="logo"><img src="../assets/logo-mark-white.svg" alt="aufguss.world">aufguss<span class="dot">.</span>world</div>
-      <p style="color:#caa787;font-size:0.85rem;margin-top:16px;max-width:280px;">Portal turystyki saunowej. Brand wideo: <span style="color:#ffb56b;">aufguss.tv</span></p>
+      <div class="footer-brand">aufguss<span class="dot">.</span>world</div>
+      <p style="color:#caa787;font-size:0.85rem;margin-top:14px;max-width:280px;">Global Aufguss Community Hub. Brand wideo: <span style="color:#ffb56b;">aufguss.tv</span></p>
     </div>
-    <div>
-      <h5>Portal</h5>
-      <a href="#kalendarz">Kalendarz</a>
-      <a href="#mapa">Mapa obiektów</a>
-      <a href="#spolecznosc">Społeczność</a>
-      <a href="#sklep">Sklep</a>
-    </div>
-    <div>
-      <h5>Dla obiektów</h5>
-      <a href="#">Zgłoś obiekt</a>
-      <a href="#">Materiały do pobrania</a>
-      <a href="#">Współpraca</a>
-    </div>
-    <div>
-      <h5>Informacje</h5>
-      <a href="#">Polityka prywatności</a>
-      <a href="#">Kontakt</a>
-      <a href="#">aufguss.tv</a>
-    </div>
+    <div><h5>Portal</h5><a href="calendar.html">Kalendarz</a><a href="map.html">Mapa obiektów</a><a href="#spolecznosc">Społeczność</a><a href="#aktualnosci">Aktualności</a><a href="#sklep">Sklep</a></div>
+    <div><h5>Dla obiektów</h5><a href="#">Zgłoś obiekt</a><a href="#">Materiały do pobrania</a><a href="#">Współpraca</a></div>
+    <div><h5>Informacje</h5><a href="#">Polityka prywatności</a><a href="#">Kontakt</a><a href="#">aufguss.tv</a></div>
   </div>
   <div class="footer-bottom">
     <span>© 2026 aufguss.world — Wszystkie prawa zastrzeżone</span>
@@ -554,122 +440,160 @@ footer .logo{color:#fffaf2;}
 
 <script src="https://cdn.jsdelivr.net/npm/jsvectormap@1.4.4/dist/js/jsvectormap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsvectormap@1.4.4/dist/maps/world-merc.js"></script>
+<script src="../data/objects-data.js"></script>
+<script src="../data/events-data.js"></script>
 <script>
-// header scroll state
+// ===== HEADER =====
 const header = document.getElementById('siteHeader');
-window.addEventListener('scroll', () => header.classList.toggle('scrolled', window.scrollY > 40));
-
-// subtle cursor glow only within hero
-document.querySelector('.hero').addEventListener('mousemove', e => {
-  document.body.style.setProperty('--mx', e.clientX + 'px');
-  document.body.style.setProperty('--my', e.clientY + 'px');
-});
-document.querySelectorAll('.event-card').forEach(card=>{
-  card.addEventListener('mousemove', e=>{
-    const r = card.getBoundingClientRect();
-    card.style.setProperty('--mx', (e.clientX-r.left)+'px');
-    card.style.setProperty('--my', (e.clientY-r.top)+'px');
-  });
-});
+window.addEventListener('scroll', ()=> header.classList.toggle('scrolled', window.scrollY>40));
 
 // language dropdown
-const langDd = document.getElementById('langDd');
-const langTrigger = document.getElementById('langTrigger');
-const langCode = document.getElementById('langCode');
-const langFlag = document.getElementById('langFlag');
-langTrigger.addEventListener('click', (e)=>{ e.stopPropagation(); langDd.classList.toggle('open'); });
-document.querySelectorAll('.lang-option').forEach(opt=>{
-  opt.addEventListener('click', ()=>{
-    document.querySelectorAll('.lang-option').forEach(o=>o.classList.remove('active'));
-    opt.classList.add('active');
-    langCode.textContent = opt.dataset.code;
-    langFlag.src = `https://flagcdn.com/20x15/${opt.dataset.flag}.png`;
-    langDd.classList.remove('open');
-  });
-});
+const langDd=document.getElementById('langDd'), langTrigger=document.getElementById('langTrigger');
+langTrigger.addEventListener('click', e=>{ e.stopPropagation(); langDd.classList.toggle('open'); });
+document.querySelectorAll('.lang-option').forEach(opt=>opt.addEventListener('click',()=>{
+  document.querySelectorAll('.lang-option').forEach(o=>o.classList.remove('active'));
+  opt.classList.add('active');
+  document.getElementById('langCode').textContent=opt.dataset.code;
+  document.getElementById('langFlag').src=`https://flagcdn.com/20x15/${opt.dataset.flag}.png`;
+  langDd.classList.remove('open');
+}));
 document.addEventListener('click', ()=> langDd.classList.remove('open'));
 
-// ember particles (contained to hero)
-const field = document.getElementById('emberField');
-for(let i=0;i<22;i++){
-  const p = document.createElement('div');
-  p.className='ember-particle';
-  const size = (Math.random()*5+2).toFixed(1);
-  p.style.setProperty('--s', size+'px');
-  p.style.left = Math.random()*100+'%';
-  p.style.setProperty('--dur', (Math.random()*10+9).toFixed(1)+'s');
-  p.style.setProperty('--delay', (Math.random()*12).toFixed(1)+'s');
-  p.style.setProperty('--drift', (Math.random()*120-60).toFixed(0)+'px');
-  field.appendChild(p);
+// ===== HERO SLIDER =====
+const slides=[...document.querySelectorAll('.hero .slide')];
+const dotsBox=document.getElementById('sliderDots');
+let cur=0, timer=null;
+slides.forEach((s,i)=>{ const b=document.createElement('button'); if(i===0)b.className='active'; b.addEventListener('click',()=>go(i,true)); dotsBox.appendChild(b); });
+const dots=[...dotsBox.children];
+function go(i,manual){
+  slides[cur].classList.remove('active'); dots[cur].classList.remove('active');
+  cur=(i+slides.length)%slides.length;
+  slides[cur].classList.add('active'); dots[cur].classList.add('active');
+  if(manual) restart();
 }
+function next(){ go(cur+1); }
+function restart(){ clearInterval(timer); timer=setInterval(next, 6500); }
+document.getElementById('slideNext').addEventListener('click',()=>go(cur+1,true));
+document.getElementById('slidePrev').addEventListener('click',()=>go(cur-1,true));
+restart();
 
-// masters slider (duplicated for seamless loop)
-// rank: docelowo wyliczana z punktów rankingowych za turnieje (10-stopniowa skala)
-const rankStyles = {
-  rookie:     {cls:'rank-rookie',    lvl:'I'},
-  advanced:   {cls:'rank-advanced',  lvl:'IV'},
-  expert:     {cls:'rank-expert',    lvl:'VII'},
-  promaster:  {cls:'rank-promaster', lvl:'X'},
-};
-const masters = [
-  {name:'Robert Zídek',    role:'Czechy · 3× Mistrz Świata', flag:'cz', rank:'promaster', rankLabel:'Pro Master', cal:true},
-  {name:'Arek Dan',        role:'Polska · Rezydent 3 obiektów', flag:'pl', rank:'expert', rankLabel:'Steam Expert', cal:true},
-  {name:'Jeremi Dygas',    role:'Polska · Finalista MP', flag:'pl', rank:'expert', rankLabel:'Steam Expert', cal:true},
-  {name:'Lukas Weber',     role:'Niemcy · Mistrz kraju 2023', flag:'de', rank:'promaster', rankLabel:'Pro Master', cal:true},
-  {name:'Sanne de Vries',  role:'Holandia · Sędzia WAC', flag:'nl', rank:'advanced', rankLabel:'Advanced', cal:false},
-  {name:'Petra Nováková',  role:'Czechy · Rezydentka', flag:'cz', rank:'advanced', rankLabel:'Advanced', cal:true},
-  {name:'Andrea Rossi',    role:'Włochy · Gościnnie', flag:'it', rank:'rookie', rankLabel:'Rookie', cal:false},
-  {name:'Tomasz Kowal',    role:'Polska · Sędzia PTS', flag:'pl', rank:'advanced', rankLabel:'Advanced', cal:true},
+// ===== WYSZUKIWARKA =====
+const OBJECTS = window.AUFGUSS_OBJECTS || [];
+const EVENTS  = window.AUFGUSS_EVENTS || [];
+const mastersData = [
+  {name:'Maciej Piczura', role:'Polska · Mistrz Świata', url:'saunamaster.html'},
+  {name:'Robert Zídek', role:'Czechy · 3× Mistrz Świata', url:'saunamaster.html'},
+  {name:'Arek Dan', role:'Polska · Steam Expert', url:'saunamaster.html'},
+  {name:'Jeremi Dygas', role:'Polska · Steam Expert', url:'saunamaster.html'},
+  {name:'Lukas Weber', role:'Niemcy · Pro Master', url:'saunamaster.html'},
+  {name:'Petra Nováková', role:'Czechy · Advanced', url:'saunamaster.html'},
 ];
-const track = document.getElementById('mastersTrack');
-[...masters, ...masters].forEach(m=>{
-  const rs = rankStyles[m.rank];
-  const el = document.createElement('div');
-  el.className='master-card';
-  const initials = m.name.split(' ').map(n=>n[0]).join('');
-  el.innerHTML = `
-    <div class="ph">${initials}<img class="flag" src="https://flagcdn.com/40x30/${m.flag}.png" alt="${m.flag}"></div>
-    <div class="info">
-      <h4>${m.name}</h4>
-      <div class="role">${m.role}</div>
-      <span class="master-rank ${rs.cls}"><span class="lvl">${rs.lvl}</span> ${m.rankLabel}</span>
-      ${m.cal
-        ? `<a href="#" class="master-cal">📅 Kalendarz saunamistrza →</a>`
-        : `<span class="master-cal disabled">Brak kalendarza</span>`}
-    </div>`;
+const searchIndex = [
+  ...OBJECTS.map(o=>({type:'Obiekt', ico:'🏠', name:o.name, sub:(o.city?o.city+', ':'')+o.country, url:'object.html'})),
+  ...mastersData.map(m=>({type:'Saunamistrz', ico:'🧖', name:m.name, sub:m.role, url:m.url})),
+  ...EVENTS.map(e=>({type:'Wydarzenie', ico:'🗓', name:e.title, sub:e.venue.name+', '+e.venue.city, url:'calendar.html'})),
+];
+const hsInput=document.getElementById('hsInput'), hsScope=document.getElementById('hsScope'), hsResults=document.getElementById('hsResults');
+function runSearch(){
+  const q=hsInput.value.trim().toLowerCase(), sc=hsScope.value;
+  if(q.length<2){ hsResults.classList.remove('show'); return; }
+  let res=searchIndex.filter(it=>(sc==='all'||it.type===sc) && (it.name.toLowerCase().includes(q)||it.sub.toLowerCase().includes(q)));
+  res=res.slice(0,8);
+  if(!res.length){ hsResults.innerHTML=`<div class="hs-empty">Brak wyników dla „${hsInput.value}"</div>`; }
+  else hsResults.innerHTML=res.map(r=>`<a class="hs-res" href="${r.url}"><span class="ico">${r.ico}</span><span><div class="tt">${r.name}</div><div class="sb">${r.sub}</div></span><span class="badge">${r.type}</span></a>`).join('');
+  hsResults.classList.add('show');
+}
+hsInput.addEventListener('input', runSearch);
+hsScope.addEventListener('change', runSearch);
+document.getElementById('hsBtn').addEventListener('click', runSearch);
+document.addEventListener('click', e=>{ if(!e.target.closest('.hero-search')) hsResults.classList.remove('show'); });
+
+// ===== SPOŁECZNOŚĆ (slider kart) =====
+const rankStyles={rookie:{cls:'rank-rookie',lvl:'I'},advanced:{cls:'rank-advanced',lvl:'IV'},expert:{cls:'rank-expert',lvl:'VII'},promaster:{cls:'rank-promaster',lvl:'X'}};
+const masters=[
+  {name:'Maciej Piczura', role:'Polska · Mistrz Świata', flag:'pl', rank:'promaster', rankLabel:'Pro Master', cal:true},
+  {name:'Robert Zídek', role:'Czechy · 3× Mistrz Świata', flag:'cz', rank:'promaster', rankLabel:'Pro Master', cal:true},
+  {name:'Arek Dan', role:'Polska · Rezydent 3 obiektów', flag:'pl', rank:'expert', rankLabel:'Steam Expert', cal:true},
+  {name:'Jeremi Dygas', role:'Polska · Finalista MP', flag:'pl', rank:'expert', rankLabel:'Steam Expert', cal:true},
+  {name:'Lukas Weber', role:'Niemcy · Mistrz kraju 2023', flag:'de', rank:'promaster', rankLabel:'Pro Master', cal:true},
+  {name:'Sanne de Vries', role:'Holandia · Sędzia WAC', flag:'nl', rank:'advanced', rankLabel:'Advanced', cal:false},
+  {name:'Petra Nováková', role:'Czechy · Rezydentka', flag:'cz', rank:'advanced', rankLabel:'Advanced', cal:true},
+  {name:'Tomasz Kowal', role:'Polska · Sędzia PTS', flag:'pl', rank:'advanced', rankLabel:'Advanced', cal:true},
+];
+const track=document.getElementById('mastersTrack');
+[...masters,...masters].forEach(m=>{
+  const rs=rankStyles[m.rank]; const el=document.createElement('a'); el.href='saunamaster.html'; el.className='master-card';
+  el.innerHTML=`<div class="ph">${m.name.split(' ').map(n=>n[0]).join('')}<img class="flag" src="https://flagcdn.com/40x30/${m.flag}.png"></div>
+    <div class="info"><h4>${m.name}</h4><div class="role">${m.role}</div>
+    <span class="master-rank ${rs.cls}"><span class="lvl">${rs.lvl}</span> ${m.rankLabel}</span>
+    ${m.cal?`<span class="master-cal">📅 Kalendarz saunamistrza →</span>`:`<span class="master-cal disabled">Brak kalendarza</span>`}</div>`;
   track.appendChild(el);
 });
 
-// jsVectorMap — dedykowana mapa Europy, podświetlanie krajów z obiektami
-const activeCodes = ['PL','DE','NL','CZ','AT','IT','BE','SK','CH','SE','NO','DK','HU','RO'];
-const readout = document.getElementById('mapReadout');
-// kraje wyznaczające kadr Europy (zoom przycinający widok do tego regionu)
-const focusCodes = ['PT','ES','IE','GB','FR','NO','SE','FI','IT','GR','PL','RO','EE'];
-const map = new jsVectorMap({
-  selector: '#europeMap',
-  map: 'world_merc',
-  zoomButtons: false,
-  zoomOnScroll: false,
-  draggable: false,
-  backgroundColor: 'transparent',
-  regionStyle: {
-    initial: { fill: '#e7d8bf', stroke: '#cdb892', strokeWidth: 0.6 },
-    hover: { fill: '#ff7a3d', fillOpacity: 1, cursor: 'pointer', stroke:'#7a3618', strokeWidth:1 },
-  },
-  series: { regions: [{ values: Object.fromEntries(activeCodes.map(c=>[c,1])), attribute: 'fill', scale: { '0':'#e7d8bf','1':'#d9a36a' } }] },
-  onRegionOver(event, code){
-    const name = map.regions[code]?.config?.name || code;
-    readout.innerHTML = activeCodes.includes(code)
-      ? `Najechano: <b>${name}</b>`
-      : `${name} — wkrótce`;
-  },
-  onRegionOut(){ readout.innerHTML = 'Najedź kursorem na mapę, aby zobaczyć kraj →'; },
+// ===== AKTUALNOŚCI =====
+const news=[
+  {cat:'Turnieje', cover:'nc1', date:'28 czerwca 2026', title:'Robert Zídek po raz trzeci Mistrzem Świata Aufguss', excerpt:'Czeski saunamistrz obronił tytuł podczas The Battle of Gladiators w Termach Rzymskich w Czeladzi.'},
+  {cat:'Obiekty', cover:'nc3', date:'21 czerwca 2026', title:'Satama otwiera nową saunę nad jeziorem', excerpt:'Kultowy resort z Brandenburgii powiększa się o zewnętrzną saunę z widokiem na Scharmützelsee.'},
+  {cat:'Społeczność', cover:'nc2', date:'12 czerwca 2026', title:'Rusza 10-stopniowy system rang saunamistrzów', excerpt:'Od teraz osiągnięcia z turniejów przekładają się na rangę widoczną na profilu — od Rookie do Pro Master.'},
+];
+document.getElementById('newsGrid').innerHTML=news.map(n=>`
+  <article class="news-card">
+    <div class="cover ${n.cover}"><span class="cat">${n.cat}</span></div>
+    <div class="body">
+      <div class="date">${n.date}</div>
+      <h3>${n.title}</h3>
+      <p>${n.excerpt}</p>
+      <div class="foot"><a href="#" class="more">Czytaj więcej →</a><a href="#" class="fb" title="Udostępnij na Facebooku">f</a></div>
+    </div>
+  </article>`).join('');
+
+// ===== MAPA-CHOROPLETH =====
+const countryData={
+  PL:{group:'Polska',n:31}, DE:{group:'Niemcy',n:31},
+  NL:{group:'Holandia + Belgia',n:17}, BE:{group:'Holandia + Belgia',n:17},
+  CZ:{group:'Czechy + Słowacja',n:10}, SK:{group:'Czechy + Słowacja',n:10},
+  AT:{group:'Austria + Szwajcaria',n:9}, CH:{group:'Austria + Szwajcaria',n:9},
+  IT:{group:'Włochy',n:5},
+  SE:{group:'Skandynawia',n:2}, NO:{group:'Skandynawia',n:2}, DK:{group:'Skandynawia',n:2}, FI:{group:'Skandynawia',n:2},
+  HU:{group:'Węgry + Rumunia',n:2}, RO:{group:'Węgry + Rumunia',n:2},
+};
+const readout=document.getElementById('mapReadout');
+function gotoCountry(group){ location.href='map.html?country='+encodeURIComponent(group); }
+// kolor kraju liczony bezpośrednio z liczby obiektów (jasny piasek -> ember)
+const C_LIGHT=[244,220,188], C_DARK=[224,74,32], MAXN=31;
+const hex=v=>('0'+Math.round(v).toString(16)).slice(-2);
+function colorFor(n){ const t=Math.pow(Math.min(n,MAXN)/MAXN,0.6); return '#'+[0,1,2].map(i=>hex(C_LIGHT[i]+(C_DARK[i]-C_LIGHT[i])*t)).join(''); }
+const fillValues=Object.fromEntries(Object.entries(countryData).map(([c,d])=>[c,colorFor(d.n)]));
+const map=new jsVectorMap({
+  selector:'#europeMap', map:'world_merc', zoomButtons:false, zoomOnScroll:false, draggable:false, backgroundColor:'transparent',
+  regionStyle:{ initial:{fill:'#ece0cb',stroke:'#d8c6a8',strokeWidth:0.5}, hover:{fill:'#ff7a3d',fillOpacity:1,cursor:'pointer',stroke:'#7a3618',strokeWidth:1} },
+  onRegionTooltipShow(ev,tt,code){ const d=countryData[code]; tt.text(d?`${d.group} — ${d.n} obiektów`:(map.regions[code]?.config?.name||code)+' — wkrótce', true); },
+  onRegionOver(ev,code){ const d=countryData[code]; readout.innerHTML=d?`<b>${d.group}</b> — ${d.n} obiektów · kliknij, aby zobaczyć`:`${map.regions[code]?.config?.name||code} — wkrótce`; },
+  onRegionOut(){ readout.innerHTML='Najedź lub kliknij kraj →'; },
+  onRegionClick(ev,code){ const d=countryData[code]; if(d) gotoCountry(d.group); },
 });
-// przytnij widok do Europy (kadr po współrzędnych środka kontynentu)
-function focusEurope(){ try{ map.setFocus({ coords: [57, 14], scale: 2.7, animate: false }); }catch(e){} }
-setTimeout(focusEurope, 120);
-setTimeout(focusEurope, 500);
-window.addEventListener('resize', ()=>setTimeout(focusEurope, 60));
+// pokoloruj kraje wg liczby obiektów (initial.fill => zachowane po hover-out)
+function paintCountries(){
+  Object.entries(countryData).forEach(([code,d])=>{
+    const sh=map.regions[code]?.element.shape;
+    if(sh){ const c=colorFor(d.n); sh.style.initial.fill=c; sh.setStyle('fill',c); }
+  });
+}
+function focusEurope(){ try{ map.setFocus({coords:[57,14],scale:2.7,animate:false}); }catch(e){} }
+setTimeout(()=>{ focusEurope(); paintCountries(); },120);
+setTimeout(()=>{ focusEurope(); paintCountries(); },500);
+window.addEventListener('resize',()=>setTimeout(focusEurope,60));
+
+// lista krajów (agregacja grup)
+const groups={}; Object.values(countryData).forEach(d=>groups[d.group]=d.n);
+const maxN=Math.max(...Object.values(groups));
+const flagByGroup={'Polska':'pl','Niemcy':'de','Holandia + Belgia':'nl','Czechy + Słowacja':'cz','Austria + Szwajcaria':'at','Włochy':'it','Skandynawia':'se','Węgry + Rumunia':'hu'};
+document.getElementById('countryList').innerHTML=Object.entries(groups).sort((a,b)=>b[1]-a[1]).map(([g,n])=>`
+  <div class="country-row" onclick="location.href='map.html?country='+encodeURIComponent('${g.replace(/'/g,"\\'")}')">
+    <img src="https://flagcdn.com/20x15/${flagByGroup[g]}.png"> ${g}
+    <span class="bar" style="width:${Math.round(n/maxN*70)+10}px"></span>
+    <span class="n">${n}</span>
+  </div>`).join('');
 </script>
 </body>
 </html>
