@@ -53,6 +53,14 @@ header{display:flex;align-items:center;justify-content:space-between;padding:16p
 .t-card .foot b{color:var(--ember-3);font-weight:600;}
 .t-card .foot img{width:18px;border-radius:2px;vertical-align:-3px;margin-right:4px;}
 .t-card .go{margin-left:auto;color:var(--ember-2);font-weight:600;}
+/* picker krajów (krajowe) */
+.cp-list{display:flex;flex-direction:column;gap:8px;max-width:520px;}
+.cp-row{display:flex;align-items:center;gap:12px;padding:14px 16px;border:1px solid var(--line);border-radius:13px;background:var(--surface);cursor:pointer;transition:border-color .18s,background .18s,transform .18s;}
+.cp-row:hover{border-color:var(--ember-1);background:var(--surface-2);transform:translateX(3px);}
+.cp-row img{width:26px;border-radius:3px;box-shadow:0 1px 3px rgba(0,0,0,0.15);}
+.cp-row .nm{font-weight:600;font-size:0.98rem;}
+.cp-row .n{margin-left:auto;font-weight:700;color:var(--nat);}
+.cp-row .chev{color:var(--stone);font-size:1.2rem;margin-left:4px;}
 
 /* SZCZEGÓŁY */
 .detail{display:none;}
@@ -110,9 +118,16 @@ header{display:flex;align-items:center;justify-content:space-between;padding:16p
     <div id="groupNat"></div>
   </div>
 
+  <!-- KROK 2 (krajowe): turnieje wybranego kraju -->
+  <div class="detail" id="countryView">
+    <button class="back-btn" id="backCountry"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg> Wszystkie turnieje</button>
+    <div class="group-head nat"><span class="dot"></span><h2 id="countryTitle"></h2><span class="cnt" id="countryCnt"></span></div>
+    <div class="t-grid" id="countryGrid"></div>
+  </div>
+
   <!-- SZCZEGÓŁY -->
   <div class="detail" id="detailView">
-    <button class="back-btn" id="backBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg> Wszystkie turnieje</button>
+    <button class="back-btn" id="backBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg> <span id="backLabel">Wszystkie turnieje</span></button>
     <div id="detailBody"></div>
   </div>
 </div>
@@ -129,7 +144,9 @@ function fmtDate(e){
 }
 function countDates(t){ return t.stages.reduce((n,s)=>n+s.entries.length,0); }
 
-const listView=document.getElementById('listView'), detailView=document.getElementById('detailView');
+const listView=document.getElementById('listView'), countryView=document.getElementById('countryView'), detailView=document.getElementById('detailView');
+const flagByCountry={}; T.forEach(t=>flagByCountry[t.host.country]=t.host.flag);
+let currentT=null;
 
 function cardHTML(t){
   const sc = t.scope==='miedzynarodowe'?'intl':'nat';
@@ -139,20 +156,37 @@ function cardHTML(t){
     <p>${t.tagline}</p>
     <div class="foot">
       <span><img src="https://flagcdn.com/20x15/${t.host.flag}.png">${t.host.city}</span>
-      <span><b>${countDates(t)}</b> dat / ${t.stages.length} etapy</span>
+      <span><b>${countDates(t)}</b> dat / ${t.stages.length} ${t.stages.length===1?'etap':'etapy'}</span>
       <span class="go">Zobacz turniej →</span>
     </div>
   </div>`;
 }
+function bindCards(sel){ document.querySelectorAll(sel+' .t-card').forEach(c=>c.addEventListener('click',()=>openTournament(c.dataset.id,true))); }
+
 function renderList(){
   const intl=T.filter(t=>t.scope==='miedzynarodowe'), nat=T.filter(t=>t.scope==='krajowe');
   document.getElementById('groupIntl').innerHTML =
     `<div class="group-head intl"><span class="dot"></span><h2>Międzynarodowe</h2><span class="cnt">${intl.length} turnieje</span></div>
      <div class="t-grid">${intl.map(cardHTML).join('')}</div>`;
+  // KRAJOWE: najpierw wybór kraju (będą ich dziesiątki na kraj)
+  const byCountry={}; nat.forEach(t=>byCountry[t.host.country]=(byCountry[t.host.country]||0)+1);
+  const rows=Object.entries(byCountry).sort((a,b)=>b[1]-a[1]);
   document.getElementById('groupNat').innerHTML =
-    `<div class="group-head nat"><span class="dot"></span><h2>Krajowe</h2><span class="cnt">${nat.length} turnieje</span></div>
-     <div class="t-grid">${nat.map(cardHTML).join('')}</div>`;
-  document.querySelectorAll('.t-card').forEach(c=>c.addEventListener('click',()=>openTournament(c.dataset.id,true)));
+    `<div class="group-head nat"><span class="dot"></span><h2>Krajowe</h2><span class="cnt">${nat.length} turniejów · ${rows.length} krajów</span></div>
+     <div class="cp-list">${rows.map(([c,n])=>`<div class="cp-row" data-country="${c}"><img src="https://flagcdn.com/20x15/${flagByCountry[c]||'eu'}.png" alt=""><span class="nm">${c}</span><span class="n">${n}</span><span class="chev">›</span></div>`).join('')}</div>`;
+  bindCards('#groupIntl');
+  document.querySelectorAll('#groupNat .cp-row').forEach(r=>r.addEventListener('click',()=>openCountry(r.dataset.country,true)));
+}
+
+function openCountry(country,push){
+  const list=T.filter(t=>t.scope==='krajowe'&&t.host.country===country);
+  document.getElementById('countryTitle').textContent='Turnieje krajowe — '+country;
+  document.getElementById('countryCnt').textContent=`${list.length} ${list.length===1?'turniej':(list.length%10>=2&&list.length%10<=4?'turnieje':'turniejów')}`;
+  document.getElementById('countryGrid').innerHTML=list.map(cardHTML).join('');
+  bindCards('#countryGrid');
+  listView.style.display='none'; detailView.style.display='none'; countryView.style.display='block';
+  window.scrollTo(0,0);
+  if(push) history.pushState({country},'','?country='+encodeURIComponent(country));
 }
 
 function renderDetail(t){
@@ -182,21 +216,27 @@ function renderDetail(t){
 
 function openTournament(id,push){
   const t=T.find(x=>x.id===id); if(!t){ showList(); return; }
+  currentT=t;
   renderDetail(t);
-  listView.style.display='none'; detailView.style.display='block';
+  document.getElementById('backLabel').textContent = t.scope==='krajowe' ? ('Turnieje — '+t.host.country) : 'Wszystkie turnieje';
+  listView.style.display='none'; countryView.style.display='none'; detailView.style.display='block';
   window.scrollTo(0,0);
   if(push) history.pushState({id}, '', '?t='+id);
 }
 function showList(push){
-  detailView.style.display='none'; listView.style.display='block';
+  detailView.style.display='none'; countryView.style.display='none'; listView.style.display='block';
   if(push) history.pushState({}, '', location.pathname);
 }
-document.getElementById('backBtn').addEventListener('click',()=>showList(true));
-window.addEventListener('popstate',()=>{ const id=new URLSearchParams(location.search).get('t'); id?openTournament(id,false):showList(false); });
+document.getElementById('backBtn').addEventListener('click',()=>{ if(currentT && currentT.scope==='krajowe') openCountry(currentT.host.country,true); else showList(true); });
+document.getElementById('backCountry').addEventListener('click',()=>showList(true));
+function route(){
+  const p=new URLSearchParams(location.search); const t=p.get('t'), c=p.get('country');
+  if(t) openTournament(t,false); else if(c) openCountry(c,false); else showList(false);
+}
+window.addEventListener('popstate', route);
 
 renderList();
-const tParam=new URLSearchParams(location.search).get('t');
-if(tParam) openTournament(tParam,false);
+route();
 </script>
 </body>
 </html>
