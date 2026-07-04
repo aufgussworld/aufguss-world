@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Moje konto — aufguss.world</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700&display=swap" rel="stylesheet">
+<style>
+.brand{height:38px;width:auto;display:block;}
+:root{
+  --ember-1:#ff7a3d;--ember-2:#e8552a;--ember-3:#d6491f;
+  --bg:#fbf5ea;--surface:#ffffff;--surface-2:#f3e8d6;
+  --ink:#2a1b10;--ink-dim:#6b5a47;--stone:#8a7960;
+  --line:rgba(42,27,16,0.1);--line-strong:rgba(42,27,16,0.18);
+  --intl:#c43a13;--nat:#b5560f;--local:#9c6c00;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--ink);font-family:'Instrument Sans',sans-serif;}
+h1,h2,h3{font-family:'Fraunces',serif;font-weight:400;}
+a{color:inherit;text-decoration:none;}
+header{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:14px 5vw;border-bottom:1px solid var(--line);background:var(--surface);position:sticky;top:0;z-index:40;}
+header nav{display:flex;gap:20px;margin-left:auto;margin-right:8px;}
+header nav a{font-size:0.86rem;color:var(--ink-dim);}
+header nav a:hover{color:var(--ember-2);}
+@media(max-width:860px){ header nav{display:none;} }
+
+.wrap{max-width:1180px;margin:0 auto;padding:30px clamp(18px,4vw,44px) 100px;}
+
+/* GATE (gość) */
+.gate{max-width:460px;margin:60px auto;text-align:center;background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:40px 34px;}
+.gate h1{font-size:1.9rem;margin-bottom:12px;}
+.gate p{color:var(--ink-dim);line-height:1.6;margin-bottom:22px;}
+.gate .hint{font-size:0.8rem;color:var(--stone);margin-top:18px;}
+.btn{display:inline-flex;align-items:center;gap:9px;padding:12px 24px;font-size:0.8rem;font-weight:600;border-radius:100px;cursor:pointer;border:none;}
+.btn-fire{background:linear-gradient(120deg,#ff8a3d,#ff5a3d);color:#2a0e02;}
+
+/* HERO */
+.acc-hero{display:flex;gap:22px;align-items:center;flex-wrap:wrap;margin-bottom:14px;}
+.acc-hero .av{width:88px;height:88px;border-radius:22px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:2rem;color:#fff6ea;background:linear-gradient(150deg,#ffd9a8,#ff8a3d 55%,#e8552a);}
+.acc-hero h1{font-size:clamp(1.7rem,3.2vw,2.4rem);line-height:1.05;margin-bottom:8px;}
+.acc-hero .sub{color:var(--ink-dim);font-size:0.92rem;}
+.acc-hero .roles{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+.acc-hero .rl{font-size:0.64rem;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;padding:4px 11px;border-radius:100px;background:var(--surface-2);color:var(--ink-dim);}
+.acc-hero .rl.verified{background:linear-gradient(120deg,#ff8a3d,#e8552a);color:#fff6ea;}
+.acc-hero .edit{margin-left:auto;}
+.btn-ghost{border:1px solid var(--line-strong);color:var(--ink);background:var(--surface);}
+.btn-ghost:hover{border-color:var(--ember-1);color:var(--ember-2);}
+
+.layout{display:grid;grid-template-columns:216px 1fr;gap:34px;margin-top:26px;align-items:start;}
+.side{position:sticky;top:88px;display:flex;flex-direction:column;gap:3px;}
+.side a{display:flex;align-items:center;gap:10px;padding:10px 13px;border-radius:11px;font-size:0.88rem;font-weight:500;color:var(--ink-dim);}
+.side a:hover{background:var(--surface);color:var(--ember-3);}
+.side a.on{background:var(--surface);color:var(--ember-3);font-weight:600;box-shadow:0 4px 14px rgba(42,27,16,0.06);}
+.side svg{width:17px;height:17px;flex-shrink:0;}
+@media(max-width:860px){ .layout{grid-template-columns:1fr;} .side{position:static;flex-direction:row;overflow-x:auto;} }
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:24px 26px;margin-bottom:22px;scroll-margin-top:90px;}
+.card > h2{font-size:1.3rem;margin-bottom:4px;display:flex;align-items:center;gap:10px;}
+.card .desc{font-size:0.85rem;color:var(--stone);margin-bottom:18px;}
+.card h2 svg{width:20px;height:20px;color:var(--ember-2);}
+.pending{background:linear-gradient(120deg,rgba(255,138,61,0.12),var(--surface-2));border:1px solid rgba(255,122,61,0.35);border-radius:14px;padding:14px 18px;margin-bottom:22px;font-size:0.88rem;color:var(--ink);display:flex;gap:10px;align-items:center;}
+.pending b{color:var(--ember-3);}
+
+.fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;}
+.field label{display:block;font-size:0.72rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--stone);margin-bottom:6px;}
+.field input,.field select,.field textarea{width:100%;padding:10px 13px;border:1px solid var(--line-strong);border-radius:10px;font-family:inherit;font-size:0.9rem;color:var(--ink);background:var(--bg);outline:none;}
+.field input:focus,.field textarea:focus{border-color:var(--ember-1);}
+.field textarea{min-height:80px;resize:vertical;}
+.save-row{margin-top:18px;display:flex;gap:10px;align-items:center;}
+.save-row .saved{font-size:0.8rem;color:var(--stone);}
+
+.toggle-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 0;border-top:1px solid var(--line);}
+.toggle-row:first-of-type{border-top:none;}
+.toggle-row .t-txt{font-size:0.9rem;}
+.toggle-row .t-sub{font-size:0.76rem;color:var(--stone);margin-top:2px;}
+.sw{position:relative;width:42px;height:24px;border-radius:100px;background:var(--line-strong);cursor:pointer;flex-shrink:0;transition:background .2s;}
+.sw::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .2s;}
+.sw.on{background:linear-gradient(120deg,#ff8a3d,#e8552a);}
+.sw.on::after{transform:translateX(18px);}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px;}
+.chip{display:inline-flex;align-items:center;gap:8px;background:var(--surface-2);border-radius:100px;padding:6px 12px 6px 6px;font-size:0.82rem;}
+.chip .ci{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.66rem;font-weight:700;color:#fff6ea;background:linear-gradient(150deg,#ff8a3d,#e8552a);}
+.chip .x{color:var(--stone);cursor:pointer;font-size:0.9rem;}
+
+.mini-list{display:flex;flex-direction:column;gap:10px;}
+.mini{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;}
+.mini .dt{text-align:center;flex-shrink:0;width:44px;}
+.mini .dt .d{font-family:'Fraunces',serif;font-size:1.3rem;line-height:1;}
+.mini .dt .m{font-size:0.62rem;text-transform:uppercase;color:var(--stone);}
+.mini .mt{flex:1;min-width:0;}
+.mini .mt h4{font-size:0.92rem;font-weight:600;}
+.mini .mt .ms{font-size:0.76rem;color:var(--stone);}
+.mini .tag{font-size:0.66rem;font-weight:700;text-transform:uppercase;padding:4px 10px;border-radius:100px;}
+.tag.pub{background:rgba(120,180,90,0.18);color:#3f6b1f;}
+.tag.draft{background:var(--surface-2);color:var(--ink-dim);}
+.tag.mod{background:rgba(255,138,61,0.16);color:var(--ember-3);}
+.tag.intl{background:rgba(196,58,19,0.12);color:var(--intl);}
+
+.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:14px;margin-bottom:6px;}
+.stat{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:14px 16px;}
+.stat .n{font-family:'Fraunces',serif;font-size:1.6rem;color:var(--ember-3);line-height:1;}
+.stat .l{font-size:0.74rem;color:var(--stone);margin-top:5px;}
+
+.rankbar{height:9px;border-radius:100px;background:var(--surface-2);overflow:hidden;margin:10px 0 6px;}
+.rankbar span{display:block;height:100%;background:linear-gradient(90deg,#ff8a3d,#e8552a);}
+
+.act-btn{display:inline-flex;align-items:center;gap:8px;padding:9px 16px;border-radius:100px;border:1px dashed var(--line-strong);background:var(--bg);color:var(--ember-3);font:600 0.8rem 'Instrument Sans';cursor:pointer;}
+.act-btn:hover{border-color:var(--ember-1);border-style:solid;}
+
+.approve{display:flex;align-items:center;gap:12px;padding:14px;border:1px solid var(--line);border-radius:12px;margin-bottom:10px;}
+.approve .av{width:40px;height:40px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;color:#fff6ea;background:linear-gradient(150deg,#ff8a3d,#e8552a);}
+.approve .info{flex:1;min-width:0;}
+.approve .info h4{font-size:0.9rem;font-weight:600;}
+.approve .info p{font-size:0.78rem;color:var(--stone);}
+.approve .acts{display:flex;gap:8px;}
+.approve .ok,.approve .no{border:none;cursor:pointer;font:600 0.74rem 'Instrument Sans';padding:8px 14px;border-radius:100px;}
+.approve .ok{background:linear-gradient(120deg,#ff8a3d,#e8552a);color:#fff6ea;}
+.approve .no{background:var(--surface-2);color:var(--ink-dim);}
+</style>
+</head>
+<body>
+
+<header>
+  <a href="index.html"><img class="brand" src="../assets/brand-logo-trim.png" alt="aufguss.world"></a>
+  <nav>
+    <a href="index.html">Strona główna</a>
+    <a href="calendar.html">Kalendarz</a>
+    <a href="map.html">Mapa</a>
+  </nav>
+  <div class="acct-area" data-acct-slot></div>
+</header>
+
+<div class="wrap" id="root"></div>
+
+<script src="../assets/auth.js"></script>
+<script>
+const IC = {
+  user:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>',
+  bell:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></svg>',
+  star:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.9 6.3 6.8.7-5.1 4.6 1.4 6.7L12 17.8 6 21l1.4-6.7L2.3 9.7l6.8-.7z"/></svg>',
+  cal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="17" rx="2"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/></svg>',
+  heart:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 8.6c0 5-8.8 10.4-8.8 10.4S3.2 13.6 3.2 8.6A4.4 4.4 0 0 1 12 6.9a4.4 4.4 0 0 1 8.8 1.7z"/></svg>',
+  post:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v14H7l-3 3z"/><path d="M8 9h8M8 13h5"/></svg>',
+  venue:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6"/></svg>',
+  trophy:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4h8v4a4 4 0 0 1-8 0zM8 6H5v1a3 3 0 0 0 3 3M16 6h3v1a3 3 0 0 1-3 3M9 20h6M12 14v6"/></svg>',
+  shield:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg>',
+  cog:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>',
+  users:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3 2.7-5 6-5s6 2 6 5M16 5.5a3 3 0 0 1 0 5.5M21 20c0-2.2-1.4-3.8-3.5-4.5"/></svg>',
+};
+const sw=(on)=>`<span class="sw ${on?'on':''}" onclick="this.classList.toggle('on')"></span>`;
+
+// ── rejestr sekcji dashboardu (roles: 'all' albo tablica ról) ──
+function SECTIONS(u){
+  const has=r=>u.roles.includes(r);
+  const S=[];
+  // WSPÓLNE
+  S.push({id:'konto', title:'Dane konta', icon:IC.user, roles:'all', html:`
+    <div class="fgrid">
+      <div class="field"><label>Imię i nazwisko</label><input value="${u.name}"></div>
+      <div class="field"><label>Nazwa użytkownika</label><input value="@${u.name.toLowerCase().replace(/[^a-z]+/g,'').slice(0,12)}"></div>
+      <div class="field"><label>E-mail</label><input value="${u.name.toLowerCase().replace(/[^a-z]+/g,'.')}@example.com"></div>
+      <div class="field"><label>Telefon (opcjonalnie)</label><input placeholder="+48 ___ ___ ___"></div>
+      <div class="field"><label>Kraj i miasto</label><input value="${u.home||''}"></div>
+      <div class="field"><label>Język portalu</label><select><option>Polski</option><option>English</option><option>Deutsch</option></select></div>
+    </div>
+    <div class="save-row"><button class="btn btn-fire" onclick="markSaved(this)">Zapisz zmiany</button>
+      <button class="act-btn">Zmień hasło</button><button class="act-btn">Włącz 2FA</button></div>`});
+
+  S.push({id:'powiadomienia', title:'Powiadomienia', icon:IC.bell, roles:'all', html:`
+    <div class="desc">Wybierz, o czym i jak chcesz być informowany.</div>
+    <div class="toggle-row"><div><div class="t-txt">Reakcje i odpowiedzi na moje komentarze</div><div class="t-sub">W portalu i e-mail</div></div>${sw(true)}</div>
+    <div class="toggle-row"><div><div class="t-txt">Nowe komentarze pod obserwowanymi wpisami</div></div>${sw(true)}</div>
+    <div class="toggle-row"><div><div class="t-txt">Przypomnienia o wydarzeniach z „Mój kalendarz"</div></div>${sw(true)}</div>
+    <div class="toggle-row"><div><div class="t-txt">Obserwowany obiekt / saunamistrz dodał wydarzenie</div></div>${sw(true)}</div>
+    <div class="toggle-row"><div><div class="t-txt">Newsletter i nowości portalu</div><div class="t-sub">Raz w tygodniu</div></div>${sw(false)}</div>`});
+
+  S.push({id:'obserwacje', title:'Moje obserwacje', icon:IC.heart, roles:'all', html:`
+    <div class="desc">Saunamistrzowie, obiekty, blogi i turnieje, które śledzisz.</div>
+    <div class="stat-row" style="margin-bottom:16px"><div class="stat"><div class="n">7</div><div class="l">Saunamistrzowie</div></div><div class="stat"><div class="n">4</div><div class="l">Obiekty</div></div><div class="stat"><div class="n">3</div><div class="l">Blogi</div></div><div class="stat"><div class="n">2</div><div class="l">Turnieje</div></div></div>
+    <div class="chips">
+      <span class="chip"><span class="ci">MP</span> Maciej Piczura <span class="x">×</span></span>
+      <span class="chip"><span class="ci">RZ</span> Robert Zídek <span class="x">×</span></span>
+      <span class="chip"><span class="ci">SA</span> Satama Sauna Resort <span class="x">×</span></span>
+      <span class="chip"><span class="ci">CT</span> Chochołowskie Termy <span class="x">×</span></span>
+      <span class="chip"><span class="ci">WK</span> Blog: Wojciech Kadź <span class="x">×</span></span>
+    </div>`});
+
+  S.push({id:'kalendarz', title:'Mój kalendarz', icon:IC.cal, roles:'all', html:`
+    <div class="desc">Najbliższe wydarzenia, które dodałeś do swojego kalendarza.</div>
+    <div class="mini-list">
+      <div class="mini"><div class="dt"><div class="d">18</div><div class="m">lip</div></div><div class="mt"><h4>The Battle of Gladiators — finał</h4><div class="ms">Termy Rzymskie, Czeladź</div></div><span class="tag intl">za 3 dni</span></div>
+      <div class="mini"><div class="dt"><div class="d">28</div><div class="m">lip</div></div><div class="mt"><h4>Noc aufguss z mistrzami świata</h4><div class="ms">Satama Sauna Resort</div></div><span class="tag draft">przypomnienie</span></div>
+    </div>
+    <div class="save-row"><a class="act-btn" href="calendar.html">Otwórz pełny kalendarz →</a></div>`});
+
+  S.push({id:'aktywnosc', title:'Moja aktywność i ranga', icon:IC.star, roles:'all', html:`
+    <div class="desc">Twoja pozycja w społeczności rośnie wraz z aktywnością.</div>
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:6px"><b style="font-family:'Fraunces',serif;font-size:1.15rem;color:var(--ember-3)">${u.rank||'Rycerz'}</b><span style="font-size:0.8rem;color:var(--stone)">→ następna ranga: Chorąży</span></div>
+    <div class="rankbar"><span style="width:64%"></span></div>
+    <div style="font-size:0.78rem;color:var(--stone);margin-bottom:16px">64% do kolejnego poziomu · 128 pkt aktywności</div>
+    <div class="stat-row"><div class="stat"><div class="n">34</div><div class="l">Komentarze</div></div><div class="stat"><div class="n">96</div><div class="l">Otrzymane reakcje</div></div><div class="stat"><div class="n">12</div><div class="l">Zapisane wpisy</div></div></div>`});
+
+  // ROLOWE
+  if(has('saunamistrz')||has('sedzia')) S.push({id:'profil', title:'Profil publiczny', icon:IC.user, roles:['saunamistrz','sedzia'], html:`
+    <div class="desc">Tak widzą Cię inni. Edytuj treści widoczne na Twoim profilu.</div>
+    <div class="fgrid" style="margin-bottom:14px">
+      <div class="field"><label>Obiekt macierzysty</label><input value="Chochołowskie Termy"></div>
+      <div class="field"><label>Ulubiony styl ceremonii</label><input value="Freestyle, Modern Classic"></div>
+      <div class="field" style="grid-column:1/-1"><label>Bio</label><textarea>Saunamistrz z Podhala, Mistrz Świata Aufguss…</textarea></div>
+    </div>
+    <div class="stat-row"><div class="stat"><div class="n">2,4k</div><div class="l">Wyświetlenia profilu</div></div><div class="stat"><div class="n">318</div><div class="l">Obserwujący</div></div><div class="stat"><div class="n">${u.rank||'—'}</div><div class="l">Ranga turniejowa</div></div></div>
+    <div class="save-row"><button class="btn btn-fire" onclick="markSaved(this)">Zapisz profil</button><a class="act-btn" href="saunamaster.html">Zobacz profil publiczny →</a></div>`});
+
+  if(has('szkoleniowiec')) S.push({id:'szkolenia', title:'Moje szkolenia', icon:IC.cal, roles:['szkoleniowiec'], html:`
+    <div class="desc">Publikuj terminy i miejsca szkoleń. Zapisani otrzymają powiadomienie.</div>
+    <div class="mini-list" style="margin-bottom:14px">
+      <div class="mini"><div class="dt"><div class="d">12</div><div class="m">wrz</div></div><div class="mt"><h4>Aufguss od podstaw</h4><div class="ms">Chochołowskie Termy · 6/12 miejsc</div></div><span class="tag pub">Opublikowane</span></div>
+      <div class="mini"><div class="dt"><div class="d">04</div><div class="m">paź</div></div><div class="mt"><h4>Choreografia i storytelling</h4><div class="ms">Termy Rzymskie · 3/8 miejsc</div></div><span class="tag pub">Opublikowane</span></div>
+    </div>
+    <button class="act-btn">+ Dodaj termin szkolenia</button>`});
+
+  if(has('bloger')||has('obiekt')||has('organizator')) S.push({id:'wpisy', title:'Moje wpisy', icon:IC.post, roles:['bloger','obiekt','organizator'], html:`
+    <div class="desc">Zarządzaj wpisami bloga. Nowe wpisy blogera przechodzą moderację.</div>
+    <div class="mini-list" style="margin-bottom:14px">
+      <div class="mini"><div class="dt">${IC.post}</div><div class="mt"><h4>Rzymski przepych, który działa…</h4><div class="ms">Recenzja · 1,2k wyświetleń · 8 komentarzy</div></div><span class="tag pub">Opublikowany</span></div>
+      <div class="mini"><div class="dt">${IC.post}</div><div class="mt"><h4>Berliński minimalizm pod wodą</h4><div class="ms">Recenzja · szkic</div></div><span class="tag draft">Szkic</span></div>
+      <div class="mini"><div class="dt">${IC.post}</div><div class="mt"><h4>Dlaczego Polska stała się potęgą…</h4><div class="ms">Felieton · oczekuje na moderację</div></div><span class="tag mod">Moderacja</span></div>
+    </div>
+    <button class="act-btn">+ Nowy wpis</button>`});
+
+  if(has('obiekt')) S.push({id:'obiekt', title:'Panel obiektu', icon:IC.venue, roles:['obiekt'], html:`
+    <div class="desc">Zarządzaj wizytówką, wydarzeniami i zespołem obiektu.</div>
+    <div class="stat-row" style="margin-bottom:16px"><div class="stat"><div class="n">6</div><div class="l">Wydarzenia</div></div><div class="stat"><div class="n">4</div><div class="l">Rezydujący mistrzowie</div></div><div class="stat"><div class="n">1,1k</div><div class="l">Obserwujący</div></div></div>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px">
+      <a class="act-btn" href="object.html">Edytuj wizytówkę</a>
+      <button class="act-btn">+ Dodaj wydarzenie</button>
+      <button class="act-btn">Zaproś saunamistrza</button>
+      <button class="act-btn">Zarządzaj biletami</button>
+    </div>
+    <div style="font-size:0.8rem;color:var(--stone);margin-bottom:8px">Zespół (redaktorzy obiektu)</div>
+    <div class="chips"><span class="chip"><span class="ci">AK</span> Anna K. — administrator <span class="x">×</span></span><span class="chip"><span class="ci">MW</span> Marek W. — redaktor <span class="x">×</span></span><span class="chip"><span class="x" style="color:var(--ember-3);font-weight:700">+ Dodaj</span></span></div>`});
+
+  if(has('organizator')) S.push({id:'turnieje', title:'Moje turnieje', icon:IC.trophy, roles:['organizator'], html:`
+    <div class="desc">Zarządzaj turniejami: etapy, zgłoszenia, wyniki i archiwum.</div>
+    <div class="mini-list" style="margin-bottom:14px">
+      <div class="mini"><div class="dt">${IC.trophy}</div><div class="mt"><h4>Mistrzostwa Polski PTS Classic 2026</h4><div class="ms">Zapisy otwarte · 41 zgłoszeń</div></div><span class="tag mod">Zapisy</span></div>
+      <div class="mini"><div class="dt">${IC.trophy}</div><div class="mt"><h4>PTS Classic 2025</h4><div class="ms">Zakończony · archiwum + podium</div></div><span class="tag pub">Archiwum</span></div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="act-btn">+ Nowy turniej</button><button class="act-btn">Przeglądaj zgłoszenia</button></div>`});
+
+  if(has('admin')) S.push({id:'admin', title:'Panel administratora', icon:IC.shield, roles:['admin'], html:`
+    <div class="desc">Kolejka wniosków o role wymagające zatwierdzenia.</div>
+    <div class="approve"><div class="av">SB</div><div class="info"><h4>Sauna Bad — wniosek o profil obiektu</h4><p>Zgłaszający: manager@saunabad.de · dziś</p></div><div class="acts"><button class="ok" onclick="resolveApprove(this,true)">Zatwierdź</button><button class="no" onclick="resolveApprove(this,false)">Odrzuć</button></div></div>
+    <div class="approve"><div class="av">JK</div><div class="info"><h4>Jan Kowalski — wniosek o status blogera</h4><p>3 przykładowe recenzje w załączniku · wczoraj</p></div><div class="acts"><button class="ok" onclick="resolveApprove(this,true)">Zatwierdź</button><button class="no" onclick="resolveApprove(this,false)">Odrzuć</button></div></div>
+    <div class="approve"><div class="av">VN</div><div class="info"><h4>VNSWB — wniosek o rolę organizatora</h4><p>Federacja saunowa (NL) · 2 dni temu</p></div><div class="acts"><button class="ok" onclick="resolveApprove(this,true)">Zatwierdź</button><button class="no" onclick="resolveApprove(this,false)">Odrzuć</button></div></div>
+    <div class="save-row" style="margin-top:16px"><span style="font-size:0.8rem;color:var(--stone)">Moderacja treści i zarządzanie obiektami — w pełnej wersji.</span></div>`});
+
+  return S;
+}
+
+function markSaved(btn){ let s=btn.parentNode.querySelector('.saved'); if(!s){ s=document.createElement('span'); s.className='saved'; btn.parentNode.appendChild(s);} s.textContent='✓ Zapisano'; }
+function resolveApprove(btn,ok){ const row=btn.closest('.approve'); row.style.opacity=.5; row.querySelector('.acts').innerHTML=`<span style="font-size:0.78rem;color:${ok?'#3f6b1f':'var(--stone)'}">${ok?'✓ Zatwierdzono':'Odrzucono'}</span>`; }
+
+function pendingBanner(u){
+  // demonstracja: konto obiektu/organizatora bywa w trakcie weryfikacji
+  if(u.roles.includes('user') && u.roles.length===1)
+    return `<div class="pending">${IC.star}<div>Chcesz zostać <b>saunamistrzem, blogerem</b> lub zarządzać <b>obiektem</b>? Złóż wniosek o rolę — po akceptacji administratora odblokujesz dodatkowe moduły. <a href="#" style="color:var(--ember-3);font-weight:600">Złóż wniosek →</a></div></div>`;
+  return '';
+}
+
+function render(u){
+  const root=document.getElementById('root');
+  if(!u || u.loggedIn===false || u.persona==='guest'){
+    root.innerHTML = `<div class="gate">
+      <h1>Zaloguj się do aufguss.world</h1>
+      <p>Twój profil, obserwacje, kalendarz i powiadomienia w jednym miejscu. Załóż konto, aby komentować, obserwować obiekty i saunamistrzów oraz zbierać rangi.</p>
+      <button class="btn btn-fire" onclick="AufgussAuth.setPersona('user')">Zaloguj / Załóż konto</button>
+      <div class="hint">Prototyp: użyj przełącznika „Podgląd" w prawym dolnym rogu, aby zobaczyć portal oczami różnych typów kont.</div>
+    </div>`;
+    return;
+  }
+  const roles=(u.roles||[]).map(r=>`<span class="rl ${u.verified&&r!=='user'?'verified':''}">${AufgussAuth.ROLE_LABEL[r]||r}</span>`).join('');
+  const S=SECTIONS(u);
+  const side=S.map((s,i)=>`<a href="#${s.id}" class="${i===0?'on':''}" data-side="${s.id}">${s.icon} ${s.title}</a>`).join('');
+  const main=S.map(s=>`<section class="card" id="${s.id}"><h2>${s.icon} ${s.title}</h2>${s.html}</section>`).join('');
+  root.innerHTML = `
+    <div class="acc-hero">
+      <div class="av">${u.init}</div>
+      <div>
+        <h1>${u.name}</h1>
+        <div class="sub">${u.home||''}${u.verified?' · <span style="color:var(--ember-3);font-weight:600">Zweryfikowany ✓</span>':''}</div>
+        <div class="roles">${roles}</div>
+      </div>
+      <button class="btn btn-ghost edit">Edytuj profil</button>
+    </div>
+    ${pendingBanner(u)}
+    <div class="layout">
+      <nav class="side">${side}</nav>
+      <div class="main">${main}</div>
+    </div>`;
+
+  // podświetlanie aktywnej sekcji w bocznym menu
+  const links=[...root.querySelectorAll('[data-side]')];
+  const obs=new IntersectionObserver(es=>{ es.forEach(e=>{ if(e.isIntersecting){ links.forEach(l=>l.classList.toggle('on', l.dataset.side===e.target.id)); } }); },{rootMargin:'-40% 0px -55% 0px'});
+  S.forEach(s=>{ const el=document.getElementById(s.id); if(el) obs.observe(el); });
+  // skok do sekcji z hasha (np. #wpisy z menu konta)
+  if(location.hash){ const el=document.querySelector(location.hash); if(el) setTimeout(()=>el.scrollIntoView({behavior:'smooth'}),120); }
+}
+
+AufgussAuth.onChange(render);
+</script>
+</body>
+</html>

@@ -378,7 +378,7 @@ footer{padding:70px 5vw 40px;position:relative;z-index:2;background:#241608;colo
         <div class="lang-soon">Wkrótce: CZ · IT</div>
       </div>
     </div>
-    <a href="#" class="btn-login"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg><span class="ll">Zaloguj się</span></a>
+    <div class="acct-area" data-acct-slot></div>
   </div>
 </header>
 
@@ -1013,5 +1013,6 @@ function nlTagSearch(mountEl, opts){
   nlTagSearch(document.querySelector('#nlModal [data-ts="wydarzenia"]'),{placeholder:'Szukaj obiektu…',search:q=>OBJ.filter(o=>o.name.toLowerCase().includes(q)).map(o=>({label:o.name,type:'Obiekt'}))});
 })();
 </script>
+<script src="../assets/auth.js"></script>
 </body>
 </html>

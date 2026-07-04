@@ -114,6 +114,15 @@
         {name:'Piotr Z.', rank:'giermek', date:'maj 2026', text:'Warsztaty u Maćka to inny poziom. Dużo wyniosłem jako początkujący saunamistrz.', reactions:{thumb:6,heart:2}, replies:[] },
       ],
     },
+    post: {
+      replyLabel:'Odpowiedź autora',
+      critics:[],
+      comments:[
+        {name:'Kasia M.', rank:'rycerz', date:'przedwczoraj', text:'Świetna inicjatywa! Czy na wydarzenie obowiązują wcześniejsze zapisy, czy wystarczy przyjść z biletem wstępu?', reactions:{fire:4,heart:1}, replies:[ {venue:true, name:'Autor wpisu', date:'wczoraj', text:'Dzień dobry! Liczba miejsc jest ograniczona, więc rekomendujemy rezerwację — link pojawi się w tym wpisie w piątek.'} ] },
+        {name:'Bartek', rank:'giermek', date:'wczoraj', text:'Będzie transmisja / relacja dla tych, którzy nie mogą dojechać?', reactions:{thumb:6}, replies:[] },
+        {name:'Ola R.', rank:'chorazy', date:'dziś', text:'Byłam na poprzedniej edycji — polecam każdemu. Klimat nie do opisania.', reactions:{fire:9,heart:3}, replies:[] },
+      ],
+    },
     tournament: {
       replyLabel:'Odpowiedź organizatora',
       critics:[
@@ -195,15 +204,22 @@
           </div>
           <div class="crit-score"><div class="n">${c.score}</div><div class="max">/ 10</div></div>
         </div>`).join('');
-      mount.innerHTML = `
+      const hasCritics = state.critics && state.critics.length;
+      const critSection = hasCritics ? `
         <h3 class="sec">Recenzje blogerów</h3>
         <div class="sec-sub">Oceny zweryfikowanych blogerów saunowych.</div>
         <div class="crit-grid">${critHTML}</div>
-        <div class="cmt-divider"></div>
-        <h3 class="sec">Opinie społeczności</h3>
-        <div class="sec-sub">${state.comments.length} ${state.comments.length===1?'opinia':'opinii'} · dodawaj recenzje i zdobywaj rangi (Paź → Kawaleria).</div>
+        <div class="cmt-divider"></div>` : '';
+      const cmtHead = cfg.type==='post' ? 'Komentarze' : 'Opinie społeczności';
+      const cmtSub = cfg.type==='post'
+        ? `${state.comments.length} ${state.comments.length===1?'komentarz':'komentarzy'} · dołącz do dyskusji i zadawaj pytania.`
+        : `${state.comments.length} ${state.comments.length===1?'opinia':'opinii'} · dodawaj recenzje i zdobywaj rangi (Paź → Kawaleria).`;
+      mount.innerHTML = `
+        ${critSection}
+        <h3 class="sec">${cmtHead}</h3>
+        <div class="sec-sub">${cmtSub}</div>
         <div id="cmtList">${state.comments.map(commentHTML).join('')}</div>
-        <div class="cmt-add"><h4>Dodaj swoją opinię</h4><textarea placeholder="Podziel się wrażeniami…"></textarea><button data-add>Opublikuj</button></div>`;
+        <div class="cmt-add"><h4>${cfg.type==='post'?'Dodaj komentarz':'Dodaj swoją opinię'}</h4><textarea placeholder="${cfg.type==='post'?'Napisz komentarz lub zadaj pytanie…':'Podziel się wrażeniami…'}"></textarea><button data-add>Opublikuj</button></div>`;
 
       mount.querySelectorAll('.read').forEach(el=>el.addEventListener('click',()=>openReview(state.critics[+el.dataset.crit])));
       mount.querySelectorAll('.react').forEach(b=>b.addEventListener('click',()=>{
