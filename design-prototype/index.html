@@ -683,7 +683,8 @@ document.addEventListener('click', ()=> langDd.classList.remove('open'));
 
 // modal logowania
 const loginModal=document.getElementById('loginModal');
-document.querySelector('.btn-login').addEventListener('click', e=>{ e.preventDefault(); loginModal.classList.add('open'); setTimeout(()=>document.getElementById('lEmail')?.focus(),100); });
+// przycisk logowania wstrzykuje auth.js (slot [data-acct-slot]); tu tylko fokus na e-mail po otwarciu
+document.querySelector('.btn-login')?.addEventListener('click', e=>{ e.preventDefault(); loginModal.classList.add('open'); setTimeout(()=>document.getElementById('lEmail')?.focus(),100); });
 // modal newslettera „Pozostań w kontakcie"
 document.getElementById('contactBtn').addEventListener('click', ()=>{ document.getElementById('nlModal').classList.add('open'); setTimeout(()=>document.getElementById('nlEmail')?.focus(),100); });
 document.addEventListener('keydown', e=>{ if(e.key==='Escape') document.querySelectorAll('.modal-bg.open').forEach(m=>m.classList.remove('open')); });
