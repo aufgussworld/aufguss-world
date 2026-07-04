@@ -302,6 +302,30 @@ footer{padding:70px 5vw 40px;position:relative;z-index:2;background:#241608;colo
 .nl-pref input:checked::after{content:'';position:absolute;left:6px;top:2px;width:5px;height:10px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg);}
 .nl-pref .t{font-weight:600;font-size:0.9rem;color:var(--ink);display:block;}
 .nl-pref .d{font-size:0.78rem;color:var(--ink-dim);margin-top:2px;display:block;}
+.login-modal{max-height:90vh;overflow-y:auto;}
+.nl-sub{display:none;margin:-2px 0 10px;padding:13px 15px;background:var(--surface-2);border-radius:12px;}
+.nl-sub.open{display:block;}
+.nl-seg{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
+.nl-chip{padding:7px 14px;border-radius:100px;border:1px solid var(--line-strong);background:var(--surface);font:600 0.78rem 'Instrument Sans';color:var(--ink-dim);cursor:pointer;transition:all .18s;}
+.nl-chip:hover{border-color:var(--ember-1);}
+.nl-chip.active{background:var(--ember-2);color:#fff;border-color:var(--ember-2);}
+.nl-countries{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px;}
+.nl-countries .nl-chip{display:inline-flex;align-items:center;gap:6px;font-size:0.75rem;padding:6px 11px;}
+.nl-countries .nl-chip img{width:16px;border-radius:2px;}
+.nl-hint{font-size:0.76rem;color:var(--ink-dim);margin-bottom:8px;}
+.nl-ts{position:relative;}
+.nl-ts-input{width:100%;padding:10px 13px;border:1px solid var(--line-strong);border-radius:10px;font-family:inherit;font-size:0.86rem;outline:none;background:var(--surface);color:var(--ink);}
+.nl-ts-input:focus{border-color:var(--ember-1);}
+.nl-ts-res{position:absolute;top:calc(100% + 5px);left:0;right:0;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:0 14px 34px rgba(20,8,2,0.22);padding:5px;z-index:6;display:none;max-height:190px;overflow:auto;}
+.nl-ts-res.show{display:block;}
+.nl-ts-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;font-size:0.84rem;cursor:pointer;}
+.nl-ts-item:hover{background:var(--surface-2);}
+.nl-ts-item .tp{margin-left:auto;font-size:0.6rem;font-weight:700;text-transform:uppercase;color:var(--ember-3);background:rgba(255,122,61,0.12);padding:2px 8px;border-radius:100px;}
+.nl-ts-empty{padding:9px 10px;font-size:0.8rem;color:var(--stone);}
+.nl-ts-chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px;}
+.nl-selchip{display:inline-flex;align-items:center;gap:7px;font-size:0.78rem;font-weight:600;background:rgba(255,122,61,0.14);color:var(--ember-3);padding:5px 6px 5px 12px;border-radius:100px;}
+.nl-selchip button{border:none;background:rgba(232,85,42,0.2);color:var(--ember-3);width:18px;height:18px;border-radius:50%;cursor:pointer;font-size:0.85rem;line-height:1;display:flex;align-items:center;justify-content:center;}
+.nl-selchip button:hover{background:var(--ember-2);color:#fff;}
 </style>
 </head>
 <body>
@@ -545,11 +569,33 @@ footer{padding:70px 5vw 40px;position:relative;z-index:2;background:#241608;colo
     <form onsubmit="event.preventDefault(); this.closest('.modal-bg').classList.remove('open');">
       <div class="lf"><label for="nlEmail">E-mail</label><input id="nlEmail" type="email" required placeholder="twój@email.com" autocomplete="email"></div>
       <div class="divider">interesują mnie</div>
-      <label class="nl-pref"><input type="checkbox" checked><span><span class="t">Turnieje</span><span class="d">Nadchodzące turnieje i aktualizacje konkretnych edycji</span></span></label>
-      <label class="nl-pref"><input type="checkbox"><span><span class="t">Szkolenia</span><span class="d">Warsztaty i kursy aufguss</span></span></label>
-      <label class="nl-pref"><input type="checkbox"><span><span class="t">Wydarzenia obiektów</span><span class="d">Noce aufguss i ceremonie ulubionych obiektów</span></span></label>
-      <label class="nl-pref"><input type="checkbox" checked><span><span class="t">Aktualności</span><span class="d">Newsy ze świata aufguss</span></span></label>
-      <label class="nl-pref"><input type="checkbox"><span><span class="t">Nowe obiekty</span><span class="d">Gdy na mapie pojawi się nowy obiekt</span></span></label>
+
+      <label class="nl-pref"><input type="checkbox" data-pref="turnieje" checked><span><span class="t">Turnieje</span><span class="d">Nadchodzące turnieje i aktualizacje edycji</span></span></label>
+      <div class="nl-sub" data-sub="turnieje">
+        <div class="nl-hint">Zakres turniejów:</div>
+        <div class="nl-seg">
+          <button type="button" class="nl-chip" data-scope="miedzynarodowe">Międzynarodowe</button>
+          <button type="button" class="nl-chip" data-scope="krajowe">Krajowe</button>
+        </div>
+        <div class="nl-countries" data-countries hidden></div>
+        <div class="nl-hint">…lub dopisz konkretny turniej:</div>
+        <div data-ts="turnieje"></div>
+      </div>
+
+      <label class="nl-pref"><input type="checkbox" data-pref="szkolenia"><span><span class="t">Szkolenia</span><span class="d">Warsztaty i kursy aufguss</span></span></label>
+      <div class="nl-sub" data-sub="szkolenia">
+        <div class="nl-hint">Śledź konkretnych trenerów lub obiekty prowadzące szkolenia:</div>
+        <div data-ts="szkolenia"></div>
+      </div>
+
+      <label class="nl-pref"><input type="checkbox" data-pref="wydarzenia"><span><span class="t">Wydarzenia obiektów</span><span class="d">Noce aufguss i ceremonie Twoich ulubionych obiektów</span></span></label>
+      <div class="nl-sub" data-sub="wydarzenia">
+        <div class="nl-hint">Wybierz ulubione obiekty:</div>
+        <div data-ts="wydarzenia"></div>
+      </div>
+
+      <label class="nl-pref"><input type="checkbox" checked><span><span class="t">Aktualności</span><span class="d">Newsy ze świata aufguss (bez zawężania)</span></span></label>
+      <label class="nl-pref"><input type="checkbox"><span><span class="t">Nowe obiekty</span><span class="d">Gdy na mapie pojawi się nowy obiekt (bez zawężania)</span></span></label>
       <button type="submit" class="login-submit" style="margin-top:14px;">Zapisz preferencje</button>
     </form>
   </div>
@@ -798,6 +844,52 @@ document.getElementById('countryList').innerHTML=Object.entries(counts).sort((a,
     <span class="n">${n}</span>
   </div>`).join('');
 document.querySelectorAll('#countryList .country-row').forEach(r=>r.addEventListener('click',()=>gotoCountry(r.dataset.country)));
+
+// ── NEWSLETTER: rozwijane preferencje + wyszukiwarki tagów ──
+function nlTagSearch(mountEl, opts){
+  const chips=[];
+  mountEl.innerHTML=`<div class="nl-ts"><input class="nl-ts-input" placeholder="${opts.placeholder}"><div class="nl-ts-res"></div></div><div class="nl-ts-chips"></div>`;
+  const input=mountEl.querySelector('.nl-ts-input'), resB=mountEl.querySelector('.nl-ts-res'), chipsEl=mountEl.querySelector('.nl-ts-chips');
+  function renderChips(){ chipsEl.innerHTML=chips.map((c,i)=>`<span class="nl-selchip">${c}<button type="button" data-i="${i}" aria-label="Usuń">×</button></span>`).join(''); chipsEl.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{chips.splice(+b.dataset.i,1);renderChips();})); }
+  function add(l){ if(l&&!chips.includes(l)){chips.push(l);renderChips();} input.value=''; resB.classList.remove('show'); }
+  input.addEventListener('input',()=>{
+    const q=input.value.trim().toLowerCase();
+    if(q.length<2){ resB.classList.remove('show'); return; }
+    const items=opts.search(q).slice(0,6);
+    resB.innerHTML = items.length
+      ? items.map(it=>`<div class="nl-ts-item" data-l="${it.label.replace(/"/g,'&quot;')}"><span>${it.label}</span>${it.type?`<span class="tp">${it.type}</span>`:''}</div>`).join('')
+      : `<div class="nl-ts-empty">Brak na liście — naciśnij Enter, aby dodać „${input.value}"</div>`;
+    resB.classList.add('show');
+    resB.querySelectorAll('.nl-ts-item').forEach(el=>el.addEventListener('click',()=>add(el.dataset.l)));
+  });
+  input.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); add(input.value.trim()); } });
+  document.addEventListener('click',e=>{ if(!mountEl.contains(e.target)) resB.classList.remove('show'); });
+}
+(function nlPrefs(){
+  const TS=window.AUFGUSS_TOURNAMENTS||[], OBJ=window.AUFGUSS_OBJECTS||[];
+  const trainers=(typeof community!=='undefined' && community.szkoleniowcy)?community.szkoleniowcy.map(t=>t.name):[];
+  document.querySelectorAll('#nlModal input[data-pref]').forEach(cb=>{
+    const sub=document.querySelector(`#nlModal .nl-sub[data-sub="${cb.dataset.pref}"]`);
+    const sync=()=>sub.classList.toggle('open',cb.checked);
+    cb.addEventListener('change',sync); sync();
+  });
+  const flagOf={}; TS.forEach(t=>flagOf[t.host.country]=t.host.flag);
+  const natCountries=[...new Set(TS.filter(t=>t.scope==='krajowe').map(t=>t.host.country))];
+  const cbox=document.querySelector('#nlModal .nl-countries');
+  document.querySelectorAll('#nlModal .nl-seg .nl-chip').forEach(ch=>ch.addEventListener('click',()=>{
+    ch.classList.toggle('active');
+    if(ch.dataset.scope==='krajowe'){
+      const on=ch.classList.contains('active'); cbox.hidden=!on;
+      if(on && !cbox.dataset.built){ cbox.dataset.built='1';
+        cbox.innerHTML=natCountries.map(c=>`<button type="button" class="nl-chip" data-c="${c}"><img src="https://flagcdn.com/20x15/${flagOf[c]||'eu'}.png">${c}</button>`).join('');
+        cbox.querySelectorAll('.nl-chip').forEach(b=>b.addEventListener('click',()=>b.classList.toggle('active')));
+      }
+    }
+  }));
+  nlTagSearch(document.querySelector('#nlModal [data-ts="turnieje"]'),{placeholder:'Szukaj turnieju…',search:q=>TS.filter(t=>t.name.toLowerCase().includes(q)).map(t=>({label:t.name,type:t.scope==='miedzynarodowe'?'Międz.':'Krajowy'}))});
+  nlTagSearch(document.querySelector('#nlModal [data-ts="szkolenia"]'),{placeholder:'Szukaj trenera lub obiektu…',search:q=>[...trainers.filter(n=>n.toLowerCase().includes(q)).map(n=>({label:n,type:'Trener'})),...OBJ.filter(o=>o.name.toLowerCase().includes(q)).map(o=>({label:o.name,type:'Obiekt'}))]});
+  nlTagSearch(document.querySelector('#nlModal [data-ts="wydarzenia"]'),{placeholder:'Szukaj obiektu…',search:q=>OBJ.filter(o=>o.name.toLowerCase().includes(q)).map(o=>({label:o.name,type:'Obiekt'}))});
+})();
 </script>
 </body>
 </html>
