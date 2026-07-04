@@ -95,6 +95,9 @@ header{
 .card-soc{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:var(--surface-2);color:var(--ember-3);transition:all .2s;}
 .card-soc svg{width:15px;height:15px;}
 .card-soc:hover{background:linear-gradient(120deg,#ff8a3d,#e8552a);color:#fff;}
+.card-nav{display:inline-flex;align-items:center;gap:6px;font-size:0.72rem;font-weight:600;color:var(--ember-3);background:var(--surface-2);border-radius:100px;padding:6px 12px;transition:all .2s;text-decoration:none;}
+.card-nav svg{width:14px;height:14px;}
+.card-nav:hover{background:linear-gradient(120deg,#ff8a3d,#e8552a);color:#fff;}
 .empty-state{padding:40px 20px;text-align:center;color:var(--stone);font-size:0.85rem;}
 
 #map{height:100%;width:100%;background:#dfe6e0;}
@@ -223,6 +226,7 @@ function rebuildMarkers(){
 // logotypy SVG + demo linków społ. (zróżnicowanie: część obiektów 2 ikonki, część 1, reszta brak — docelowo z profilu obiektu)
 const SVG_FB='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 22v-8h2.8l.42-3.2H13.5V8.75c0-.93.26-1.56 1.6-1.56h1.7V4.3c-.3-.04-1.3-.13-2.48-.13-2.46 0-4.14 1.5-4.14 4.26v2.34H7.4V14h2.28v8z"/></svg>';
 const SVG_IG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5.2"/><circle cx="12" cy="12" r="4"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none"/></svg>';
+const SVG_NAV='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 11l18-8-8 18-2-8-8-2z"/></svg>';
 // demo: nie każdy obiekt ma linki (docelowo z profilu obiektu). Zróżnicowanie po id.
 function socialsFor(o){
   const m=o.id%5;
@@ -232,8 +236,10 @@ function socialsFor(o){
   return null;
 }
 function cardSocials(o){
-  const s=socialsFor(o); if(!s) return '';
+  const s=socialsFor(o)||{};
   let html='<div class="card-soc-row">';
+  // Dojazd (Google Maps) — na każdej karcie
+  html+=`<a class="card-nav" href="https://www.google.com/maps/dir/?api=1&destination=${o.lat},${o.lng}" target="_blank" rel="noopener" title="Wskazówki dojazdu" onclick="event.stopPropagation()">${SVG_NAV} Dojazd</a>`;
   if(s.fb) html+=`<a class="card-soc" href="${s.fb}" target="_blank" rel="noopener" title="Facebook" aria-label="Facebook" onclick="event.stopPropagation()">${SVG_FB}</a>`;
   if(s.ig) html+=`<a class="card-soc" href="${s.ig}" target="_blank" rel="noopener" title="Instagram" aria-label="Instagram" onclick="event.stopPropagation()">${SVG_IG}</a>`;
   return html+'</div>';

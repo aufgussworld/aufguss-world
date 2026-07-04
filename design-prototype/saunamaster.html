@@ -245,7 +245,7 @@ myEvents.forEach(e=>{
   el.className = `show ${scopeClass[e.scope]}`;
   el.innerHTML = `
     <div class="date"><div class="d">${d.getDate()}</div><div class="m">${MONTHS[d.getMonth()]}</div></div>
-    <div class="mid"><h4>${e.title}</h4><div class="v"><img src="https://flagcdn.com/20x15/${e.venue.flag}.png"> ${e.venue.name}, ${e.venue.city}</div></div>
+    <div class="mid"><h4>${e.title}</h4><div class="v"><img src="https://flagcdn.com/20x15/${e.venue.flag}.png"> <a href="object.html" class="venue-link"><b>${e.venue.name}</b></a>, ${e.venue.city}</div></div>
     <div class="role">${role}</div>`;
   showsEl.appendChild(el);
 });

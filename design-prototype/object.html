@@ -109,6 +109,8 @@ section.block{margin:46px 0;}
 .show .date .m{font-size:0.66rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--stone);}
 .show .mid h4{font-size:0.96rem;font-weight:600;margin-bottom:4px;}
 .show .mid .who{font-size:0.78rem;color:var(--ink-dim);}
+.show .who .name-link{color:var(--ember-2);font-weight:600;}
+.show .who .name-link:hover{color:var(--ember-3);text-decoration:underline;}
 .show .scope-tag{font-size:0.66rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;padding:5px 11px;border-radius:100px;white-space:nowrap;}
 .scope-tag.intl{background:rgba(196,58,19,0.1);color:var(--intl);}
 .scope-tag.nat{background:rgba(255,140,60,0.16);color:var(--nat);}
@@ -163,6 +165,21 @@ section.block{margin:46px 0;}
 .card-chip{display:inline-flex;align-items:center;gap:6px;font-size:0.78rem;font-weight:600;padding:7px 13px;border-radius:100px;background:rgba(79,138,61,0.12);color:var(--ok);}
 .card-chip.off{background:var(--surface-2);color:var(--stone);font-weight:400;}
 .cards-na{font-size:0.84rem;color:var(--stone);line-height:1.5;}
+/* AKTUALNOŚCI OBIEKTU (blog) */
+.obj-news{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;}
+.obj-news article{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;transition:transform .3s,box-shadow .3s,border-color .3s;cursor:pointer;}
+.obj-news article:hover{transform:translateY(-5px);box-shadow:0 16px 40px rgba(42,27,16,0.1);border-color:rgba(255,122,61,0.4);}
+.obj-news .cover{height:130px;position:relative;display:flex;align-items:flex-end;padding:12px;}
+.obj-news .cover::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(42,15,5,0.4),transparent 60%);}
+.obj-news .cat{position:relative;z-index:1;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.07em;font-weight:700;color:#2a0e02;background:#ffb56b;padding:3px 10px;border-radius:100px;}
+.obj-news .body{padding:15px 17px 17px;display:flex;flex-direction:column;flex:1;}
+.obj-news .ndate{font-size:0.72rem;color:var(--stone);margin-bottom:6px;}
+.obj-news h3{font-size:1.05rem;font-weight:500;line-height:1.3;margin-bottom:8px;}
+.obj-news p{font-size:0.85rem;color:var(--ink-dim);line-height:1.5;margin-bottom:12px;flex:1;}
+.obj-news .more{font-size:0.78rem;font-weight:600;color:var(--ember-2);}
+.obj-news .nc1{background:linear-gradient(150deg,#ffd9a8,#ff8a3d);}
+.obj-news .nc2{background:linear-gradient(150deg,#e8552a,#a8320f);}
+.obj-news .nc3{background:linear-gradient(150deg,#7a3618,#c9651f);}
 
 /* MODAL (podgląd Aufgussplanu) */
 .modal-bg{position:fixed;inset:0;background:rgba(30,16,8,0.6);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;z-index:100;padding:24px;}
@@ -300,6 +317,12 @@ section.block{margin:46px 0;}
     <a class="v-action" id="fullCalLink" style="margin-top:18px;"><span class="ic">📅</span> Pełny kalendarz wydarzeń obiektu</a>
   </section>
 
+  <section class="block" id="aktualnosci-obiektu">
+    <div class="sec-head"><h2>Aktualności obiektu</h2><span class="count">blog Satama Sauna Resort</span></div>
+    <div class="obj-news" id="objNews"></div>
+    <a class="v-action" href="#" style="margin-top:16px;"><span class="ic">📰</span> Wszystkie wpisy obiektu</a>
+  </section>
+
   <section class="block" id="opinie">
     <div class="rev-summary">
       <div class="big">4.8</div>
@@ -380,9 +403,19 @@ document.getElementById('mastersRow').innerHTML = masters.map(m=>{
 const myEvents = EVENTS.filter(e=>e.venue.name===VENUE_NAME).sort((a,b)=>parse(a.start)-parse(b.start));
 document.getElementById('eventsCount').textContent = `${myEvents.length} w kalendarzu obiektu`;
 document.getElementById('fullCalLink').href = `calendar.html?venue=${encodeURIComponent(VENUE_NAME)}`;
+
+// aktualności obiektu (blog) — docelowo content dla portalowych Aktualności
+const objNews=[
+  {cat:'Wydarzenie', cover:'nc2', date:'28 czerwca 2026', title:'Noc aufguss z Robertem Zídkiem i Davidem Zatočilem', excerpt:'Wyjątkowy wieczór z dwoma mistrzami świata — bilety w sprzedaży od piątku.'},
+  {cat:'Obiekt', cover:'nc3', date:'20 czerwca 2026', title:'Nowa sauna zewnętrzna nad Scharmützelsee', excerpt:'Oddajemy do użytku panoramiczną saunę z widokiem na jezioro.'},
+  {cat:'Ceremonie', cover:'nc1', date:'11 czerwca 2026', title:'Letni program ceremonii — nowe aromaty', excerpt:'Cedr, mięta i cytrusy w odświeżonym planie ceremonii na lato.'},
+];
+document.getElementById('objNews').innerHTML=objNews.map(n=>`
+  <article><div class="cover ${n.cover}"><span class="cat">${n.cat}</span></div>
+    <div class="body"><div class="ndate">${n.date}</div><h3>${n.title}</h3><p>${n.excerpt}</p><span class="more">Czytaj więcej →</span></div></article>`).join('');
 document.getElementById('shows').innerHTML = myEvents.map(e=>{
   const d = parse(e.start);
-  const names = e.masters.map(m=>m.name).join(', ');
+  const names = e.masters.map(m=>`<a href="saunamaster.html" class="name-link">${m.name}</a>`).join(', ');
   return `<div class="show ${scopeClass[e.scope]}">
     <div class="date"><div class="d">${d.getDate()}</div><div class="m">${MONTHS[d.getMonth()]}</div></div>
     <div class="mid"><h4>${e.title}</h4><div class="who">${names}</div></div>
