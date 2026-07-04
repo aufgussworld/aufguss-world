@@ -92,6 +92,41 @@ header{display:flex;align-items:center;justify-content:space-between;padding:16p
 .entry .trophy{color:var(--ember-2);}
 .stage-line{margin-left:14px;border-left:2px dashed var(--line);height:16px;}
 
+/* szczegóły: main + archiwum */
+.detail-grid{display:grid;grid-template-columns:1fr 300px;gap:36px;align-items:start;}
+.detail-main{min-width:0;}
+.detail-aside{position:sticky;top:86px;}
+.archive-box{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;}
+.archive-box h3{font-size:1.15rem;margin-bottom:3px;}
+.archive-box .sub{font-size:0.78rem;color:var(--stone);margin-bottom:14px;}
+.arch-row{display:flex;align-items:center;gap:11px;padding:11px 13px;border:1px solid var(--line);border-radius:11px;cursor:pointer;margin-bottom:8px;transition:all .18s;}
+.arch-row:hover{border-color:var(--ember-1);background:var(--surface-2);transform:translateX(3px);}
+.arch-row .yr{font-family:'Fraunces',serif;font-size:1.2rem;color:var(--ember-3);}
+.arch-row .ci{font-size:0.8rem;color:var(--ink-dim);}
+.arch-row .chev{margin-left:auto;color:var(--stone);font-size:1.1rem;}
+/* modal podium */
+.pod-bg{position:fixed;inset:0;background:rgba(30,16,8,0.62);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;z-index:160;padding:24px;}
+.pod-bg.open{display:flex;}
+.pod-modal{background:var(--bg);border-radius:20px;max-width:460px;width:100%;padding:28px;position:relative;box-shadow:0 30px 80px rgba(0,0,0,0.4);animation:podIn .3s cubic-bezier(.2,.8,.2,1);}
+@keyframes podIn{from{opacity:0;transform:translateY(12px) scale(.98);}to{opacity:1;transform:none;}}
+.pod-modal .close{position:absolute;top:14px;right:16px;background:none;border:none;font-size:1.5rem;color:var(--stone);cursor:pointer;}
+.pod-modal h3{font-size:1.4rem;margin-bottom:4px;}
+.pod-modal .sub{font-size:0.82rem;color:var(--ink-dim);margin-bottom:18px;}
+.pod-row{display:grid;grid-template-columns:40px 1fr auto;gap:14px;align-items:center;padding:12px 14px;border-radius:12px;margin-bottom:8px;border:1px solid var(--line);}
+.pod-row.p1{background:linear-gradient(120deg,rgba(255,190,80,0.22),var(--surface));border-color:rgba(255,180,80,0.5);}
+.pod-row.p2{background:rgba(170,170,170,0.12);}
+.pod-row.p3{background:rgba(205,127,50,0.12);}
+.pod-medal{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-weight:600;color:#2a0e02;}
+.p1 .pod-medal{background:linear-gradient(135deg,#ffd77a,#e8a53a);}
+.p2 .pod-medal{background:linear-gradient(135deg,#e6e6e6,#b8b8b8);}
+.p3 .pod-medal{background:linear-gradient(135deg,#e0a86a,#c07a3a);}
+.pod-name{font-weight:600;font-size:0.95rem;}
+.pod-name .c{display:block;font-weight:400;font-size:0.78rem;color:var(--ink-dim);margin-top:1px;}
+.pod-name img{width:16px;border-radius:2px;vertical-align:-2px;margin-right:5px;}
+.pod-pts{font-family:'Fraunces',serif;color:var(--ember-3);font-size:1.15rem;text-align:right;}
+.pod-pts small{font-size:0.62rem;color:var(--stone);display:block;}
+@media(max-width:820px){ .detail-grid{grid-template-columns:1fr;} .detail-aside{position:static;} }
+
 @media(max-width:560px){
   .entry{grid-template-columns:1fr;gap:6px;}
   .entry .ctry{justify-self:start;}
@@ -132,7 +167,18 @@ header{display:flex;align-items:center;justify-content:space-between;padding:16p
   </div>
 </div>
 
+<!-- MODAL PODIUM (archiwum edycji) -->
+<div class="pod-bg" id="podModal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="pod-modal">
+    <button class="close" onclick="document.getElementById('podModal').classList.remove('open')" aria-label="Zamknij">×</button>
+    <h3 id="podTitle"></h3>
+    <div class="sub" id="podSub"></div>
+    <div id="podBody"></div>
+  </div>
+</div>
+
 <script src="../data/tournaments-data.js"></script>
+<script src="../assets/community.js"></script>
 <script>
 const T = window.AUFGUSS_TOURNAMENTS || [];
 const MONTHS=['sty','lut','mar','kwi','maj','cze','lip','sie','wrz','paź','lis','gru'];
@@ -211,7 +257,30 @@ function renderDetail(t){
     </div>`;
     if(i<t.stages.length-1) html+=`<div class="stage-line"></div>`;
   });
-  document.getElementById('detailBody').innerHTML=html;
+  // archiwum (poprzednie edycje) po prawej
+  let aside='';
+  if(t.archive && t.archive.length){
+    aside=`<div class="archive-box"><h3>Archiwum</h3><div class="sub">Poprzednie edycje — kliknij, aby zobaczyć podium.</div>
+      ${t.archive.map((a,i)=>`<div class="arch-row" data-arch="${i}"><span class="yr">${a.year}</span><span class="ci">${a.city}</span><span class="chev">›</span></div>`).join('')}</div>`;
+  }
+  document.getElementById('detailBody').innerHTML =
+    `<div class="detail-grid"><div class="detail-main">${html}<div id="tComments" style="margin-top:40px"></div></div><aside class="detail-aside">${aside}</aside></div>`;
+  // komentarze
+  AufgussComments.render(document.getElementById('tComments'), { type:'tournament', replyLabel:'Odpowiedź organizatora' });
+  // archiwum -> podium
+  document.querySelectorAll('.arch-row').forEach(row=>row.addEventListener('click',()=>openPodium(t, t.archive[+row.dataset.arch])));
+}
+
+function openPodium(t, ed){
+  document.getElementById('podTitle').textContent=`${t.name} ${ed.year}`;
+  document.getElementById('podSub').textContent=`Podium · ${ed.city}`;
+  document.getElementById('podBody').innerHTML = ed.podium.map(p=>`
+    <div class="pod-row p${p.place}">
+      <div class="pod-medal">${p.place}</div>
+      <div class="pod-name"><img src="https://flagcdn.com/20x15/${p.flag}.png">${p.name}<span class="c">${p.country}</span></div>
+      <div class="pod-pts">${p.points}<small>pkt</small></div>
+    </div>`).join('');
+  document.getElementById('podModal').classList.add('open');
 }
 
 function openTournament(id,push){

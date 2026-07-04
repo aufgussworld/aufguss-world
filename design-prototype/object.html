@@ -300,23 +300,15 @@ section.block{margin:46px 0;}
     <a class="v-action" id="fullCalLink" style="margin-top:18px;"><span class="ic">📅</span> Pełny kalendarz wydarzeń obiektu</a>
   </section>
 
-  <section class="block">
-    <div class="sec-head"><h2>Opinie społeczności</h2></div>
+  <section class="block" id="opinie">
     <div class="rev-summary">
       <div class="big">4.8</div>
       <div>
         <div class="mini-buckets" id="avgBuckets"></div>
-        <div class="sub">na podstawie 128 opinii saunowiczów</div>
+        <div class="sub">średnia ocena obiektu · 128 opinii</div>
       </div>
     </div>
-    <div id="reviews"></div>
-    <div class="add-review">
-      <h4>Dodaj swoją opinię</h4>
-      <div class="rate-pick">Twoja ocena: <div class="buckets" id="ratePick"></div></div>
-      <div class="field"><input type="text" placeholder="Imię / pseudonim"></div>
-      <textarea placeholder="Jak wspominasz wizytę w tym obiekcie?"></textarea>
-      <div style="margin-top:12px;"><button class="btn" onclick="alert('To prototyp — wysyłka opinii pojawi się w wersji z backendem.')">Opublikuj opinię</button></div>
-    </div>
+    <div id="commentsMount"></div>
   </section>
 
 </div>
@@ -334,6 +326,7 @@ section.block{margin:46px 0;}
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="../data/events-data.js"></script>
+<script src="../assets/community.js"></script>
 <script>
 const VENUE_NAME = "Satama Sauna Resort";
 const EVENTS = window.AUFGUSS_EVENTS || [];
@@ -397,23 +390,6 @@ document.getElementById('shows').innerHTML = myEvents.map(e=>{
   </div>`;
 }).join('') || '<div style="color:var(--stone)">Brak zaplanowanych wydarzeń.</div>';
 
-// przykładowe opinie
-const reviews = [
-  {who:'Marek W.', date:'maj 2026', r:5, t:'Najlepsze ceremonie aufguss, jakie widziałem w Europie. Klimat nad jeziorem nie do podrobienia, obsługa na najwyższym poziomie.'},
-  {who:'Anna K.', date:'kwiecień 2026', r:5, t:'Magiczne miejsce. Spędziłam tu cały dzień i czas płynął inaczej. Banya rewelacyjna, saunamistrzowie prawdziwi artyści.'},
-  {who:'Tomasz P.', date:'marzec 2026', r:4, t:'Świetny obiekt, choć w weekendy bywa tłoczno. Warto rezerwować ceremonie z wyprzedzeniem.'},
-];
-document.getElementById('reviews').innerHTML = reviews.map(rv=>{
-  const initials = rv.who.split(' ').map(n=>n[0]).join('');
-  return `<div class="review">
-    <div class="top">
-      <div class="av">${initials}</div>
-      <div><div class="who">${rv.who}</div><div class="date">${rv.date}</div></div>
-      <div class="mini-buckets">${bucketRow(rv.r)}</div>
-    </div>
-    <p>${rv.t}</p>
-  </div>`;
-}).join('');
 
 // ── BILETY I CENY ──────────────────────────────────────────────
 // obiekt sam wybiera model prezentacji ceny: 'day' (za dzień) lub 'hour' (za godzinę)
@@ -469,11 +445,8 @@ document.getElementById('planSheet').innerHTML = plan.map(p=>
   `<div class="plan-row"><span class="t">${p.t}</span><div><div class="th">${p.th}</div><div class="sa">${p.sa}</div></div><span class="tmp">${p.tmp}</span></div>`
 ).join('');
 
-// interaktywny wybór oceny w formularzu
-const ratePick = document.getElementById('ratePick');
-let picked = 0;
-function renderPick(){ ratePick.innerHTML = ''; for(let i=1;i<=5;i++){ const wrap=document.createElement('div'); wrap.innerHTML=bucketSVG(i<=picked?'lit':''); const svg=wrap.firstChild; svg.addEventListener('click',()=>{picked=i;renderPick();}); ratePick.appendChild(svg);} }
-renderPick();
+// sekcja recenzji/komentarzy (wspólny komponent) — krytycy + społeczność + odpowiedzi obiektu
+AufgussComments.render(document.getElementById('commentsMount'), { type:'object', replyLabel:'Odpowiedź obiektu' });
 
 // ── MAPA LOKALIZACJI (Leaflet) ─────────────────────────────────
 const VENUE_COORDS = [52.21502, 14.01027];
@@ -493,7 +466,6 @@ function setupReveal(container, limit, labelMore, labelLess){
 }
 setupReveal(document.querySelector('.tiles'), 4, 'Pokaż całą galerię', 'Zwiń galerię');
 setupReveal(document.getElementById('shows'), 3, `Pokaż wszystkie wydarzenia (${myEvents.length})`, 'Zwiń wydarzenia');
-setupReveal(document.getElementById('reviews'), 2, 'Zobacz wszystkie opinie (128)', 'Zwiń opinie');
 </script>
 </body>
 </html>

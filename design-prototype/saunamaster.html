@@ -215,9 +215,14 @@ section.block{margin-bottom:56px;}
     <div id="albums"></div>
   </section>
 
+  <section class="block" id="opinie">
+    <div id="commentsMount"></div>
+  </section>
+
 </div>
 
 <script src="../data/events-data.js"></script>
+<script src="../assets/community.js"></script>
 <script>
 const MASTER = "Maciej Piczura";
 const EVENTS = window.AUFGUSS_EVENTS || [];
@@ -279,6 +284,9 @@ function setupReveal(container, limit, labelMore, labelLess){
 }
 setupReveal(showsEl, 3, `Pokaż wszystkie występy (${myEvents.length})`, 'Zwiń występy');
 setupReveal(albumsEl, 2, 'Pokaż całą galerię', 'Zwiń galerię');
+
+// sekcja komentarzy (wspólny komponent) — krytycy + społeczność + odpowiedzi saunamistrza
+AufgussComments.render(document.getElementById('commentsMount'), { type:'master', replyLabel:'Odpowiedź saunamistrza' });
 </script>
 </body>
 </html>

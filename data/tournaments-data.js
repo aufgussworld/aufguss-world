@@ -11,6 +11,20 @@ window.AUFGUSS_TOURNAMENTS = [
     season: '2026',
     host: { venue: 'Termy Rzymskie', city: 'Czeladź', country: 'Polska', flag: 'pl' },
     tagline: 'Najbardziej prestiżowy turniej aufguss na świecie — od eliminacji krajowych po wielki finał w Colosseum Sauna Arena w Czeladzi.',
+    archive: [
+      { year:2025, city:'Czeladź', podium:[
+        {place:1, name:'Robert Zídek', country:'Czechy', flag:'cz', points:284},
+        {place:2, name:'Maciej Piczura', country:'Polska', flag:'pl', points:279},
+        {place:3, name:'Lukas Weber', country:'Niemcy', flag:'de', points:271} ] },
+      { year:2024, city:'Czeladź', podium:[
+        {place:1, name:'Maciej Piczura', country:'Polska', flag:'pl', points:288},
+        {place:2, name:'Robert Zídek', country:'Czechy', flag:'cz', points:282},
+        {place:3, name:'Arek Dan', country:'Polska', flag:'pl', points:270} ] },
+      { year:2023, city:'Czeladź', podium:[
+        {place:1, name:'Maciej Piczura', country:'Polska', flag:'pl', points:281},
+        {place:2, name:'David Zatočil', country:'Czechy', flag:'cz', points:276},
+        {place:3, name:'Jeremi Dygas', country:'Polska', flag:'pl', points:268} ] },
+    ],
     stages: [
       { label: 'Eliminacje krajowe', desc: 'Siedem krajów wyłania reprezentantów w obiektach na swoim terenie.',
         entries: [
@@ -64,6 +78,16 @@ window.AUFGUSS_TOURNAMENTS = [
     season: '2026',
     host: { venue: 'Centrum SPA', city: 'Słupsk', country: 'Polska', flag: 'pl' },
     tagline: 'Krajowe mistrzostwa saunamistrzów — droga na arenę międzynarodową.',
+    archive: [
+      { year:2025, city:'Słupsk', podium:[
+        {place:1, name:'Arek Dan', country:'Polska', flag:'pl', points:262},
+        {place:2, name:'Jeremi Dygas', country:'Polska', flag:'pl', points:258},
+        {place:3, name:'Tomasz Kowal', country:'Polska', flag:'pl', points:249} ] },
+      { year:2024, city:'Wręcza', podium:[
+        {place:1, name:'Maciej Piczura', country:'Polska', flag:'pl', points:270},
+        {place:2, name:'Arek Dan', country:'Polska', flag:'pl', points:264},
+        {place:3, name:'Jeremi Dygas', country:'Polska', flag:'pl', points:255} ] },
+    ],
     stages: [
       { label: 'Eliminacje regionalne', desc: 'Turnieje kwalifikacyjne w regionach.',
         entries: [

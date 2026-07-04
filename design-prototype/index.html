@@ -295,6 +295,13 @@ footer{padding:70px 5vw 40px;position:relative;z-index:2;background:#241608;colo
 .login-submit:hover{transform:translateY(-2px);}
 .reg-line{text-align:center;font-size:0.86rem;color:var(--ink-dim);margin-top:20px;}
 .reg-line a{color:var(--ember-2);font-weight:600;}
+.nl-pref{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;margin-bottom:9px;cursor:pointer;transition:all .18s;text-align:left;}
+.nl-pref:hover{border-color:var(--ember-1);background:var(--surface-2);}
+.nl-pref input{appearance:none;width:20px;height:20px;border-radius:6px;border:1.5px solid var(--line-strong);flex-shrink:0;margin-top:1px;position:relative;cursor:pointer;transition:all .15s;}
+.nl-pref input:checked{background:var(--ember-1);border-color:var(--ember-1);}
+.nl-pref input:checked::after{content:'';position:absolute;left:6px;top:2px;width:5px;height:10px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg);}
+.nl-pref .t{font-weight:600;font-size:0.9rem;color:var(--ink);display:block;}
+.nl-pref .d{font-size:0.78rem;color:var(--ink-dim);margin-top:2px;display:block;}
 </style>
 </head>
 <body>
@@ -489,11 +496,8 @@ footer{padding:70px 5vw 40px;position:relative;z-index:2;background:#241608;colo
   <div class="newsletter">
     <span class="tag" style="color:var(--ember-2);font-size:0.74rem;text-transform:uppercase;letter-spacing:0.18em;font-weight:600;">Newsletter</span>
     <h2 style="margin-top:12px;">Bądź na bieżąco</h2>
-    <p>Nowe obiekty, turnieje i aktualności — raz w tygodniu, bez spamu.</p>
-    <div class="newsletter-form">
-      <input type="email" placeholder="twój@email.com">
-      <button class="btn btn-fire">Zapisz się</button>
-    </div>
+    <p>Sam decydujesz, o czym chcesz dostawać wiadomości — turnieje, szkolenia czy wydarzenia ulubionych obiektów.</p>
+    <button class="btn btn-fire" id="contactBtn" style="margin:0 auto;">Pozostań w kontakcie</button>
   </div>
 </section>
 
@@ -532,6 +536,25 @@ footer{padding:70px 5vw 40px;position:relative;z-index:2;background:#241608;colo
   </div>
 </div>
 
+<!-- MODAL NEWSLETTERA (preferencje) -->
+<div class="modal-bg" id="nlModal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="login-modal">
+    <button class="close" onclick="document.getElementById('nlModal').classList.remove('open')" aria-label="Zamknij">×</button>
+    <h3>Pozostań w kontakcie</h3>
+    <div class="sub">Podaj e-mail i zaznacz, o czym chcesz dostawać wiadomości.</div>
+    <form onsubmit="event.preventDefault(); this.closest('.modal-bg').classList.remove('open');">
+      <div class="lf"><label for="nlEmail">E-mail</label><input id="nlEmail" type="email" required placeholder="twój@email.com" autocomplete="email"></div>
+      <div class="divider">interesują mnie</div>
+      <label class="nl-pref"><input type="checkbox" checked><span><span class="t">Turnieje</span><span class="d">Nadchodzące turnieje i aktualizacje konkretnych edycji</span></span></label>
+      <label class="nl-pref"><input type="checkbox"><span><span class="t">Szkolenia</span><span class="d">Warsztaty i kursy aufguss</span></span></label>
+      <label class="nl-pref"><input type="checkbox"><span><span class="t">Wydarzenia obiektów</span><span class="d">Noce aufguss i ceremonie ulubionych obiektów</span></span></label>
+      <label class="nl-pref"><input type="checkbox" checked><span><span class="t">Aktualności</span><span class="d">Newsy ze świata aufguss</span></span></label>
+      <label class="nl-pref"><input type="checkbox"><span><span class="t">Nowe obiekty</span><span class="d">Gdy na mapie pojawi się nowy obiekt</span></span></label>
+      <button type="submit" class="login-submit" style="margin-top:14px;">Zapisz preferencje</button>
+    </form>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/jsvectormap@1.4.4/dist/js/jsvectormap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsvectormap@1.4.4/dist/maps/world-merc.js"></script>
 <script src="../data/objects-data.js"></script>
@@ -557,7 +580,9 @@ document.addEventListener('click', ()=> langDd.classList.remove('open'));
 // modal logowania
 const loginModal=document.getElementById('loginModal');
 document.querySelector('.btn-login').addEventListener('click', e=>{ e.preventDefault(); loginModal.classList.add('open'); setTimeout(()=>document.getElementById('lEmail')?.focus(),100); });
-document.addEventListener('keydown', e=>{ if(e.key==='Escape') loginModal.classList.remove('open'); });
+// modal newslettera „Pozostań w kontakcie"
+document.getElementById('contactBtn').addEventListener('click', ()=>{ document.getElementById('nlModal').classList.add('open'); setTimeout(()=>document.getElementById('nlEmail')?.focus(),100); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') document.querySelectorAll('.modal-bg.open').forEach(m=>m.classList.remove('open')); });
 
 // ===== HERO SLIDER =====
 const slides=[...document.querySelectorAll('.hero .slide')];
