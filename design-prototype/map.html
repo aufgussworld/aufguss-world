@@ -98,6 +98,10 @@ header{
 .card-nav{display:inline-flex;align-items:center;gap:6px;font-size:0.72rem;font-weight:600;color:var(--ember-3);background:var(--surface-2);border-radius:100px;padding:6px 12px;transition:all .2s;text-decoration:none;}
 .card-nav svg{width:14px;height:14px;}
 .card-nav:hover{background:linear-gradient(120deg,#ff8a3d,#e8552a);color:#fff;}
+.leaflet-popup-content .card-nav,.leaflet-popup-content .card-soc{color:var(--ember-3);}
+.leaflet-popup-content .card-nav:hover,.leaflet-popup-content .card-soc:hover{color:#fff;}
+.leaflet-popup-content .card-soc-row{margin-top:10px;margin-bottom:2px;}
+.popup-visit{display:inline-block;margin-top:8px;}
 .empty-state{padding:40px 20px;text-align:center;color:var(--stone);font-size:0.85rem;}
 
 #map{height:100%;width:100%;background:#dfe6e0;}
@@ -214,7 +218,7 @@ function rebuildMarkers(){
   Object.keys(markers).forEach(k=>delete markers[k]);
   objects.filter(o=>selected.has(o.country)).forEach(o=>{
     const m = L.marker([o.lat,o.lng], { icon: pinIcon(false) });
-    m.bindPopup(`<h4>${o.name}</h4><p>${o.city ? o.city+', ' : ''}${o.country}</p><a href="#">Zobacz wizytówkę →</a>`);
+    m.bindPopup(`<h4>${o.name}</h4><p>${o.city ? o.city+', ' : ''}${o.country}</p>${cardSocials(o)}<a class="popup-visit" href="object.html">Zobacz wizytówkę →</a>`);
     m.on('mouseover', ()=> setHighlight(o.id, true));
     m.on('mouseout', ()=> setHighlight(o.id, false));
     m.on('click', ()=> { document.getElementById('card-'+o.id)?.scrollIntoView({behavior:'smooth', block:'center'}); });
