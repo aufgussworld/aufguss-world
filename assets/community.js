@@ -11,7 +11,7 @@
     rycerz:    {label:'Rycerz',    cls:'r-rycerz'},
     chorazy:   {label:'Chorąży',   cls:'r-choragy'},
     kawaleria: {label:'Kawaleria', cls:'r-kawaleria'},
-    krytyk:    {label:'Krytyk saunowy', cls:'r-krytyk'},
+    krytyk:    {label:'Bloger', cls:'r-krytyk'},
   };
   const ICON = {
     fire:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3c1.2 3-2 4.2-2 7a2 2 0 0 0 4 .2c2 1.8 3 3.8 3 5.8a5 5 0 0 1-10 0c0-3.8 3-6 5-9z"/></svg>',
@@ -126,6 +126,9 @@
     },
   };
 
+  // znani blogerzy → slug profilu/bloga
+  const BLOG_SLUG = {'Wojciech Kadź':'wojciech-kadz'};
+  function blogLink(name){ const s=BLOG_SLUG[name]; return s?`<a href="blog.html?blog=${s}" style="color:inherit">${esc(name)}</a>`:esc(name); }
   function avatarText(name){ return name.split(' ').map(n=>n[0]).slice(0,2).join(''); }
   function esc(s){ return String(s).replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c])); }
 
@@ -147,7 +150,7 @@
     }
     function openReview(c){
       modal.querySelector('.m-inner').innerHTML =
-        `<div class="m-meta"><div class="av">${avatarText(c.name)}</div><div><div style="font-weight:600">${esc(c.name)}</div><span class="rank-badge r-krytyk">${ICON.star} Krytyk saunowy</span></div><div class="m-score">${c.score}<span style="font-size:0.7rem;color:var(--stone)">/10</span></div></div>
+        `<div class="m-meta"><div class="av">${avatarText(c.name)}</div><div><div style="font-weight:600">${blogLink(c.name)}</div><span class="rank-badge r-krytyk">${ICON.star} Bloger</span></div><div class="m-score">${c.score}<span style="font-size:0.7rem;color:var(--stone)">/10</span></div></div>
          <h2>${esc(c.title)}</h2><div class="m-body">${c.body.map(p=>`<p>${esc(p)}</p>`).join('')}</div>`;
       modal.classList.add('open');
     }
@@ -186,15 +189,15 @@
         <div class="crit-card">
           <div class="av">${c.init||avatarText(c.name)}</div>
           <div style="flex:1;min-width:0">
-            <div class="who">${esc(c.name)} <span class="rank-badge r-krytyk">${ICON.star} Krytyk</span></div>
+            <div class="who">${blogLink(c.name)} <span class="rank-badge r-krytyk">${ICON.star} Bloger</span></div>
             <h4>${esc(c.title)}</h4><p>${esc(c.excerpt)}</p>
             <span class="read" data-crit="${i}">Czytaj pełną recenzję →</span>
           </div>
           <div class="crit-score"><div class="n">${c.score}</div><div class="max">/ 10</div></div>
         </div>`).join('');
       mount.innerHTML = `
-        <h3 class="sec">Recenzje krytyków</h3>
-        <div class="sec-sub">Oceny zweryfikowanych krytyków saunowych.</div>
+        <h3 class="sec">Recenzje blogerów</h3>
+        <div class="sec-sub">Oceny zweryfikowanych blogerów saunowych.</div>
         <div class="crit-grid">${critHTML}</div>
         <div class="cmt-divider"></div>
         <h3 class="sec">Opinie społeczności</h3>

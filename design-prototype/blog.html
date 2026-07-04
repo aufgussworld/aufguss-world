@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blog — aufguss.world</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700&display=swap" rel="stylesheet">
+<style>
+.brand{height:40px;width:auto;display:block;}
+:root{
+  --ember-1:#ff7a3d;--ember-2:#e8552a;--ember-3:#d6491f;
+  --bg:#fbf5ea;--surface:#ffffff;--surface-2:#f3e8d6;
+  --ink:#2a1b10;--ink-dim:#6b5a47;--stone:#8a7960;
+  --line:rgba(42,27,16,0.1);--line-strong:rgba(42,27,16,0.18);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--ink);font-family:'Instrument Sans',sans-serif;}
+h1,h2,h3{font-family:'Fraunces',serif;font-weight:400;}
+a{color:inherit;text-decoration:none;}
+
+header{display:flex;align-items:center;justify-content:space-between;padding:16px 5vw;border-bottom:1px solid var(--line);background:var(--surface);position:sticky;top:0;z-index:30;}
+.back-link{font-size:0.8rem;color:var(--ink-dim);}
+.back-link:hover{color:var(--ember-2);}
+.wrap{max-width:1040px;margin:0 auto;padding:40px clamp(20px,4vw,48px) 90px;}
+
+/* HERO PROFILU/BLOGA */
+.blog-hero{display:flex;gap:28px;align-items:center;margin-bottom:14px;flex-wrap:wrap;}
+.bh-av{width:110px;height:110px;border-radius:24px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:2.4rem;color:#fff6ea;background:linear-gradient(150deg,#ffd9a8,#ff8a3d 55%,#e8552a);box-shadow:0 12px 30px rgba(42,27,16,0.14);}
+.bh-type{display:inline-block;font-size:0.64rem;text-transform:uppercase;letter-spacing:0.1em;font-weight:700;padding:4px 12px;border-radius:100px;margin-bottom:10px;}
+.bh-type.bloger{background:linear-gradient(120deg,#2a1208,#7a3618);color:#ffd2a8;}
+.bh-type.obiekt{background:rgba(255,191,40,0.2);color:#9c6c00;}
+.bh-type.partner{background:rgba(196,58,19,0.12);color:var(--intl,#c43a13);}
+.blog-hero h1{font-size:clamp(1.9rem,3.6vw,2.8rem);line-height:1.05;margin-bottom:12px;}
+.bh-meta{display:flex;flex-wrap:wrap;gap:8px 10px;margin-bottom:14px;}
+.bh-meta span{font-size:0.78rem;color:var(--ink-dim);background:var(--surface);border:1px solid var(--line);padding:5px 12px;border-radius:100px;}
+.bh-bio{color:var(--ink-dim);line-height:1.7;max-width:640px;}
+.bh-follow{display:inline-flex;align-items:center;gap:8px;margin-top:16px;padding:11px 22px;border-radius:100px;background:linear-gradient(120deg,#ff8a3d,#ff5a3d);color:#2a0e02;font:700 0.76rem 'Instrument Sans';letter-spacing:0.06em;text-transform:uppercase;cursor:pointer;border:none;transition:transform .2s;}
+.bh-follow:hover{transform:translateY(-2px);}
+
+.sec-head{display:flex;align-items:baseline;gap:12px;margin:44px 0 22px;}
+.sec-head h2{font-size:clamp(1.5rem,2.6vw,2rem);}
+.sec-head .count{font-size:0.82rem;color:var(--stone);}
+
+/* WPISY */
+.posts{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;}
+.post-card{background:var(--surface);border:1px solid var(--line);border-radius:18px;overflow:hidden;display:flex;flex-direction:column;cursor:pointer;transition:transform .3s,box-shadow .3s,border-color .3s;}
+.post-card:hover{transform:translateY(-5px);box-shadow:0 18px 44px rgba(42,27,16,0.1);border-color:rgba(255,122,61,0.4);}
+.post-card .cover{height:150px;position:relative;display:flex;align-items:flex-end;justify-content:space-between;padding:14px;}
+.post-card .cover::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(42,15,5,0.42),transparent 60%);}
+.post-card .cat{position:relative;z-index:1;font-size:0.62rem;text-transform:uppercase;letter-spacing:0.07em;font-weight:700;color:#2a0e02;background:#ffb56b;padding:3px 11px;border-radius:100px;}
+.post-card .score{position:relative;z-index:1;font-family:'Fraunces',serif;font-size:1.5rem;color:#fffaf2;text-shadow:0 2px 8px rgba(0,0,0,0.4);}
+.post-card .score small{font-size:0.62rem;opacity:0.8;}
+.pc1{background:linear-gradient(150deg,#ffd9a8,#ff8a3d);}.pc2{background:linear-gradient(150deg,#e8552a,#a8320f);}
+.pc3{background:linear-gradient(150deg,#7a3618,#c9651f);}.pc4{background:linear-gradient(150deg,#2a1208,#7a3618);}
+.post-card .body{padding:16px 18px 18px;display:flex;flex-direction:column;flex:1;}
+.post-card .pdate{font-size:0.72rem;color:var(--stone);margin-bottom:6px;}
+.post-card .pobj{font-size:0.72rem;color:var(--ember-3);font-weight:600;margin-bottom:6px;}
+.post-card h3{font-size:1.12rem;font-weight:500;line-height:1.3;margin-bottom:9px;}
+.post-card p{font-size:0.86rem;color:var(--ink-dim);line-height:1.55;margin-bottom:14px;flex:1;}
+.post-card .more{font-size:0.78rem;font-weight:600;color:var(--ember-2);}
+
+/* MODAL WPISU */
+.modal-bg{position:fixed;inset:0;background:rgba(30,16,8,0.62);backdrop-filter:blur(3px);display:none;align-items:flex-start;justify-content:center;z-index:150;padding:40px 18px;overflow:auto;}
+.modal-bg.open{display:flex;}
+.pmodal{background:var(--bg);border-radius:20px;max-width:680px;width:100%;padding:0 0 34px;position:relative;margin:auto;box-shadow:0 30px 80px rgba(0,0,0,0.4);overflow:hidden;}
+.pmodal .close{position:absolute;top:14px;right:16px;background:rgba(20,10,4,0.4);color:#fff6ea;border:none;font-size:1.4rem;width:36px;height:36px;border-radius:50%;cursor:pointer;z-index:2;}
+.pmodal .pm-cover{height:200px;display:flex;align-items:flex-end;padding:20px;}
+.pmodal .pm-cover::after{content:'';position:absolute;left:0;right:0;height:200px;background:linear-gradient(to top,rgba(42,15,5,0.5),transparent 60%);}
+.pmodal .pm-cover .cat{position:relative;z-index:1;font-size:0.64rem;text-transform:uppercase;letter-spacing:0.07em;font-weight:700;color:#2a0e02;background:#ffb56b;padding:4px 12px;border-radius:100px;}
+.pmodal .pm-inner{padding:24px 34px 0;}
+.pmodal .pm-meta{display:flex;align-items:center;gap:10px;font-size:0.8rem;color:var(--ink-dim);margin-bottom:12px;flex-wrap:wrap;}
+.pmodal .pm-score{font-family:'Fraunces',serif;color:var(--ember-3);font-size:1.3rem;}
+.pmodal h2{font-family:'Fraunces',serif;font-weight:500;font-size:1.9rem;line-height:1.15;margin-bottom:16px;}
+.pmodal .pm-body p{color:var(--ink-dim);line-height:1.75;margin-bottom:15px;font-size:1rem;}
+.pmodal .pm-obj{margin-top:6px;font-size:0.86rem;}
+.pmodal .pm-obj a{color:var(--ember-2);font-weight:600;}
+@media(max-width:560px){ .bh-av{width:84px;height:84px;font-size:1.9rem;} .pmodal .pm-inner{padding:22px 22px 0;} }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="index.html"><img class="brand" src="../assets/brand-logo-trim.png" alt="aufguss.world"></a>
+  <a href="index.html" class="back-link">← Strona główna</a>
+</header>
+
+<div class="wrap">
+  <div class="blog-hero" id="blogHero"></div>
+  <div class="sec-head"><h2 id="postsHead">Wpisy</h2><span class="count" id="postsCount"></span></div>
+  <div class="posts" id="posts"></div>
+</div>
+
+<!-- MODAL WPISU -->
+<div class="modal-bg" id="postModal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="pmodal">
+    <button class="close" onclick="document.getElementById('postModal').classList.remove('open')" aria-label="Zamknij">×</button>
+    <div class="pm-cover" id="pmCover"><span class="cat" id="pmCat"></span></div>
+    <div class="pm-inner">
+      <div class="pm-meta" id="pmMeta"></div>
+      <h2 id="pmTitle"></h2>
+      <div class="pm-body" id="pmBody"></div>
+      <div class="pm-obj" id="pmObj"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const BLOGS = {
+  'wojciech-kadz': {
+    type:'Bloger', typeCls:'bloger', name:'Wojciech Kadź', init:'WK',
+    meta:['Polska','Bloger saunowy','48 recenzji'],
+    bio:'Recenzent i bloger saunowy. Od ośmiu lat objeżdżam europejskie sauny i opisuję je bez filtra — od jakości aufguss, przez architekturę, po obsługę i atmosferę. Współpracuję z aufguss.world jako zweryfikowany bloger.',
+    postsLabel:'Recenzje i wpisy',
+    posts:[
+      {cat:'Recenzja', cover:'pc1', date:'czerwiec 2026', score:'8,8', obj:'Satama Sauna Resort', title:'Rzymski przepych, który działa nie tylko na Instagramie',
+        excerpt:'Colosseum Sauna Arena robi wrażenie skalą, ale prawdziwą wartością są ceremonie i obsługa.',
+        body:['Satama to obiekt, który łatwo sprowadzić do efektownych zdjęć — antyczne kolumny, ogromna arena, para unosząca się pod sklepieniem. Byłoby jednak krzywdzące zatrzymać się na warstwie wizualnej.','Program ceremonii jest gęsty i różnorodny, a saunamistrzowie prowadzą seans jak spektakl — z narracją, muzyką i wyczuciem temperatury. Strefa banii i rytuał z wenikiem to mocne punkty.','Minusy? W szczycie weekendu bywa tłoczno, a część seansów wymaga rezerwacji. Mimo to — jeden z najlepszych obiektów aufguss w Europie.']},
+      {cat:'Recenzja', cover:'pc2', date:'maj 2026', score:'7,9', obj:'Liquidrom', title:'Berliński minimalizm pod wodą',
+        excerpt:'Kultowa architektura i podwodna muzyka, ale program aufguss bywa nierówny.',
+        body:['Liquidrom to instytucja — basen solankowy pod kopułą z muzyką pod wodą robi wrażenie za każdym razem.','Aufguss? Wieczorami potrafi być znakomity, ale w ciągu dnia poziom bywa nierówny. To miejsce raczej o relaksie niż o ceremonialnym show.']},
+      {cat:'Felieton', cover:'pc4', date:'kwiecień 2026', title:'Dlaczego Polska stała się saunową potęgą Europy',
+        excerpt:'W pięć lat przeszliśmy drogę, którą inne kraje pokonywały dekadę.',
+        body:['Jeszcze niedawno aufguss w Polsce był niszą. Dziś mamy własne mistrzostwa, obiekty inwestujące w saunamistrzów i publiczność, która rozumie ceremonię.','Ten tekst to próba uchwycenia, co zadecydowało o tak szybkim rozwoju — i co może nas jeszcze zatrzymać.']},
+    ],
+  },
+  'pts': {
+    type:'Partner', typeCls:'partner', name:'Polskie Towarzystwo Saunowe (PTS)', init:'PTS',
+    meta:['Polska','Organizator turniejów','Partner portalu'],
+    bio:'Federacja zrzeszająca saunamistrzów i obiekty, organizator Mistrzostw Polski oraz cyklu PTS Classic. Na aufguss.world publikujemy aktualności związane z organizowanymi wydarzeniami.',
+    postsLabel:'Aktualności',
+    posts:[
+      {cat:'Turnieje', cover:'pc2', date:'czerwiec 2026', title:'Ruszają zapisy na Mistrzostwa Polski PTS Classic 2026',
+        excerpt:'Rejestracja zawodników otwarta do końca lipca. Finał w Słupsku.',
+        body:['Zapraszamy saunamistrzów do rejestracji na tegoroczne Mistrzostwa Polski. Eliminacje regionalne ruszają jesienią, a wielki finał odbędzie się w Słupsku.','Regulamin i formularz zgłoszeniowy dostępne są w panelu zawodnika.']},
+      {cat:'Federacja', cover:'pc3', date:'maj 2026', title:'Nowy system rankingowy saunamistrzów',
+        excerpt:'Wspólnie z aufguss.world wdrażamy 10-stopniową skalę rang.',
+        body:['Punkty za turnieje przekładają się teraz na rangę widoczną na profilu zawodnika — od Rookie do Pro Master.','To ważny krok w profesjonalizacji polskiej sceny aufguss.']},
+    ],
+  },
+  'satama': {
+    type:'Obiekt', typeCls:'obiekt', name:'Satama Sauna Resort', init:'SAT',
+    meta:['Niemcy','Obiekt saunowy','Blog obiektu'],
+    bio:'Blog obiektu Satama Sauna Resort — nowości, wydarzenia specjalne i kulisy ceremonii aufguss nad jeziorem Scharmützelsee w Brandenburgii.',
+    postsLabel:'Wpisy obiektu',
+    posts:[
+      {cat:'Wydarzenie', cover:'pc2', date:'28 czerwca 2026', title:'Noc aufguss z Robertem Zídkiem i Davidem Zatočilem',
+        excerpt:'Wyjątkowy wieczór z dwoma mistrzami świata — bilety w sprzedaży od piątku.',
+        body:['Zapraszamy na wyjątkową noc aufguss z udziałem dwóch mistrzów świata. Wieczór wypełnią autorskie ceremonie i muzyka na żywo.']},
+      {cat:'Obiekt', cover:'pc3', date:'20 czerwca 2026', title:'Nowa sauna zewnętrzna nad Scharmützelsee',
+        excerpt:'Oddajemy do użytku panoramiczną saunę z widokiem na jezioro.',
+        body:['Nowa sauna zewnętrzna z tarasem widokowym jest już otwarta. Schłodzenie w jeziorze na wyciągnięcie ręki.']},
+    ],
+  },
+};
+
+const slug = new URLSearchParams(location.search).get('blog') || 'wojciech-kadz';
+const blog = BLOGS[slug] || BLOGS['wojciech-kadz'];
+
+document.title = `${blog.name} — blog | aufguss.world`;
+document.getElementById('blogHero').innerHTML = `
+  <div class="bh-av">${blog.init}</div>
+  <div>
+    <span class="bh-type ${blog.typeCls}">${blog.type}</span>
+    <h1>${blog.name}</h1>
+    <div class="bh-meta">${blog.meta.map(m=>`<span>${m}</span>`).join('')}</div>
+    <p class="bh-bio">${blog.bio}</p>
+    <button class="bh-follow">＋ Obserwuj bloga</button>
+  </div>`;
+document.getElementById('postsHead').textContent = blog.postsLabel;
+document.getElementById('postsCount').textContent = `${blog.posts.length} ${blog.posts.length===1?'wpis':'wpisów'}`;
+
+const postsEl = document.getElementById('posts');
+postsEl.innerHTML = blog.posts.map((p,i)=>`
+  <article class="post-card" data-i="${i}">
+    <div class="cover ${p.cover}"><span class="cat">${p.cat}</span>${p.score?`<span class="score">${p.score}<small>/10</small></span>`:''}</div>
+    <div class="body">
+      <div class="pdate">${p.date}</div>
+      ${p.obj?`<div class="pobj">${p.obj}</div>`:''}
+      <h3>${p.title}</h3>
+      <p>${p.excerpt}</p>
+      <span class="more">Czytaj wpis →</span>
+    </div>
+  </article>`).join('');
+
+function openPost(p){
+  const cov=document.getElementById('pmCover'); cov.className='pm-cover '+p.cover;
+  document.getElementById('pmCat').textContent=p.cat;
+  document.getElementById('pmMeta').innerHTML=`${p.date}${p.score?` · <span class="pm-score">${p.score}/10</span>`:''}`;
+  document.getElementById('pmTitle').textContent=p.title;
+  document.getElementById('pmBody').innerHTML=p.body.map(t=>`<p>${t}</p>`).join('');
+  document.getElementById('pmObj').innerHTML = p.obj?`Recenzowany obiekt: <a href="object.html">${p.obj}</a>`:'';
+  document.getElementById('postModal').classList.add('open');
+}
+postsEl.querySelectorAll('.post-card').forEach(c=>c.addEventListener('click',()=>openPost(blog.posts[+c.dataset.i])));
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') document.getElementById('postModal').classList.remove('open'); });
+</script>
+</body>
+</html>

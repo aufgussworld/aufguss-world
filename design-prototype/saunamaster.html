@@ -109,6 +109,21 @@ section.block{margin-bottom:56px;}
 .show .mid .v img{width:16px;border-radius:2px;}
 .show .role{font-size:0.72rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;padding:5px 12px;border-radius:100px;background:var(--surface-2);color:var(--ink-dim);white-space:nowrap;}
 
+/* SZKOLENIA (tylko dla saunamistrzów-trenerów) */
+.train-intro{color:var(--ink-dim);line-height:1.7;font-size:0.98rem;margin-bottom:22px;max-width:640px;}
+.trainings{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;}
+.train-card{background:var(--surface);border:1px solid var(--line);border-top:3px solid var(--ember-2);border-radius:16px;padding:18px 20px;display:flex;flex-direction:column;}
+.train-card .tc-date{display:inline-flex;align-items:center;gap:8px;font-family:'Fraunces',serif;font-size:1.15rem;color:var(--ember-3);margin-bottom:8px;}
+.train-card .tc-lvl{margin-left:auto;font-size:0.64rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;padding:3px 10px;border-radius:100px;background:var(--surface-2);color:var(--ink-dim);}
+.train-card h4{font-size:1.05rem;font-weight:600;font-family:'Instrument Sans';margin-bottom:6px;line-height:1.3;}
+.train-card .tc-place{font-size:0.82rem;color:var(--ink-dim);display:flex;align-items:center;gap:7px;margin-bottom:12px;}
+.train-card .tc-place img{width:16px;border-radius:2px;}
+.train-card p{font-size:0.85rem;color:var(--ink-dim);line-height:1.55;margin-bottom:16px;flex:1;}
+.train-card .tc-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.train-card .tc-spots{font-size:0.76rem;color:var(--stone);}
+.train-card .tc-spots b{color:var(--ember-3);}
+.train-card .tc-btn{font:700 0.68rem 'Instrument Sans';letter-spacing:0.05em;text-transform:uppercase;padding:8px 16px;border-radius:100px;border:none;cursor:pointer;background:linear-gradient(120deg,#ff8a3d,#ff5a3d);color:#2a0e02;}
+
 /* GALLERY (a'la sauna Instagram, z podziałem na wydarzenia) */
 .album{margin-bottom:30px;}
 .album-head{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
@@ -210,6 +225,13 @@ section.block{margin-bottom:56px;}
     <div class="shows" id="shows"></div>
   </section>
 
+  <!-- SZKOLENIA — sekcja widoczna tylko dla saunamistrzów-trenerów -->
+  <section class="block" id="szkolenia" style="display:none">
+    <div class="sec-head"><h2>Szkolenia</h2><span class="count" id="trainCount"></span></div>
+    <p class="train-intro">Maciej jako <b>Aufguss Master Trainer</b> prowadzi warsztaty i szkolenia dla saunamistrzów — od podstaw pracy z ręcznikiem po przygotowanie do turniejów. Poniżej najbliższe terminy i miejsca.</p>
+    <div class="trainings" id="trainings"></div>
+  </section>
+
   <section class="block" id="galeria">
     <div class="sec-head"><h2>Galeria</h2><span class="count">z podziałem na wydarzenia — saunowy feed Macieja</span></div>
     <div id="albums"></div>
@@ -272,6 +294,27 @@ albums.forEach(a=>{
     <div class="tiles">${tiles}${more}</div>`;
   albumsEl.appendChild(block);
 });
+
+// ── SZKOLENIA (tylko dla trenerów) ─────────────────────────────
+// docelowo flaga z backendu: profil.isTrainer. Maciej = Aufguss Master Trainer.
+const IS_TRAINER = true;
+const TRAININGS = [
+  { date:'12 wrz 2026', level:'Podstawowy', title:'Aufguss od podstaw — praca z ręcznikiem i temperaturą', flag:'pl', place:'Chochołowskie Termy, Chochołów', spots:'6 / 12', desc:'Jednodniowy warsztat dla początkujących: technika machania, rozprowadzanie pary, bezpieczeństwo i pierwsze układy.' },
+  { date:'4 paź 2026', level:'Zaawansowany', title:'Choreografia i storytelling w ceremonii', flag:'pl', place:'Termy Rzymskie, Czeladź', spots:'3 / 8', desc:'Budowanie dramaturgii seansu, dobór muzyki i narracji, praca sceniczna z publicznością na dużej arenie.' },
+  { date:'22 lis 2026', level:'Turniejowy', title:'Przygotowanie do turnieju aufguss', flag:'de', place:'Satama Sauna Resort, Bad Saarow', spots:'2 / 6', desc:'Intensywny kurs pod kątem startu w zawodach: regulaminy, ocena sędziowska, dopięcie autorskiego programu.' },
+];
+if(IS_TRAINER){
+  const sec=document.getElementById('szkolenia'); sec.style.display='';
+  document.getElementById('trainCount').textContent = `${TRAININGS.length} nadchodzące terminy`;
+  document.getElementById('trainings').innerHTML = TRAININGS.map(t=>`
+    <div class="train-card">
+      <div class="tc-date"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="17" rx="2"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4"/></svg> ${t.date}<span class="tc-lvl">${t.level}</span></div>
+      <h4>${t.title}</h4>
+      <div class="tc-place"><img src="https://flagcdn.com/20x15/${t.flag}.png"> ${t.place}</div>
+      <p>${t.desc}</p>
+      <div class="tc-foot"><span class="tc-spots">Wolne miejsca: <b>${t.spots}</b></span><button class="tc-btn">Zapisz się</button></div>
+    </div>`).join('');
+}
 
 // ── „POKAŻ WIĘCEJ" dla list, które będą rosły ──────────────────
 function setupReveal(container, limit, labelMore, labelLess){
