@@ -197,14 +197,19 @@ section{position:relative;z-index:2;padding:120px 5vw;}
 .slider-nav[disabled]{opacity:0;pointer-events:none;}
 @media(max-width:760px){ .slider-nav{display:none;} }
 /* PARTNERZY */
-.partner-card{width:260px;flex-shrink:0;scroll-snap-align:start;border-radius:20px;background:var(--surface);border:1px solid var(--line);box-shadow:0 6px 20px rgba(42,27,16,0.06);transition:transform .35s,box-shadow .35s,border-color .35s;display:flex;flex-direction:column;padding:22px;height:230px;}
+.partner-card{width:260px;flex-shrink:0;scroll-snap-align:start;border-radius:20px;background:var(--surface);border:1px solid var(--line);box-shadow:0 6px 20px rgba(42,27,16,0.06);transition:transform .35s,box-shadow .35s,border-color .35s;display:flex;flex-direction:column;padding:22px;min-height:250px;}
 .partner-card:hover{transform:translateY(-6px);border-color:rgba(255,122,61,0.4);box-shadow:0 18px 40px rgba(42,27,16,0.12);}
 .partner-card .logo{width:64px;height:64px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:1.3rem;color:#fff6ea;background:linear-gradient(150deg,#ffd9a8,#ff8a3d 55%,#e8552a);margin-bottom:16px;}
 .partner-card .pcat{font-size:0.66rem;text-transform:uppercase;letter-spacing:0.08em;font-weight:700;color:var(--ember-2);margin-bottom:6px;}
 .partner-card h4{font-family:'Fraunces',serif;font-weight:500;font-size:1.2rem;line-height:1.15;margin-bottom:6px;}
 .partner-card .pdesc{font-size:0.82rem;color:var(--ink-dim);line-height:1.5;flex:1;}
-.partner-card .plink{margin-top:12px;font-size:0.78rem;font-weight:600;color:var(--ember-2);}
-.partner-card:hover .plink{color:var(--ember-3);}
+.partner-card .pfoot{margin-top:14px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.partner-card .plink{font-size:0.78rem;font-weight:600;color:var(--ember-2);}
+.partner-card .plink:hover{color:var(--ember-3);}
+.partner-card .psoc{display:flex;gap:7px;}
+.partner-card .psoc a{width:32px;height:32px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line-strong);color:var(--ember-3);background:var(--surface);transition:all .2s;}
+.partner-card .psoc svg{width:16px;height:16px;}
+.partner-card .psoc a:hover{background:linear-gradient(120deg,#ff8a3d,#e8552a);color:#fff;border-color:transparent;transform:translateY(-2px);}
 .master-card{width:236px;flex-shrink:0;scroll-snap-align:start;border-radius:20px;overflow:hidden;height:344px;background:var(--surface);border:1px solid var(--line);box-shadow:0 6px 20px rgba(42,27,16,0.06);transition:transform .35s,box-shadow .35s,border-color .35s;display:flex;flex-direction:column;}
 .master-card:hover{transform:translateY(-6px);border-color:rgba(255,122,61,0.4);box-shadow:0 18px 40px rgba(42,27,16,0.12);}
 .master-card .ph{height:180px;background:linear-gradient(150deg,#ffd9a8,#ff8a3d);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:2.6rem;color:#fff6ea;position:relative;}
@@ -852,29 +857,35 @@ startAuto();
 // ===== PARTNERZY (slider bliźniaczy do społeczności) =====
 const partners={
   organizatorzy:[
-    {name:'PTS', full:'Polskie Towarzystwo Saunowe', cat:'Organizator turniejów', desc:'Mistrzostwa Polski i cykl PTS Classic. Federacja saunamistrzów i obiektów.', href:'blog.html?blog=pts'},
-    {name:'WM', full:'Aufguss-WM', cat:'Organizator turniejów', desc:'Mistrzostwa Świata Aufguss — najbardziej prestiżowy turniej w kalendarzu.', href:'blog.html?blog=pts'},
-    {name:'VN', full:'VNSWB', cat:'Organizator turniejów', desc:'Holenderska federacja saunowa, organizator turniejów rangi krajowej i międzynarodowej.', href:'blog.html?blog=pts'},
+    {name:'PTS', full:'Polskie Towarzystwo Saunowe', cat:'Organizator turniejów', desc:'Mistrzostwa Polski i cykl PTS Classic. Federacja saunamistrzów i obiektów.', href:'blog.html?blog=pts', www:'https://example.com', fb:'https://facebook.com', ig:'https://instagram.com'},
+    {name:'WM', full:'Aufguss-WM', cat:'Organizator turniejów', desc:'Mistrzostwa Świata Aufguss — najbardziej prestiżowy turniej w kalendarzu.', href:'blog.html?blog=pts', www:'https://example.com', fb:'https://facebook.com', ig:'https://instagram.com'},
+    {name:'VN', full:'VNSWB', cat:'Organizator turniejów', desc:'Holenderska federacja saunowa, organizator turniejów rangi krajowej i międzynarodowej.', href:'blog.html?blog=pts', www:'https://example.com', fb:'https://facebook.com', ig:null},
   ],
   szkoleniowe:[
-    {name:'SS', full:'Sauna Skillers', cat:'Projekt szkoleniowy', desc:'Warsztaty i kursy aufguss dla saunamistrzów na każdym poziomie zaawansowania.', href:'blog.html?blog=pts'},
-    {name:'FA', full:'Flow Aufguss Academy', cat:'Projekt szkoleniowy', desc:'Akademia skupiona na technice, choreografii i budowaniu autorskich ceremonii.', href:'blog.html?blog=pts'},
-    {name:'AS', full:'Akademia Saunamistrza', cat:'Projekt szkoleniowy', desc:'Kompleksowe szkolenia zawodowe dla przyszłych saunamistrzów i rezydentów obiektów.', href:'blog.html?blog=pts'},
+    {name:'SS', full:'Sauna Skillers', cat:'Projekt szkoleniowy', desc:'Warsztaty i kursy aufguss dla saunamistrzów na każdym poziomie zaawansowania.', href:'blog.html?blog=pts', www:'https://example.com', fb:'https://facebook.com', ig:'https://instagram.com'},
+    {name:'FA', full:'Flow Aufguss Academy', cat:'Projekt szkoleniowy', desc:'Akademia skupiona na technice, choreografii i budowaniu autorskich ceremonii.', href:'blog.html?blog=pts', www:'https://example.com', fb:null, ig:'https://instagram.com'},
+    {name:'AS', full:'Akademia Saunamistrza', cat:'Projekt szkoleniowy', desc:'Kompleksowe szkolenia zawodowe dla przyszłych saunamistrzów i rezydentów obiektów.', href:'blog.html?blog=pts', www:'https://example.com', fb:'https://facebook.com', ig:'https://instagram.com'},
   ],
 };
+const SVG_WWW='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 3.5 6 3.5 9s-1 6.5-3.5 9c-2.5-2.5-3.5-6-3.5-9s1-6.5 3.5-9z"/></svg>';
 const partTitles={
   organizatorzy:'Organizatorzy turniejów,<br>którzy tworzą scenę',
   szkoleniowe:'Projekty szkoleniowe,<br>które kształcą mistrzów',
 };
 const partTrack=document.getElementById('partnersTrack');
 function partCard(p){
-  return `<a class="partner-card" href="${p.href}">
+  const soc = [
+    p.www?`<a href="${p.www}" target="_blank" rel="noopener" title="Strona WWW" aria-label="Strona WWW">${SVG_WWW}</a>`:'',
+    p.fb?`<a href="${p.fb}" target="_blank" rel="noopener" title="Facebook" aria-label="Facebook">${SVG_FB}</a>`:'',
+    p.ig?`<a href="${p.ig}" target="_blank" rel="noopener" title="Instagram" aria-label="Instagram">${SVG_IG}</a>`:'',
+  ].join('');
+  return `<div class="partner-card">
     <div class="logo">${p.name}</div>
     <div class="pcat">${p.cat}</div>
     <h4>${p.full}</h4>
     <div class="pdesc">${p.desc}</div>
-    <span class="plink">Zobacz blog →</span>
-  </a>`;
+    <div class="pfoot"><a class="plink" href="${p.href}">Zobacz blog →</a><div class="psoc">${soc}</div></div>
+  </div>`;
 }
 function renderPartners(key){
   partTrack.innerHTML=partners[key].map(partCard).join('');
@@ -900,18 +911,18 @@ renderPartners('organizatorzy');
 
 // ===== AKTUALNOŚCI =====
 const news=[
-  {cat:'Turnieje', cover:'nc1', date:'28 czerwca 2026', title:'Robert Zídek po raz trzeci Mistrzem Świata Aufguss', excerpt:'Czeski saunamistrz obronił tytuł podczas The Battle of Gladiators w Termach Rzymskich w Czeladzi.'},
-  {cat:'Obiekty', cover:'nc3', date:'21 czerwca 2026', title:'Satama otwiera nową saunę nad jeziorem', excerpt:'Kultowy resort z Brandenburgii powiększa się o zewnętrzną saunę z widokiem na Scharmützelsee.'},
-  {cat:'Społeczność', cover:'nc2', date:'12 czerwca 2026', title:'Rusza 10-stopniowy system rang saunamistrzów', excerpt:'Od teraz osiągnięcia z turniejów przekładają się na rangę widoczną na profilu — od Rookie do Pro Master.'},
+  {id:'zidek-mistrz-swiata', cat:'Turnieje', cover:'nc1', date:'28 czerwca 2026', title:'Robert Zídek po raz trzeci Mistrzem Świata Aufguss', excerpt:'Czeski saunamistrz obronił tytuł podczas The Battle of Gladiators w Termach Rzymskich w Czeladzi.'},
+  {id:'satama-nowa-sauna', cat:'Obiekty', cover:'nc3', date:'21 czerwca 2026', title:'Satama otwiera nową saunę nad jeziorem', excerpt:'Kultowy resort z Brandenburgii powiększa się o zewnętrzną saunę z widokiem na Scharmützelsee.'},
+  {id:'pts-nowy-ranking', cat:'Społeczność', cover:'nc2', date:'12 czerwca 2026', title:'Rusza 10-stopniowy system rang saunamistrzów', excerpt:'Od teraz osiągnięcia z turniejów przekładają się na rangę widoczną na profilu — od Rookie do Pro Master.'},
 ];
 document.getElementById('newsGrid').innerHTML=news.map(n=>`
   <article class="news-card">
-    <div class="cover ${n.cover}"><span class="cat">${n.cat}</span></div>
+    <a href="post.html?id=${n.id}" class="cover ${n.cover}" style="display:flex"><span class="cat">${n.cat}</span></a>
     <div class="body">
       <div class="date">${n.date}</div>
-      <h3>${n.title}</h3>
+      <h3><a href="post.html?id=${n.id}">${n.title}</a></h3>
       <p>${n.excerpt}</p>
-      <div class="foot"><a href="#" class="more">Czytaj więcej →</a><a href="#" class="fb" title="Udostępnij na Facebooku" aria-label="Udostępnij na Facebooku">${SVG_FB}</a></div>
+      <div class="foot"><a href="post.html?id=${n.id}" class="more">Czytaj więcej →</a><a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(location.origin+location.pathname.replace(/index\.html$/,'')+'post.html?id='+n.id)}" target="_blank" rel="noopener" class="fb" title="Udostępnij na Facebooku" aria-label="Udostępnij na Facebooku">${SVG_FB}</a></div>
     </div>
   </article>`).join('');
 

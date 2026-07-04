@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wpis — aufguss.world</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700&display=swap" rel="stylesheet">
+<style>
+.brand{height:40px;width:auto;display:block;}
+:root{
+  --ember-1:#ff7a3d;--ember-2:#e8552a;--ember-3:#d6491f;
+  --bg:#fbf5ea;--surface:#ffffff;--surface-2:#f3e8d6;
+  --ink:#2a1b10;--ink-dim:#6b5a47;--stone:#8a7960;
+  --line:rgba(42,27,16,0.1);--line-strong:rgba(42,27,16,0.18);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--ink);font-family:'Instrument Sans',sans-serif;}
+h1,h2,h3{font-family:'Fraunces',serif;font-weight:400;}
+a{color:inherit;text-decoration:none;}
+
+header{display:flex;align-items:center;justify-content:space-between;padding:16px 5vw;border-bottom:1px solid var(--line);background:var(--surface);position:sticky;top:0;z-index:30;}
+.back-link{font-size:0.8rem;color:var(--ink-dim);}
+.back-link:hover{color:var(--ember-2);}
+
+.article{max-width:760px;margin:0 auto;padding:14px clamp(20px,4vw,40px) 90px;}
+.crumbs{font-size:0.78rem;color:var(--stone);margin:22px 0 20px;}
+.crumbs a:hover{color:var(--ember-2);}
+.a-cat{display:inline-block;font-size:0.66rem;text-transform:uppercase;letter-spacing:0.08em;font-weight:700;color:#2a0e02;background:#ffb56b;padding:4px 13px;border-radius:100px;margin-bottom:16px;}
+.article h1{font-size:clamp(1.9rem,4.4vw,3rem);line-height:1.08;margin-bottom:18px;}
+.a-lead{font-size:1.15rem;line-height:1.6;color:var(--ink-dim);font-family:'Fraunces',serif;font-style:italic;margin-bottom:26px;}
+
+.byline{display:flex;align-items:center;gap:14px;padding:16px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-bottom:12px;}
+.byline .av{width:48px;height:48px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:1.1rem;color:#fff6ea;background:linear-gradient(150deg,#ffd9a8,#ff8a3d 55%,#e8552a);}
+.byline .who{flex:1;min-width:0;}
+.byline .nm{font-weight:600;font-size:0.95rem;}
+.byline .nm a:hover{color:var(--ember-2);}
+.byline .sub{font-size:0.78rem;color:var(--stone);margin-top:2px;}
+.byline .a-type{font-size:0.62rem;text-transform:uppercase;letter-spacing:0.07em;font-weight:700;padding:3px 10px;border-radius:100px;background:var(--surface-2);color:var(--ink-dim);}
+.a-score{margin-left:auto;text-align:center;flex-shrink:0;}
+.a-score .n{font-family:'Fraunces',serif;font-size:1.8rem;line-height:1;color:var(--ember-3);}
+.a-score .max{font-size:0.62rem;color:var(--stone);}
+
+.a-cover{height:clamp(200px,34vw,320px);border-radius:20px;margin:22px 0 30px;}
+.pc1{background:linear-gradient(150deg,#ffd9a8,#ff8a3d);}.pc2{background:linear-gradient(150deg,#e8552a,#a8320f);}
+.pc3{background:linear-gradient(150deg,#7a3618,#c9651f);}.pc4{background:linear-gradient(150deg,#2a1208,#7a3618);}
+
+.a-body p{font-size:1.08rem;line-height:1.85;color:var(--ink);margin-bottom:20px;}
+.a-body p:first-child::first-letter{font-family:'Fraunces',serif;font-size:3.1rem;line-height:0.8;float:left;padding:6px 10px 0 0;color:var(--ember-3);}
+.reviewed{margin:26px 0;padding:16px 20px;background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--ember-2);border-radius:14px;font-size:0.92rem;}
+.reviewed a{color:var(--ember-2);font-weight:600;}
+
+.a-foot{margin-top:40px;padding-top:26px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+.a-foot .more-blog{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:0.86rem;color:var(--ember-2);}
+.a-share{display:flex;gap:10px;}
+.a-share a{width:40px;height:40px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line-strong);color:var(--ember-3);background:var(--surface);transition:all .2s;}
+.a-share a:hover{background:linear-gradient(120deg,#ff8a3d,#e8552a);color:#fff;border-color:transparent;transform:translateY(-2px);}
+.a-share svg{width:18px;height:18px;}
+.notfound{text-align:center;padding:80px 20px;color:var(--stone);}
+</style>
+</head>
+<body>
+
+<header>
+  <a href="index.html"><img class="brand" src="../assets/brand-logo-trim.png" alt="aufguss.world"></a>
+  <a href="javascript:history.back()" class="back-link">← Wróć</a>
+</header>
+
+<article class="article" id="article"></article>
+
+<script src="../data/posts-data.js"></script>
+<script>
+const SVG_FB='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 22v-8h2.8l.42-3.2H13.5V8.75c0-.93.26-1.56 1.6-1.56h1.7V4.3c-.3-.04-1.3-.13-2.48-.13-2.46 0-4.14 1.5-4.14 4.26v2.34H7.4V14h2.28v8z"/></svg>';
+const SVG_X='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.9 3H21l-6.6 7.6L22 21h-6.1l-4.8-6.3L5.6 21H2.5l7.1-8.1L2 3h6.3l4.3 5.7zM16.8 19.1h1.7L7.3 4.8H5.5z"/></svg>';
+const SVG_LINK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1.5 1.5M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1.5-1.5"/></svg>';
+
+const id = new URLSearchParams(location.search).get('id');
+const POSTS = window.AUFGUSS_POSTS||{}, AUTHORS = window.AUFGUSS_POST_AUTHORS||{};
+const post = POSTS[id];
+const el = document.getElementById('article');
+
+if(!post){
+  el.innerHTML = `<div class="notfound"><h1>Nie znaleziono wpisu</h1><p style="margin-top:12px">Ten wpis nie istnieje lub został usunięty.</p><p style="margin-top:20px"><a class="back-link" href="index.html">← Wróć na stronę główną</a></p></div>`;
+} else {
+  const a = AUTHORS[post.author] || {name:'aufguss.world', type:'', href:null, init:'AW'};
+  document.title = `${post.title} — aufguss.world`;
+  const nameHTML = a.href ? `<a href="${a.href}">${a.name}</a>` : a.name;
+  const shareUrl = encodeURIComponent(location.href);
+  const shareTxt = encodeURIComponent(post.title);
+  el.innerHTML = `
+    <div class="crumbs"><a href="index.html">Strona główna</a> › <a href="index.html#aktualnosci">Aktualności</a> › ${post.cat}</div>
+    <span class="a-cat">${post.cat}</span>
+    <h1>${post.title}</h1>
+    ${post.lead?`<p class="a-lead">${post.lead}</p>`:''}
+    <div class="byline">
+      <div class="av">${a.init}</div>
+      <div class="who">
+        <div class="nm">${nameHTML}</div>
+        <div class="sub"><span class="a-type">${a.type}</span> · ${post.date}</div>
+      </div>
+      ${post.score?`<div class="a-score"><div class="n">${post.score}</div><div class="max">/ 10</div></div>`:''}
+    </div>
+    <div class="a-cover ${post.cover}"></div>
+    <div class="a-body">${post.body.map(p=>`<p>${p}</p>`).join('')}</div>
+    ${post.obj?`<div class="reviewed">Recenzowany obiekt: <a href="${post.objHref||'object.html'}">${post.obj}</a></div>`:''}
+    <div class="a-foot">
+      ${a.href?`<a class="more-blog" href="${a.href}">→ Więcej wpisów: ${a.name}</a>`:'<span></span>'}
+      <div class="a-share">
+        <a href="https://www.facebook.com/sharer/sharer.php?u=${shareUrl}" target="_blank" rel="noopener" title="Udostępnij na Facebooku" aria-label="Facebook">${SVG_FB}</a>
+        <a href="https://twitter.com/intent/tweet?url=${shareUrl}&text=${shareTxt}" target="_blank" rel="noopener" title="Udostępnij na X" aria-label="X">${SVG_X}</a>
+        <a href="javascript:void(0)" onclick="navigator.clipboard&&navigator.clipboard.writeText(location.href);this.title='Skopiowano link'" title="Kopiuj link" aria-label="Kopiuj link">${SVG_LINK}</a>
+      </div>
+    </div>`;
+}
+</script>
+</body>
+</html>

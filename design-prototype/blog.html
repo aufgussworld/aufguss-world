@@ -93,109 +93,52 @@ header{display:flex;align-items:center;justify-content:space-between;padding:16p
   <div class="posts" id="posts"></div>
 </div>
 
-<!-- MODAL WPISU -->
-<div class="modal-bg" id="postModal" onclick="if(event.target===this)this.classList.remove('open')">
-  <div class="pmodal">
-    <button class="close" onclick="document.getElementById('postModal').classList.remove('open')" aria-label="Zamknij">×</button>
-    <div class="pm-cover" id="pmCover"><span class="cat" id="pmCat"></span></div>
-    <div class="pm-inner">
-      <div class="pm-meta" id="pmMeta"></div>
-      <h2 id="pmTitle"></h2>
-      <div class="pm-body" id="pmBody"></div>
-      <div class="pm-obj" id="pmObj"></div>
-    </div>
-  </div>
-</div>
-
+<script src="../data/posts-data.js"></script>
 <script>
+// meta właścicieli blogów (autor = wpisy z posts-data.js po polu author)
 const BLOGS = {
-  'wojciech-kadz': {
-    type:'Bloger', typeCls:'bloger', name:'Wojciech Kadź', init:'WK',
-    meta:['Polska','Bloger saunowy','48 recenzji'],
+  'wojciech-kadz': { typeCls:'bloger', meta:['Polska','Bloger saunowy','48 recenzji'],
     bio:'Recenzent i bloger saunowy. Od ośmiu lat objeżdżam europejskie sauny i opisuję je bez filtra — od jakości aufguss, przez architekturę, po obsługę i atmosferę. Współpracuję z aufguss.world jako zweryfikowany bloger.',
-    postsLabel:'Recenzje i wpisy',
-    posts:[
-      {cat:'Recenzja', cover:'pc1', date:'czerwiec 2026', score:'8,8', obj:'Satama Sauna Resort', title:'Rzymski przepych, który działa nie tylko na Instagramie',
-        excerpt:'Colosseum Sauna Arena robi wrażenie skalą, ale prawdziwą wartością są ceremonie i obsługa.',
-        body:['Satama to obiekt, który łatwo sprowadzić do efektownych zdjęć — antyczne kolumny, ogromna arena, para unosząca się pod sklepieniem. Byłoby jednak krzywdzące zatrzymać się na warstwie wizualnej.','Program ceremonii jest gęsty i różnorodny, a saunamistrzowie prowadzą seans jak spektakl — z narracją, muzyką i wyczuciem temperatury. Strefa banii i rytuał z wenikiem to mocne punkty.','Minusy? W szczycie weekendu bywa tłoczno, a część seansów wymaga rezerwacji. Mimo to — jeden z najlepszych obiektów aufguss w Europie.']},
-      {cat:'Recenzja', cover:'pc2', date:'maj 2026', score:'7,9', obj:'Liquidrom', title:'Berliński minimalizm pod wodą',
-        excerpt:'Kultowa architektura i podwodna muzyka, ale program aufguss bywa nierówny.',
-        body:['Liquidrom to instytucja — basen solankowy pod kopułą z muzyką pod wodą robi wrażenie za każdym razem.','Aufguss? Wieczorami potrafi być znakomity, ale w ciągu dnia poziom bywa nierówny. To miejsce raczej o relaksie niż o ceremonialnym show.']},
-      {cat:'Felieton', cover:'pc4', date:'kwiecień 2026', title:'Dlaczego Polska stała się saunową potęgą Europy',
-        excerpt:'W pięć lat przeszliśmy drogę, którą inne kraje pokonywały dekadę.',
-        body:['Jeszcze niedawno aufguss w Polsce był niszą. Dziś mamy własne mistrzostwa, obiekty inwestujące w saunamistrzów i publiczność, która rozumie ceremonię.','Ten tekst to próba uchwycenia, co zadecydowało o tak szybkim rozwoju — i co może nas jeszcze zatrzymać.']},
-    ],
-  },
-  'pts': {
-    type:'Partner', typeCls:'partner', name:'Polskie Towarzystwo Saunowe (PTS)', init:'PTS',
-    meta:['Polska','Organizator turniejów','Partner portalu'],
+    postsLabel:'Recenzje i wpisy' },
+  'pts': { typeCls:'partner', meta:['Polska','Organizator turniejów','Partner portalu'],
     bio:'Federacja zrzeszająca saunamistrzów i obiekty, organizator Mistrzostw Polski oraz cyklu PTS Classic. Na aufguss.world publikujemy aktualności związane z organizowanymi wydarzeniami.',
-    postsLabel:'Aktualności',
-    posts:[
-      {cat:'Turnieje', cover:'pc2', date:'czerwiec 2026', title:'Ruszają zapisy na Mistrzostwa Polski PTS Classic 2026',
-        excerpt:'Rejestracja zawodników otwarta do końca lipca. Finał w Słupsku.',
-        body:['Zapraszamy saunamistrzów do rejestracji na tegoroczne Mistrzostwa Polski. Eliminacje regionalne ruszają jesienią, a wielki finał odbędzie się w Słupsku.','Regulamin i formularz zgłoszeniowy dostępne są w panelu zawodnika.']},
-      {cat:'Federacja', cover:'pc3', date:'maj 2026', title:'Nowy system rankingowy saunamistrzów',
-        excerpt:'Wspólnie z aufguss.world wdrażamy 10-stopniową skalę rang.',
-        body:['Punkty za turnieje przekładają się teraz na rangę widoczną na profilu zawodnika — od Rookie do Pro Master.','To ważny krok w profesjonalizacji polskiej sceny aufguss.']},
-    ],
-  },
-  'satama': {
-    type:'Obiekt', typeCls:'obiekt', name:'Satama Sauna Resort', init:'SAT',
-    meta:['Niemcy','Obiekt saunowy','Blog obiektu'],
+    postsLabel:'Aktualności' },
+  'satama': { typeCls:'obiekt', meta:['Niemcy','Obiekt saunowy','Blog obiektu'],
     bio:'Blog obiektu Satama Sauna Resort — nowości, wydarzenia specjalne i kulisy ceremonii aufguss nad jeziorem Scharmützelsee w Brandenburgii.',
-    postsLabel:'Wpisy obiektu',
-    posts:[
-      {cat:'Wydarzenie', cover:'pc2', date:'28 czerwca 2026', title:'Noc aufguss z Robertem Zídkiem i Davidem Zatočilem',
-        excerpt:'Wyjątkowy wieczór z dwoma mistrzami świata — bilety w sprzedaży od piątku.',
-        body:['Zapraszamy na wyjątkową noc aufguss z udziałem dwóch mistrzów świata. Wieczór wypełnią autorskie ceremonie i muzyka na żywo.']},
-      {cat:'Obiekt', cover:'pc3', date:'20 czerwca 2026', title:'Nowa sauna zewnętrzna nad Scharmützelsee',
-        excerpt:'Oddajemy do użytku panoramiczną saunę z widokiem na jezioro.',
-        body:['Nowa sauna zewnętrzna z tarasem widokowym jest już otwarta. Schłodzenie w jeziorze na wyciągnięcie ręki.']},
-    ],
-  },
+    postsLabel:'Wpisy obiektu' },
 };
 
 const slug = new URLSearchParams(location.search).get('blog') || 'wojciech-kadz';
-const blog = BLOGS[slug] || BLOGS['wojciech-kadz'];
+const meta = BLOGS[slug] || BLOGS['wojciech-kadz'];
+const AUTHORS = window.AUFGUSS_POST_AUTHORS||{}, POSTS = window.AUFGUSS_POSTS||{};
+const author = AUTHORS[slug] || AUTHORS['wojciech-kadz'];
+// wpisy tego autora (kolejność wg rejestru)
+const posts = Object.entries(POSTS).filter(([,p])=>p.author===slug).map(([id,p])=>({id,...p}));
 
-document.title = `${blog.name} — blog | aufguss.world`;
+document.title = `${author.name} — blog | aufguss.world`;
 document.getElementById('blogHero').innerHTML = `
-  <div class="bh-av">${blog.init}</div>
+  <div class="bh-av">${author.init}</div>
   <div>
-    <span class="bh-type ${blog.typeCls}">${blog.type}</span>
-    <h1>${blog.name}</h1>
-    <div class="bh-meta">${blog.meta.map(m=>`<span>${m}</span>`).join('')}</div>
-    <p class="bh-bio">${blog.bio}</p>
+    <span class="bh-type ${meta.typeCls}">${author.type}</span>
+    <h1>${author.name}</h1>
+    <div class="bh-meta">${meta.meta.map(m=>`<span>${m}</span>`).join('')}</div>
+    <p class="bh-bio">${meta.bio}</p>
     <button class="bh-follow">＋ Obserwuj bloga</button>
   </div>`;
-document.getElementById('postsHead').textContent = blog.postsLabel;
-document.getElementById('postsCount').textContent = `${blog.posts.length} ${blog.posts.length===1?'wpis':'wpisów'}`;
+document.getElementById('postsHead').textContent = meta.postsLabel;
+document.getElementById('postsCount').textContent = `${posts.length} ${posts.length===1?'wpis':'wpisów'}`;
 
-const postsEl = document.getElementById('posts');
-postsEl.innerHTML = blog.posts.map((p,i)=>`
-  <article class="post-card" data-i="${i}">
+document.getElementById('posts').innerHTML = posts.map(p=>`
+  <a class="post-card" href="post.html?id=${p.id}">
     <div class="cover ${p.cover}"><span class="cat">${p.cat}</span>${p.score?`<span class="score">${p.score}<small>/10</small></span>`:''}</div>
     <div class="body">
       <div class="pdate">${p.date}</div>
       ${p.obj?`<div class="pobj">${p.obj}</div>`:''}
       <h3>${p.title}</h3>
-      <p>${p.excerpt}</p>
+      <p>${p.lead||p.excerpt||''}</p>
       <span class="more">Czytaj wpis →</span>
     </div>
-  </article>`).join('');
-
-function openPost(p){
-  const cov=document.getElementById('pmCover'); cov.className='pm-cover '+p.cover;
-  document.getElementById('pmCat').textContent=p.cat;
-  document.getElementById('pmMeta').innerHTML=`${p.date}${p.score?` · <span class="pm-score">${p.score}/10</span>`:''}`;
-  document.getElementById('pmTitle').textContent=p.title;
-  document.getElementById('pmBody').innerHTML=p.body.map(t=>`<p>${t}</p>`).join('');
-  document.getElementById('pmObj').innerHTML = p.obj?`Recenzowany obiekt: <a href="object.html">${p.obj}</a>`:'';
-  document.getElementById('postModal').classList.add('open');
-}
-postsEl.querySelectorAll('.post-card').forEach(c=>c.addEventListener('click',()=>openPost(blog.posts[+c.dataset.i])));
-document.addEventListener('keydown',e=>{ if(e.key==='Escape') document.getElementById('postModal').classList.remove('open'); });
+  </a>`).join('') || '<p style="color:var(--stone)">Brak wpisów.</p>';
 </script>
 </body>
 </html>

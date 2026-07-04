@@ -406,13 +406,13 @@ document.getElementById('fullCalLink').href = `calendar.html?venue=${encodeURICo
 
 // aktualności obiektu (blog) — docelowo content dla portalowych Aktualności
 const objNews=[
-  {cat:'Wydarzenie', cover:'nc2', date:'28 czerwca 2026', title:'Noc aufguss z Robertem Zídkiem i Davidem Zatočilem', excerpt:'Wyjątkowy wieczór z dwoma mistrzami świata — bilety w sprzedaży od piątku.'},
-  {cat:'Obiekt', cover:'nc3', date:'20 czerwca 2026', title:'Nowa sauna zewnętrzna nad Scharmützelsee', excerpt:'Oddajemy do użytku panoramiczną saunę z widokiem na jezioro.'},
-  {cat:'Ceremonie', cover:'nc1', date:'11 czerwca 2026', title:'Letni program ceremonii — nowe aromaty', excerpt:'Cedr, mięta i cytrusy w odświeżonym planie ceremonii na lato.'},
+  {id:'satama-noc-aufguss', cat:'Wydarzenie', cover:'nc2', date:'28 czerwca 2026', title:'Noc aufguss z Robertem Zídkiem i Davidem Zatočilem', excerpt:'Wyjątkowy wieczór z dwoma mistrzami świata — bilety w sprzedaży od piątku.'},
+  {id:'satama-nowa-sauna', cat:'Obiekt', cover:'nc3', date:'20 czerwca 2026', title:'Nowa sauna zewnętrzna nad Scharmützelsee', excerpt:'Oddajemy do użytku panoramiczną saunę z widokiem na jezioro.'},
+  {id:'satama-letni-program', cat:'Ceremonie', cover:'nc1', date:'11 czerwca 2026', title:'Letni program ceremonii — nowe aromaty', excerpt:'Cedr, mięta i cytrusy w odświeżonym planie ceremonii na lato.'},
 ];
 document.getElementById('objNews').innerHTML=objNews.map(n=>`
-  <article><div class="cover ${n.cover}"><span class="cat">${n.cat}</span></div>
-    <div class="body"><div class="ndate">${n.date}</div><h3>${n.title}</h3><p>${n.excerpt}</p><span class="more">Czytaj więcej →</span></div></article>`).join('');
+  <article><a class="cover ${n.cover}" href="post.html?id=${n.id}" style="display:block"><span class="cat">${n.cat}</span></a>
+    <div class="body"><div class="ndate">${n.date}</div><h3><a href="post.html?id=${n.id}">${n.title}</a></h3><p>${n.excerpt}</p><a class="more" href="post.html?id=${n.id}">Czytaj więcej →</a></div></article>`).join('');
 document.getElementById('shows').innerHTML = myEvents.map(e=>{
   const d = parse(e.start);
   const names = e.masters.map(m=>`<a href="saunamaster.html" class="name-link">${m.name}</a>`).join(', ');
