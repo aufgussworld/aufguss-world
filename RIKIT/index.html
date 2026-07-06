@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RIKIT sp. z o.o. — Bocznice kolejowe, budowa i remonty infrastruktury kolejowej | Kolej na nas…</title>
+<meta name="description" content="RIKIT sp. z o.o. — kompleksowa realizacja inwestycji kolejowych: projektowanie i budowa bocznic kolejowych, przejazdy GTP i CBP, rozjazdy kolejowe, diagnostyka, przeglądy i badania roczne, kompleksowe remonty infrastruktury kolejowej. Słupsk, cała Polska. Kolej na nas…">
+<meta name="keywords" content="bocznice kolejowe, remonty bocznic kolejowych, diagnostyka infrastruktury kolejowej, przeglądy, badania roczne infrastruktury kolejowej, drogi żelazne, projektowanie infrastruktury kolejowej, przejazdy GTP, przejazdy CBP, przejazdy Mirosław Ujski, rozjazdy kolejowe, materiały staroużyteczne, kompleksowe remonty infrastruktury kolejowej, projektowanie i budowa bocznic kolejowych">
+<meta property="og:title" content="RIKIT sp. z o.o. — Kolej na nas…">
+<meta property="og:description" content="Projektowanie, budowa, diagnostyka i remonty infrastruktury kolejowej. Bocznice kolejowe, przejazdy GTP, rozjazdy — pełen cykl, jedna odpowiedzialność.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="pl_PL">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Signika:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/main.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": "RIKIT sp. z o.o.",
+  "slogan": "Kolej na nas…",
+  "description": "Kompleksowa realizacja budowy, remontów oraz diagnostyki infrastruktury kolejowej: projektowanie i budowa bocznic kolejowych, przejazdy GTP i CBP, rozjazdy kolejowe, przeglądy i badania roczne.",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "ul. Gen. Dwernickiego 1",
+    "postalCode": "76-200",
+    "addressLocality": "Słupsk",
+    "addressCountry": "PL"
+  },
+  "vatID": "PL8393213090",
+  "taxID": "8393213090",
+  "identifier": [
+    {"@type": "PropertyValue", "name": "REGON", "value": "384295101"},
+    {"@type": "PropertyValue", "name": "KRS", "value": "0000802278"},
+    {"@type": "PropertyValue", "name": "BDO", "value": "000150785"}
+  ],
+  "knowsAbout": ["bocznice kolejowe", "remonty bocznic kolejowych", "przejazdy GTP", "przejazdy CBP", "rozjazdy kolejowe", "diagnostyka infrastruktury kolejowej", "projektowanie infrastruktury kolejowej", "materiały staroużyteczne"]
+}
+</script>
+</head>
+<body>
+
+<!-- ══════════ PRELOADER ══════════ -->
+<div class="preloader" id="preloader" aria-hidden="true">
+  <div class="preloader__inner">
+    <svg class="preloader__signet" viewBox="0 0 120 120" fill="none" aria-hidden="true">
+      <path class="pre-stroke" d="M14 96 L52 22 H64 L26 96 Z" stroke="#E6E8EA" stroke-width="3"/>
+      <path class="pre-stroke" d="M34 22 L18 52" stroke="#E6E8EA" stroke-width="6"/>
+      <path class="pre-stroke" d="M46 16 L30 46" stroke="#E6E8EA" stroke-width="6"/>
+      <path class="pre-stroke" d="M58 22 H78 C94 22 100 32 100 44 C100 56 92 64 78 64 L102 96 H88 L64 64" stroke="#E6E8EA" stroke-width="9"/>
+      <path class="pre-stroke pre-stroke--green" d="M38 96 L62 52 L86 96 H72 L62 76 L52 96 Z" stroke="#2DB24A" stroke-width="3" fill="#2DB24A" fill-opacity="0"/>
+    </svg>
+    <p class="preloader__motto"><span id="preloader-motto"></span><span class="caret"></span></p>
+  </div>
+</div>
+
+<!-- ══════════ PROGRESS RAIL (kilometraż) ══════════ -->
+<nav class="kmrail" id="kmrail" aria-label="Postęp strony">
+  <div class="kmrail__line"><div class="kmrail__fill" id="kmrail-fill"></div></div>
+  <a href="#start"      class="kmrail__stop" data-km="00+000"><span>Start</span></a>
+  <a href="#uslugi"     class="kmrail__stop" data-km="01+200"><span>Usługi</span></a>
+  <a href="#realizacja" class="kmrail__stop" data-km="02+400"><span>Realizacja</span></a>
+  <a href="#gtp"        class="kmrail__stop" data-km="03+600"><span>Przejazd GTP</span></a>
+  <a href="#partnerzy"  class="kmrail__stop" data-km="04+300"><span>Partnerzy</span></a>
+  <a href="#kontakt"    class="kmrail__stop" data-km="04+800"><span>Kontakt</span></a>
+</nav>
+
+<!-- ══════════ HEADER ══════════ -->
+<header class="header" id="header">
+  <a class="header__logo" href="#start" aria-label="RIKIT — strona główna">
+    <svg class="logo" viewBox="0 0 340 84" fill="none" aria-hidden="true">
+      <g class="logo__signet">
+        <path d="M8 66 L36 14 H45 L17 66 Z" fill="currentColor"/>
+        <path d="M22 14 L11 35 L17 38 L28 17 Z" fill="currentColor"/>
+        <path d="M32 10 L21 31 L27 34 L38 13 Z" fill="currentColor"/>
+        <path d="M40 14 H56 C68 14 73 22 73 30 C73 38 67 44 57 44 L74 66 H63 L45 43 V37 H55 C60 37 64 34 64 30 C64 26 61 22 55 22 H44 Z" fill="currentColor"/>
+        <path d="M26 66 L44 33 L62 66 H52 L44 51 L36 66 Z" fill="#2DB24A"/>
+      </g>
+      <text x="86" y="52" class="logo__word">RIKIT</text>
+      <text x="188" y="74" class="logo__slogan">kolej na nas…</text>
+    </svg>
+  </a>
+  <nav class="header__nav" aria-label="Nawigacja główna">
+    <a href="#uslugi">Usługi</a>
+    <a href="#realizacja">Realizacja</a>
+    <a href="#gtp">Przejazdy GTP</a>
+    <a href="#partnerzy">Partnerzy</a>
+  </nav>
+  <a href="#kontakt" class="btn btn--green header__cta">Skontaktuj się
+    <svg viewBox="0 0 16 16" width="14" height="14" fill="none" aria-hidden="true"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </a>
+</header>
+
+<main>
+
+<!-- ══════════ HERO ══════════ -->
+<section class="hero" id="start">
+  <div class="hero__media" aria-hidden="true">
+    <video class="hero__video" muted playsinline loop preload="none" data-src="assets/video/hero.mp4"></video>
+    <svg class="hero__scene" viewBox="0 0 1440 810" preserveAspectRatio="xMidYMid slice" fill="none">
+      <defs>
+        <linearGradient id="hg" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#14181D"/><stop offset="1" stop-color="#0D1013"/>
+        </linearGradient>
+      </defs>
+      <rect width="1440" height="810" fill="url(#hg)"/>
+      <g class="hero-blueprint" stroke="#7A7F87" stroke-opacity=".28" stroke-width="1">
+        <line x1="0" y1="470" x2="1440" y2="470"/>
+        <path class="draw" d="M690 470 L330 810"/>
+        <path class="draw" d="M750 470 L1110 810"/>
+        <path class="draw" d="M710 470 L560 810" stroke-opacity=".16"/>
+        <path class="draw" d="M730 470 L880 810" stroke-opacity=".16"/>
+        <g class="hero-sleepers">
+          <line x1="655" y1="500" x2="785" y2="500"/><line x1="630" y1="535" x2="810" y2="535"/>
+          <line x1="600" y1="577" x2="840" y2="577"/><line x1="562" y1="628" x2="878" y2="628"/>
+          <line x1="516" y1="690" x2="924" y2="690"/><line x1="458" y1="765" x2="982" y2="765"/>
+        </g>
+        <g stroke-opacity=".22">
+          <path d="M420 470 V300 M420 300 H470" /><path d="M1020 470 V260 M1020 260 H970"/>
+          <path d="M240 470 V360 M240 360 H290"/><path d="M1200 470 V330 M1200 330 H1150"/>
+        </g>
+      </g>
+      <g class="hero-signal">
+        <line x1="1088" y1="470" x2="1088" y2="330" stroke="#7A7F87" stroke-width="4"/>
+        <rect x="1074" y="286" width="28" height="52" rx="8" fill="#1C2129" stroke="#7A7F87"/>
+        <circle class="hero-signal__lamp" cx="1088" cy="304" r="7" fill="#2DB24A"/>
+        <circle cx="1088" cy="322" r="6" fill="#22262C"/>
+      </g>
+      <g class="hero-km" fill="#7A7F87" font-family="Inter, sans-serif" font-size="13" letter-spacing="2">
+        <text x="120" y="740">KM 00+000</text>
+      </g>
+    </svg>
+    <div class="hero__vignette"></div>
+  </div>
+  <div class="hero__content">
+    <p class="eyebrow hero__eyebrow">RIKIT sp. z o.o. — infrastruktura kolejowa</p>
+    <h1 class="hero__title">
+      <span class="hero__line"><em>Budujemy</em> przyszłość</span>
+      <span class="hero__line">kolei.</span>
+    </h1>
+    <p class="hero__sub">Kompleksowa realizacja inwestycji: <strong>projektowanie i budowa bocznic kolejowych</strong>, <strong>przejazdy GTP</strong>, diagnostyka i <strong>remonty infrastruktury kolejowej</strong>. Od pierwszej kreski projektu po ostatni pomiar toru.</p>
+    <p class="hero__motto" aria-label="Kolej na nas…"><span id="hero-motto"></span><span class="caret" aria-hidden="true"></span></p>
+  </div>
+  <a class="hero__scrollcue" href="#manifest" aria-label="Przewiń niżej">
+    <span class="hero__scrollcue-label">Ruszamy</span>
+    <svg viewBox="0 0 20 30" width="20" height="30" fill="none" aria-hidden="true">
+      <rect x="1" y="1" width="18" height="28" rx="9" stroke="#7A7F87" stroke-width="1.5"/>
+      <circle class="scrollcue-dot" cx="10" cy="9" r="3" fill="#2DB24A"/>
+    </svg>
+  </a>
+</section>
+
+<!-- ══════════ MANIFEST ══════════ -->
+<section class="manifest" id="manifest">
+  <div class="container">
+    <p class="eyebrow">Pełen cykl. Jedna odpowiedzialność.</p>
+    <h2 class="manifest__text" id="manifest-text">
+      <span class="w">Drogi</span> <span class="w">żelazne</span> <span class="w">to</span> <span class="w">nasz</span> <span class="w">żywioł.</span>
+      <span class="w">Projektujemy</span> <span class="w">i</span> <span class="w">budujemy</span> <span class="w kw">bocznice</span> <span class="w kw">kolejowe,</span>
+      <span class="w">modernizujemy</span> <span class="w kw">przejazdy</span> <span class="w">i</span> <span class="w kw">rozjazdy</span> <span class="w kw">kolejowe,</span>
+      <span class="w">prowadzimy</span> <span class="w kw">diagnostykę</span>
+      <span class="w">oraz</span> <span class="w kw">kompleksowe</span> <span class="w kw">remonty</span> <span class="w kw">infrastruktury</span> <span class="w kw">kolejowej.</span>
+    </h2>
+  </div>
+</section>
+
+<!-- ══════════ USŁUGI — LINIA ══════════ -->
+<section class="services" id="uslugi">
+  <div class="container">
+    <p class="eyebrow">Linia usług RIKIT</p>
+    <h2 class="section-title">Cztery stacje.<br>Jedna podróż Twojej inwestycji.</h2>
+    <div class="services__route" aria-hidden="true">
+      <div class="services__track"><div class="services__train" id="services-train"></div></div>
+    </div>
+    <ol class="services__grid">
+      <li class="service reveal">
+        <span class="service__km">Stacja 01</span>
+        <span class="service__icon" aria-hidden="true">
+          <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4 8 28M16 4l8 24M16 4v6"/><circle cx="16" cy="12.5" r="2.6"/><path d="M10.5 21h11"/></svg>
+        </span>
+        <h3>Projektowanie infrastruktury kolejowej</h3>
+        <p><strong>Projektowanie i budowa bocznic kolejowych</strong>, układów torowych i dróg żelaznych — koncepcja, projekt budowlany i wykonawczy, uzgodnienia z zarządcami sieci.</p>
+      </li>
+      <li class="service reveal">
+        <span class="service__km">Stacja 02</span>
+        <span class="service__icon" aria-hidden="true">
+          <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 24h24M4 28h24"/><path d="M8 24V10l8-5 8 5v14"/><path d="M13 24v-6h6v6"/></svg>
+        </span>
+        <h3>Budowa infrastruktury kolejowej</h3>
+        <p>Nawierzchnia torowa, <strong>rozjazdy kolejowe</strong>, przejazdy kolejowo-drogowe w technologiach <strong>GTP</strong>, <strong>CBP</strong> i <strong>Mirosław Ujski</strong>, odwodnienie i obiekty towarzyszące.</p>
+      </li>
+      <li class="service reveal">
+        <span class="service__km">Stacja 03</span>
+        <span class="service__icon" aria-hidden="true">
+          <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16h6l3-8 4 16 3-8h10"/><circle cx="9" cy="16" r="1.4" fill="currentColor" stroke="none"/></svg>
+        </span>
+        <h3>Diagnostyka infrastruktury kolejowej</h3>
+        <p>Bieżąca <strong>diagnostyka, przeglądy i badania roczne infrastruktury kolejowej</strong>: pomiary toru, oceny stanu technicznego bocznic, zalecenia utrzymaniowe.</p>
+      </li>
+      <li class="service reveal">
+        <span class="service__km">Stacja 04</span>
+        <span class="service__icon" aria-hidden="true">
+          <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 26 26 6M9 9l6 1-1 6-6-1zM18 18l6 1-1 6-6-1z"/></svg>
+        </span>
+        <h3>Remonty infrastruktury kolejowej</h3>
+        <p><strong>Kompleksowe remonty infrastruktury kolejowej</strong> i <strong>remonty bocznic kolejowych</strong> — również z wykorzystaniem <strong>materiałów staroużytecznych</strong>, gdy liczy się budżet.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ══════════ SEKWENCJA 1: OD ŁĄKI DO BOCZNICY ══════════ -->
+<section class="seq seq--siding" id="realizacja" data-end="3.8">
+  <div class="seq__pin">
+    <header class="seq__head container">
+      <p class="eyebrow">Realizacja od zera — KM 02+400</p>
+      <h2 class="section-title">Od łąki do bocznicy.</h2>
+    </header>
+    <div class="seq__stage">
+      <video class="seq__video" muted playsinline preload="none" data-src="assets/video/seq-siding.mp4"></video>
+      <svg class="seq__scene" id="scene-siding" viewBox="0 160 1280 480" preserveAspectRatio="xMidYMid meet" fill="none" role="img" aria-label="Animowana wizualizacja budowy zakładu przemysłowego z bocznicą kolejową — od łąki, przez projekt i roboty ziemne, po gotową fabrykę z torami">
+        <!-- niebo / tło -->
+        <rect width="1280" height="640" fill="#DDE0E3"/>
+        <g id="s1-meadow">
+          <rect x="0" y="400" width="1280" height="240" fill="#C9D2C4"/>
+          <path d="M0 400 Q320 384 640 398 T1280 396 V640 H0 Z" fill="#BFCBB8"/>
+          <g stroke="#9FAF96" stroke-width="2" stroke-linecap="round">
+            <path d="M150 460 q4 -14 8 0"/><path d="M162 462 q4 -12 8 0"/>
+            <path d="M980 500 q4 -14 8 0"/><path d="M992 502 q4 -12 8 0"/>
+            <path d="M540 560 q4 -14 8 0"/><path d="M300 530 q4 -12 8 0"/>
+            <path d="M1150 550 q4 -14 8 0"/><path d="M760 470 q4 -12 8 0"/>
+          </g>
+          <g stroke="#AEBBA6" stroke-width="1.4" fill="none" opacity=".7">
+            <ellipse cx="420" cy="500" rx="130" ry="26"/><ellipse cx="420" cy="500" rx="80" ry="15"/>
+            <ellipse cx="900" cy="560" rx="150" ry="30"/><ellipse cx="900" cy="560" rx="95" ry="18"/>
+          </g>
+        </g>
+        <!-- siatka geodezyjna + obrysy projektowe -->
+        <g id="s1-survey">
+          <g stroke="#7A7F87" stroke-opacity=".35" stroke-width="1">
+            <line x1="120" y1="420" x2="1200" y2="420"/><line x1="110" y1="470" x2="1210" y2="470"/>
+            <line x1="95"  y1="530" x2="1225" y2="530"/><line x1="80"  y1="600" x2="1240" y2="600"/>
+            <line x1="200" y1="405" x2="150" y2="640"/><line x1="440" y1="405" x2="410" y2="640"/>
+            <line x1="680" y1="405" x2="680" y2="640"/><line x1="920" y1="405" x2="950" y2="640"/>
+            <line x1="1140" y1="405" x2="1190" y2="640"/>
+          </g>
+          <g class="draw" stroke="#2DB24A" stroke-width="2" stroke-dasharray="7 6" fill="none">
+            <path d="M300 415 h220 v-96 h-220 Z"/>
+            <path d="M560 415 h220 v-120 h-220 Z"/>
+            <path d="M820 415 h180 v-78 h-180 Z"/>
+            <path d="M240 520 H1080"/>
+            <path d="M240 560 H1080"/>
+          </g>
+          <g fill="#111418" font-family="Inter,sans-serif" font-size="15" letter-spacing="1.4">
+            <text x="306" y="306">HALA A</text><text x="566" y="282">HALA B</text><text x="826" y="324">MAGAZYN</text>
+            <text x="245" y="510" fill="#2DB24A">OŚ TORU BOCZNICY</text>
+          </g>
+          <g id="s1-surveyors" stroke="#111418" stroke-width="2.4" stroke-linecap="round">
+            <g transform="translate(180 366)"><path d="M0 44 14 8M28 44 14 8M14 44 V8"/><circle cx="14" cy="4" r="5" fill="#2DB24A" stroke="none"/></g>
+            <g transform="translate(1060 350)"><path d="M0 44 14 8M28 44 14 8M14 44 V8"/><circle cx="14" cy="4" r="5" fill="#2DB24A" stroke="none"/></g>
+          </g>
+        </g>
+        <!-- roboty ziemne -->
+        <g id="s1-earth">
+          <path d="M60 640 L110 500 Q640 462 1170 500 L1220 640 Z" fill="#8D7B66"/>
+          <path d="M110 500 Q640 462 1170 500 L1150 540 Q640 505 130 540 Z" fill="#A5947E"/>
+          <g id="s1-digger" transform="translate(940 430)">
+            <rect x="0" y="26" width="66" height="26" rx="5" fill="#111418"/>
+            <circle cx="14" cy="58" r="9" fill="#22262C"/><circle cx="50" cy="58" r="9" fill="#22262C"/>
+            <rect x="8" y="4" width="26" height="24" rx="4" fill="#2DB24A"/>
+            <path d="M40 18 L86 6 L96 26 L82 30 Z" fill="#111418"/>
+          </g>
+        </g>
+        <!-- zakład: hale -->
+        <g id="s1-buildings">
+          <g id="s1-hall-a">
+            <rect x="300" y="322" width="220" height="94" fill="#3A4048"/>
+            <path d="M300 322 L340 296 H560 L520 322 Z" fill="#4C535D"/>
+            <path d="M560 296 L520 322 V416 L560 390 Z" fill="#2E343B"/>
+            <rect x="316" y="352" width="188" height="12" fill="#7A7F87" opacity=".55"/>
+            <rect x="420" y="376" width="52" height="40" fill="#2DB24A"/>
+          </g>
+          <g id="s1-hall-b">
+            <rect x="560" y="298" width="220" height="118" fill="#111418"/>
+            <path d="M560 298 L600 272 H820 L780 298 Z" fill="#22262C"/>
+            <path d="M820 272 L780 298 V416 L820 390 Z" fill="#0B0E11"/>
+            <g fill="#7A7F87" opacity=".6">
+              <rect x="576" y="326" width="188" height="10"/><rect x="576" y="346" width="188" height="10"/>
+            </g>
+            <rect x="700" y="380" width="46" height="36" fill="#2DB24A"/>
+            <text x="590" y="404" fill="#E6E8EA" font-family="Signika,sans-serif" font-weight="600" font-size="22" letter-spacing="3">ZAKŁAD</text>
+          </g>
+          <g id="s1-hall-c">
+            <rect x="820" y="344" width="180" height="72" fill="#3A4048"/>
+            <path d="M820 344 L852 322 H1032 L1000 344 Z" fill="#4C535D"/>
+            <path d="M1032 322 L1000 344 V416 L1032 394 Z" fill="#2E343B"/>
+            <rect x="900" y="382" width="40" height="34" fill="#7A7F87"/>
+          </g>
+          <g id="s1-silo">
+            <rect x="1060" y="330" width="26" height="86" rx="12" fill="#7A7F87"/>
+            <rect x="1096" y="330" width="26" height="86" rx="12" fill="#9AA0A7"/>
+          </g>
+        </g>
+        <!-- droga + parking -->
+        <g id="s1-road">
+          <path d="M0 620 H1280 V584 H0 Z" fill="#4C535D"/>
+          <g stroke="#E6E8EA" stroke-width="3" stroke-dasharray="26 20"><line x1="0" y1="602" x2="1280" y2="602"/></g>
+          <g id="s1-parking">
+            <rect x="96" y="430" width="176" height="72" fill="#5A616B"/>
+            <g stroke="#E6E8EA" stroke-width="2" opacity=".8">
+              <line x1="128" y1="430" x2="128" y2="502"/><line x1="164" y1="430" x2="164" y2="502"/>
+              <line x1="200" y1="430" x2="200" y2="502"/><line x1="236" y1="430" x2="236" y2="502"/>
+            </g>
+            <rect x="132" y="448" width="26" height="42" rx="5" fill="#2DB24A"/>
+            <rect x="204" y="448" width="26" height="42" rx="5" fill="#111418"/>
+          </g>
+        </g>
+        <!-- bocznica -->
+        <g id="s1-siding">
+          <path d="M0 576 H1280 V522 H0 Z" fill="#B9B2A6" opacity=".9"/>
+          <g id="s1-sleepers" fill="#5B554B">
+            <rect x="20"  y="532" width="14" height="36"/><rect x="80"  y="532" width="14" height="36"/>
+            <rect x="140" y="532" width="14" height="36"/><rect x="200" y="532" width="14" height="36"/>
+            <rect x="260" y="532" width="14" height="36"/><rect x="320" y="532" width="14" height="36"/>
+            <rect x="380" y="532" width="14" height="36"/><rect x="440" y="532" width="14" height="36"/>
+            <rect x="500" y="532" width="14" height="36"/><rect x="560" y="532" width="14" height="36"/>
+            <rect x="620" y="532" width="14" height="36"/><rect x="680" y="532" width="14" height="36"/>
+            <rect x="740" y="532" width="14" height="36"/><rect x="800" y="532" width="14" height="36"/>
+            <rect x="860" y="532" width="14" height="36"/><rect x="920" y="532" width="14" height="36"/>
+            <rect x="980" y="532" width="14" height="36"/><rect x="1040" y="532" width="14" height="36"/>
+            <rect x="1100" y="532" width="14" height="36"/><rect x="1160" y="532" width="14" height="36"/>
+            <rect x="1220" y="532" width="14" height="36"/>
+          </g>
+          <g stroke="#111418" stroke-width="5">
+            <line class="draw" x1="0" y1="540" x2="1280" y2="540"/>
+            <line class="draw" x1="0" y1="562" x2="1280" y2="562"/>
+          </g>
+          <g id="s1-switch" stroke="#111418" stroke-width="4">
+            <path class="draw" d="M640 540 Q700 528 760 500 L820 470"/>
+            <path class="draw" d="M668 562 Q740 546 800 512 L850 484"/>
+          </g>
+          <g id="s1-buffer">
+            <rect x="838" y="452" width="10" height="26" fill="#B02E2E"/>
+            <rect x="862" y="466" width="10" height="26" fill="#B02E2E"/>
+          </g>
+          <g id="s1-wagon">
+            <rect x="180" y="492" width="150" height="42" rx="4" fill="#2E343B"/>
+            <rect x="188" y="500" width="134" height="18" fill="#7A7F87" opacity=".4"/>
+            <circle cx="212" cy="540" r="10" fill="#111418"/><circle cx="298" cy="540" r="10" fill="#111418"/>
+            <text x="206" y="527" fill="#E6E8EA" font-family="Inter,sans-serif" font-size="12" letter-spacing="2">RIKIT</text>
+          </g>
+        </g>
+        <!-- flaga finał -->
+        <g id="s1-flag">
+          <line x1="640" y1="250" x2="640" y2="196" stroke="#111418" stroke-width="3"/>
+          <path d="M640 196 h86 l-12 12 12 12 h-86 Z" fill="#2DB24A"/>
+          <text x="652" y="213" fill="#0E2A15" font-family="Signika,sans-serif" font-weight="600" font-size="12">kolej na nas…</text>
+        </g>
+      </svg>
+      <div class="seq__km" aria-hidden="true"><span id="seq1-km">KM 02+400</span></div>
+    </div>
+    <aside class="seq__captions" aria-live="polite">
+      <div class="seq__step" data-step="0">
+        <h3>Łąka</h3>
+        <p>Tu, gdzie dziś szumi trawa, jutro stanie zakład przemysłowy z własną bocznicą kolejową.</p>
+      </div>
+      <div class="seq__step" data-step="1">
+        <h3>Projekt</h3>
+        <p>Na teren wchodzą geodeci i projektanci. Powstaje <strong>projekt infrastruktury kolejowej</strong>: hale, drogi, parkingi i układ torowy bocznicy.</p>
+      </div>
+      <div class="seq__step" data-step="2">
+        <h3>Roboty ziemne</h3>
+        <p>Znika humus, rośnie korpus ziemny, powstaje odwodnienie. Łąka zamienia się w plac budowy.</p>
+      </div>
+      <div class="seq__step" data-step="3">
+        <h3>Budowa zakładu</h3>
+        <p>Hale produkcyjne i magazyny stają jedna po drugiej. Równolegle prowadzimy <strong>budowę infrastruktury kolejowej</strong>.</p>
+      </div>
+      <div class="seq__step" data-step="4">
+        <h3>Bocznica kolejowa</h3>
+        <p>Układamy tory, zabudowujemy <strong>rozjazdy kolejowe</strong>, oddajemy drogi i parkingi. Zakład ma połączenie z siecią. <em class="motto-inline">Kolej na nas…</em></p>
+      </div>
+      <div class="seq__dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+    </aside>
+  </div>
+</section>
+
+<!-- ══════════ MARQUEE SEO ══════════ -->
+<section class="marquee" aria-label="Zakres usług">
+  <div class="marquee__row marquee__row--a">
+    <div class="marquee__inner">
+      <span>Bocznice kolejowe</span><span>Remonty bocznic kolejowych</span><span>Rozjazdy kolejowe</span><span>Przejazdy GTP</span><span>Przejazdy CBP</span><span>Przejazdy Mirosław Ujski</span><span>Drogi żelazne</span>
+      <span>Bocznice kolejowe</span><span>Remonty bocznic kolejowych</span><span>Rozjazdy kolejowe</span><span>Przejazdy GTP</span><span>Przejazdy CBP</span><span>Przejazdy Mirosław Ujski</span><span>Drogi żelazne</span>
+    </div>
+  </div>
+  <div class="marquee__row marquee__row--b">
+    <div class="marquee__inner">
+      <span>Diagnostyka infrastruktury kolejowej</span><span>Przeglądy i badania roczne</span><span>Projektowanie infrastruktury kolejowej</span><span>Materiały staroużyteczne</span><span>Kompleksowe remonty infrastruktury kolejowej</span>
+      <span>Diagnostyka infrastruktury kolejowej</span><span>Przeglądy i badania roczne</span><span>Projektowanie infrastruktury kolejowej</span><span>Materiały staroużyteczne</span><span>Kompleksowe remonty infrastruktury kolejowej</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ SEKWENCJA 2: PRZEJAZD GTP ══════════ -->
+<section class="seq seq--gtp" id="gtp" data-end="3.8">
+  <div class="seq__pin">
+    <header class="seq__head container">
+      <p class="eyebrow">Technologia — KM 03+600</p>
+      <h2 class="section-title">Przejazd GTP. Warstwa po warstwie.</h2>
+    </header>
+    <div class="seq__stage">
+      <video class="seq__video" muted playsinline preload="none" data-src="assets/video/seq-gtp.mp4"></video>
+      <svg class="seq__scene" id="scene-gtp" viewBox="0 240 1280 400" preserveAspectRatio="xMidYMid meet" fill="none" role="img" aria-label="Animowany przekrój przez przejazd kolejowo-drogowy typu GTP: rozbiórka starego przejazdu i budowa nowych warstw aż po masę asfaltową">
+        <rect width="1280" height="640" fill="#DDE0E3"/>
+        <line x1="0" y1="480" x2="1280" y2="480" stroke="#7A7F87" stroke-width="1" stroke-opacity=".5"/>
+        <!-- stary przejazd -->
+        <g id="g-old">
+          <g id="g-old-asphalt">
+            <rect x="0" y="440" width="420" height="40" fill="#6B7077"/>
+            <rect x="860" y="440" width="420" height="40" fill="#6B7077"/>
+          </g>
+          <g id="g-old-cracks" stroke="#3A4048" stroke-width="2.4" fill="none">
+            <path d="M60 444 l40 20 30 -12 44 24"/><path d="M950 448 l52 18 36 -10 40 22"/>
+            <path d="M260 442 l30 26"/><path d="M1120 444 l36 30"/>
+          </g>
+          <g id="g-old-sleepers" fill="#5B4A38">
+            <rect x="440" y="452" width="60" height="26" rx="2"/><rect x="540" y="452" width="60" height="26" rx="2"/>
+            <rect x="640" y="452" width="60" height="26" rx="2"/><rect x="740" y="452" width="60" height="26" rx="2"/>
+          </g>
+          <g id="g-old-rails" fill="#43494F">
+            <rect x="430" y="436" width="420" height="10"/><rect x="430" y="446" width="420" height="4" fill="#2E343B"/>
+          </g>
+          <g id="g-old-warning" stroke="#B02E2E" stroke-width="5" opacity="0">
+            <path d="M600 300 l80 80M680 300 l-80 80"/>
+          </g>
+        </g>
+        <!-- wykop -->
+        <g id="g-pit">
+          <path d="M400 480 L440 620 H840 L880 480" stroke="#7A7F87" stroke-width="2.5" stroke-dasharray="10 8" fill="#CFD3D6"/>
+          <g stroke="#7A7F87" stroke-width="1.6">
+            <line x1="360" y1="480" x2="360" y2="620"/><path d="M352 488 l8 -8 8 8M352 612 l8 8 8 -8"/>
+          </g>
+          <text x="300" y="556" fill="#43494F" font-family="Inter,sans-serif" font-size="15">≈ 0,9 m</text>
+        </g>
+        <!-- warstwy GTP (od dołu) -->
+        <g id="g-layers">
+          <g id="gl-1"><path d="M420 620 H860 L850 592 H430 Z" fill="#8D7B66"/></g>
+          <g id="gl-2"><rect x="430" y="586" width="420" height="7" rx="3" fill="#2DB24A"/></g>
+          <g id="gl-3"><path d="M432 586 H848 L842 556 H438 Z" fill="#B9B2A6"/></g>
+          <g id="gl-4">
+            <path d="M438 556 H842 L836 516 H444 Z" fill="#9AA0A7"/>
+            <g fill="#7A7F87"><circle cx="500" cy="536" r="5"/><circle cx="560" cy="542" r="4"/><circle cx="640" cy="534" r="5"/><circle cx="720" cy="541" r="4"/><circle cx="780" cy="533" r="5"/></g>
+          </g>
+          <g id="gl-5" fill="#DADDE0">
+            <rect x="470" y="498" width="52" height="20" rx="3"/><rect x="560" y="498" width="52" height="20" rx="3"/>
+            <rect x="650" y="498" width="52" height="20" rx="3"/><rect x="740" y="498" width="52" height="20" rx="3"/>
+          </g>
+          <g id="gl-6" fill="#111418">
+            <path d="M500 470 h12 v10 h6 v6 h-24 v-6 h6 Z"/><path d="M500 462 h12 v8 h-12 Z" fill="#22262C"/>
+            <path d="M756 470 h12 v10 h6 v6 h-24 v-6 h6 Z"/><path d="M756 462 h12 v8 h-12 Z" fill="#22262C"/>
+          </g>
+          <g id="gl-7">
+            <rect x="530" y="460" width="212" height="24" rx="3" fill="#22262C"/>
+            <g stroke="#43494F" stroke-width="2"><line x1="548" y1="460" x2="548" y2="484"/><line x1="584" y1="460" x2="584" y2="484"/><line x1="620" y1="460" x2="620" y2="484"/><line x1="656" y1="460" x2="656" y2="484"/><line x1="692" y1="460" x2="692" y2="484"/><line x1="724" y1="460" x2="724" y2="484"/></g>
+            <rect x="432" y="460" width="60" height="24" rx="3" fill="#2E343B"/>
+            <rect x="780" y="460" width="60" height="24" rx="3" fill="#2E343B"/>
+          </g>
+          <g id="gl-8">
+            <path d="M0 480 H432 V456 H60 Q20 456 0 466 Z" fill="#1C2129"/>
+            <path d="M1280 480 H848 V456 H1220 Q1260 456 1280 466 Z" fill="#1C2129"/>
+            <g stroke="#E6E8EA" stroke-width="3" stroke-dasharray="22 18"><line x1="30" y1="468" x2="420" y2="468"/><line x1="860" y1="468" x2="1250" y2="468"/></g>
+          </g>
+          <g id="gl-9">
+            <line x1="150" y1="456" x2="150" y2="320" stroke="#43494F" stroke-width="5"/>
+            <path d="M108 330 l84 32M108 362 l84 -32" stroke="#B02E2E" stroke-width="9"/>
+            <path d="M104 330 l84 32M104 362 l84 -32" stroke="#E6E8EA" stroke-width="4"/>
+            <circle id="g-signal-lamp" cx="150" cy="300" r="10" fill="#2DB24A"/>
+          </g>
+        </g>
+        <!-- etykiety warstw -->
+        <g id="g-labels" font-family="Inter,sans-serif" font-size="14" fill="#43494F">
+          <g id="lb-1"><line x1="900" y1="606" x2="990" y2="606" stroke="#7A7F87"/><text x="1000" y="610">podtorze / grunt</text></g>
+          <g id="lb-2"><line x1="900" y1="589" x2="990" y2="589" stroke="#2DB24A"/><text x="1000" y="593" fill="#1E7A34">geowłóknina</text></g>
+          <g id="lb-3"><line x1="900" y1="570" x2="990" y2="570" stroke="#7A7F87"/><text x="1000" y="574">warstwa ochronna</text></g>
+          <g id="lb-4"><line x1="900" y1="534" x2="990" y2="534" stroke="#7A7F87"/><text x="1000" y="538">podsypka tłuczniowa</text></g>
+          <g id="lb-5"><line x1="900" y1="508" x2="990" y2="508" stroke="#7A7F87"/><text x="1000" y="512">podkłady strunobetonowe</text></g>
+          <g id="lb-6"><line x1="900" y1="472" x2="990" y2="472" stroke="#7A7F87"/><text x="1000" y="476">szyny + płyty GTP</text></g>
+          <g id="lb-8"><line x1="1080" y1="450" x2="1130" y2="430" stroke="#7A7F87"/><text x="1000" y="422">masa asfaltowa</text></g>
+        </g>
+      </svg>
+      <div class="seq__km" aria-hidden="true"><span>KM 03+600</span></div>
+    </div>
+    <aside class="seq__captions" aria-live="polite">
+      <div class="seq__step" data-step="0">
+        <h3>Stary przejazd</h3>
+        <p>Wyeksploatowana nawierzchnia, pęknięty asfalt, zużyte podkłady. Czas na remont.</p>
+      </div>
+      <div class="seq__step" data-step="1">
+        <h3>Rozbiórka</h3>
+        <p>Demontujemy starą nawierzchnię przejazdu i korytujemy podtorze na pełną głębokość konstrukcji.</p>
+      </div>
+      <div class="seq__step" data-step="2">
+        <h3>Podbudowa</h3>
+        <p>Geowłóknina, warstwa ochronna i podsypka tłuczniowa — fundament trwałości każdego <strong>przejazdu GTP</strong>.</p>
+      </div>
+      <div class="seq__step" data-step="3">
+        <h3>Tor i płyty GTP</h3>
+        <p>Nowe podkłady strunobetonowe, szyny oraz płyty przejazdowe <strong>GTP</strong> — wewnętrzne i zewnętrzne.</p>
+      </div>
+      <div class="seq__step" data-step="4">
+        <h3>Wykończenie</h3>
+        <p>Dojazdy zamyka masa asfaltowa, wraca oznakowanie. Przejazd gotowy do ruchu. <em class="motto-inline">Kolej na nas…</em></p>
+      </div>
+      <p class="seq__note">Wykonujemy również <strong>przejazdy CBP</strong> oraz przejazdy w systemie <strong>Mirosław Ujski</strong>.</p>
+      <div class="seq__dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+    </aside>
+  </div>
+</section>
+
+<!-- ══════════ FILARY ══════════ -->
+<section class="pillars">
+  <div class="container">
+    <p class="eyebrow">Dlaczego RIKIT</p>
+    <h2 class="section-title">Fundamenty są z nami na zawsze.</h2>
+    <ul class="pillars__grid">
+      <li class="reveal"><span class="pillar__icon" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3 27 8v8c0 7-5 11-11 13C10 27 5 23 5 16V8Z"/><path d="m11.5 16 3 3 6-6" stroke="#2DB24A"/></svg></span><h3>Solidność</h3><p>Terminowo i zgodnie ze sztuką — od podtorza po odbiory.</p></li>
+      <li class="reveal"><span class="pillar__icon" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4 8 28M16 4l8 24M16 4v6"/><circle cx="16" cy="12.5" r="2.6"/></svg></span><h3>Inżynieria</h3><p>Własna kadra projektowa i wykonawcza z uprawnieniami kolejowymi.</p></li>
+      <li class="reveal"><span class="pillar__icon" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 26 26 6M9 12V6h6M17 26h6v-6" /><circle cx="9" cy="23" r="3" stroke="#2DB24A"/><circle cx="23" cy="9" r="3" stroke="#2DB24A"/></svg></span><h3>Nowoczesność</h3><p>Nowe technologie nawierzchni: GTP, CBP, systemy Mirosław Ujski.</p></li>
+      <li class="reveal"><span class="pillar__icon" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="16" cy="10" r="5"/><path d="M6 28c1.5-6 6-8 10-8s8.5 2 10 8"/><path d="m22 13 1.2 2.4 2.8.4-2 2 0.4 2.7-2.4-1.2" stroke="#2DB24A"/></svg></span><h3>Doświadczenie</h3><p>Setki kilometrów torów, rozjazdów i przejazdów w portfolio zespołu.</p></li>
+      <li class="reveal"><span class="pillar__icon" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M5 22a11 11 0 0 1 22 0Z"/><path d="M16 8V5M16 22v4M10 26h12" /><path d="M13 22a3 3 0 0 1 6 0" stroke="#2DB24A"/></svg></span><h3>Bezpieczeństwo</h3><p>Kultura BHP i certyfikowane materiały — bez kompromisów.</p></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ══════════ PARTNERZY ══════════ -->
+<section class="partners" id="partnerzy">
+  <div class="container">
+    <p class="eyebrow">Zaufali nam — KM 04+300</p>
+    <h2 class="section-title">Jedziemy razem od lat.</h2>
+    <div class="partners__group reveal">
+      <h3>Partnerzy przemysłowi</h3>
+      <ul class="partners__wall">
+        <li>Wagon Service Ostróda</li><li>Cement Ożarów</li><li>IKEA Industry Poland</li><li>Woodeco Sp.&nbsp;z&nbsp;o.o.</li><li>PKP Cargo</li><li>Polregio</li><li>MPEC Olsztyn</li>
+      </ul>
+    </div>
+    <div class="partners__group reveal">
+      <h3>Generalni wykonawcy</h3>
+      <ul class="partners__wall">
+        <li>PPMT Sp.&nbsp;z&nbsp;o.o.</li><li>ZRK-DOM Sp.&nbsp;z&nbsp;o.o.</li><li>KB Pomorze</li><li>Colas Rail Polska</li><li>Budimex</li><li>Skanska</li><li>Strabag</li>
+      </ul>
+    </div>
+    <div class="partners__group reveal">
+      <h3>Współpraca</h3>
+      <ul class="partners__wall">
+        <li>Asmo Sp.&nbsp;z&nbsp;o.o.</li><li>Bahati Rail Sp.&nbsp;z&nbsp;o.o.</li><li>Gór-Tor Sp.&nbsp;z&nbsp;o.o.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ KONTAKT ══════════ -->
+<section class="contact" id="kontakt">
+  <div class="container contact__grid">
+    <div class="contact__info">
+      <p class="eyebrow eyebrow--light">Stacja końcowa — KM 04+800</p>
+      <h2 class="contact__title">Porozmawiajmy<br>o Twojej inwestycji.</h2>
+      <p class="contact__motto" aria-hidden="true"><span id="contact-motto"></span><span class="caret"></span></p>
+      <address class="contact__address">
+        <strong>RIKIT sp. z o.o.</strong><br>
+        ul. Gen. Dwernickiego 1<br>
+        76-200 Słupsk
+      </address>
+      <dl class="contact__registry">
+        <div><dt>NIP</dt><dd>8393213090</dd></div>
+        <div><dt>REGON</dt><dd>384295101</dd></div>
+        <div><dt>KRS</dt><dd>0000802278</dd></div>
+        <div><dt>BDO</dt><dd>000150785</dd></div>
+      </dl>
+      <a class="btn btn--green btn--lg" href="https://www.google.com/maps/search/?api=1&query=RIKIT%20sp.%20z%20o.o.%2C%20ul.%20Gen.%20Dwernickiego%201%2C%2076-200%20S%C5%82upsk" target="_blank" rel="noopener">
+        Otwórz w Google Maps
+        <svg viewBox="0 0 16 16" width="14" height="14" fill="none" aria-hidden="true"><path d="M2 8h11M9 3.5 13.5 8 9 12.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+    <div class="contact__map reveal">
+      <iframe title="Mapa dojazdu — RIKIT sp. z o.o., ul. Gen. Dwernickiego 1, Słupsk"
+        src="https://www.openstreetmap.org/export/embed.html?bbox=17.0330%2C54.4570%2C17.0630%2C54.4728&layer=mapnik&marker=54.4649174%2C17.0480503"
+        loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ══════════ FOOTER ══════════ -->
+<footer class="footer">
+  <div class="container footer__grid">
+    <div class="footer__brand">
+      <svg class="logo logo--footer" viewBox="0 0 340 84" fill="none" aria-hidden="true">
+        <g class="logo__signet">
+          <path d="M8 66 L36 14 H45 L17 66 Z" fill="currentColor"/>
+          <path d="M22 14 L11 35 L17 38 L28 17 Z" fill="currentColor"/>
+          <path d="M32 10 L21 31 L27 34 L38 13 Z" fill="currentColor"/>
+          <path d="M40 14 H56 C68 14 73 22 73 30 C73 38 67 44 57 44 L74 66 H63 L45 43 V37 H55 C60 37 64 34 64 30 C64 26 61 22 55 22 H44 Z" fill="currentColor"/>
+          <path d="M26 66 L44 33 L62 66 H52 L44 51 L36 66 Z" fill="#2DB24A"/>
+        </g>
+        <text x="86" y="52" class="logo__word">RIKIT</text>
+        <text x="188" y="74" class="logo__slogan">kolej na nas…</text>
+      </svg>
+      <p class="footer__desc">Kompleksowa realizacja budowy, remontów i diagnostyki infrastruktury kolejowej. Projektowanie i budowa bocznic kolejowych, przejazdy GTP i CBP, rozjazdy kolejowe, materiały staroużyteczne.</p>
+    </div>
+    <nav class="footer__nav" aria-label="Nawigacja stopki">
+      <a href="#uslugi">Usługi</a>
+      <a href="#realizacja">Realizacja</a>
+      <a href="#gtp">Przejazdy GTP</a>
+      <a href="#partnerzy">Partnerzy</a>
+      <a href="#kontakt">Kontakt</a>
+    </nav>
+    <div class="footer__registry">
+      <p>RIKIT sp. z o.o.<br>ul. Gen. Dwernickiego 1, 76-200 Słupsk</p>
+      <p>NIP 8393213090 · REGON 384295101<br>KRS 0000802278 · BDO 000150785</p>
+    </div>
+  </div>
+  <div class="container footer__bottom">
+    <p>© 2026 RIKIT sp. z o.o. Wszystkie prawa zastrzeżone.</p>
+    <p class="footer__motto">Kolej na nas…</p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
