@@ -114,11 +114,14 @@ address { font-style: normal; }
 .preloader.is-done { transform: translateY(-101%); }
 .preloader.is-removed { display: none; }
 .preloader__inner { text-align: center; }
-.preloader__signet { width: clamp(84px, 12vw, 130px); margin-inline: auto; }
-.preloader__signet .pre-stroke { stroke-dasharray: 460; stroke-dashoffset: 460; animation: pre-draw 1.1s var(--ease-out) forwards; }
-.preloader__signet .pre-stroke--green { animation-delay: .5s; animation-name: pre-draw-fill; }
-@keyframes pre-draw { to { stroke-dashoffset: 0; } }
-@keyframes pre-draw-fill { 70% { fill-opacity: 0; } to { stroke-dashoffset: 0; fill-opacity: 1; } }
+.preloader__logo {
+  width: clamp(220px, 34vw, 380px); height: auto; margin-inline: auto;
+  animation: pre-logo 1.2s var(--ease-out) both;
+}
+@keyframes pre-logo {
+  from { opacity: 0; transform: translateY(14px) scale(.96); }
+  to { opacity: 1; transform: none; }
+}
 .preloader__motto {
   margin-top: 22px;
   font-family: var(--font-display); font-weight: 600;
@@ -189,9 +192,7 @@ address { font-style: normal; }
 }
 .header.is-hidden { translate: 0 -100%; }
 .header__logo { margin-right: auto; }
-.logo { height: 46px; width: auto; color: var(--beton); }
-.logo__word { font-family: var(--font-display); font-weight: 700; font-size: 52px; letter-spacing: 2px; fill: currentColor; }
-.logo__slogan { font-family: var(--font-display); font-weight: 600; font-size: 20px; fill: var(--zielony); }
+.logo { height: 52px; width: auto; }
 .header__nav { display: none; gap: 30px; }
 @media (min-width: 900px) { .header__nav { display: flex; } }
 .header__nav a {
@@ -489,7 +490,7 @@ address { font-style: normal; }
   grid-template-columns: 1fr;
 }
 @media (min-width: 900px) { .footer__grid { grid-template-columns: 1.4fr .6fr 1fr; } }
-.logo--footer { height: 40px; color: var(--beton); }
+.logo--footer { height: 46px; }
 .footer__desc { margin-top: 16px; max-width: 44ch; }
 .footer__nav { display: grid; gap: 8px; align-content: start; }
 .footer__nav a { padding: 4px 0; min-height: 32px; display: inline-flex; align-items: center; transition: color var(--dur-1); }
