@@ -498,8 +498,8 @@ address { font-style: normal; }
   grid-template-columns: 1fr;
 }
 @media (min-width: 900px) { .footer__grid { grid-template-columns: 1.4fr .6fr 1fr; } }
-.logo--footer { height: 46px; }
-.footer__desc { margin-top: 16px; max-width: 44ch; }
+.logo--footer { height: clamp(64px, 7vw, 92px); }
+.footer__desc { margin-top: 22px; max-width: 44ch; }
 .footer__nav { display: grid; gap: 8px; align-content: start; }
 .footer__nav a { padding: 4px 0; min-height: 32px; display: inline-flex; align-items: center; transition: color var(--dur-1); }
 .footer__nav a:hover { color: var(--beton); }
