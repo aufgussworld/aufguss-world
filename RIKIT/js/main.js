@@ -191,11 +191,15 @@
   buildSequence("#realizacja", crossfadeFrames);
   buildSequence("#gtp", crossfadeFrames);
 
-  /* ── wideo (Seedance): podmiana scen po dograniu klipów ─ */
+  /* ── wideo: podmiana scen po dograniu klipów ─ */
+  var wantsVideo = window.matchMedia("(min-width: 900px)").matches &&
+    !(navigator.connection && navigator.connection.saveData);
+  if (!wantsVideo) return;
   document.querySelectorAll("video[data-src]").forEach(function (video) {
     var src = video.dataset.src;
     fetch(src, { method: "HEAD" }).then(function (r) {
       if (!r.ok) return;
+      video.preload = "auto";
       video.src = src;
       video.load();
       video.addEventListener("loadedmetadata", function () {
