@@ -111,12 +111,8 @@
   document.querySelectorAll(".reveal").forEach(function (el) { revObs.observe(el); });
 
   if (!hasGsap || reduced) {
-    /* fallback: pokaż wszystkie warstwy scen */
-    ["s1-survey", "s1-earth", "s1-buildings", "s1-road", "s1-siding", "s1-flag",
-     "g-pit", "g-layers", "g-labels"].forEach(function (id) {
-      var el = document.getElementById(id);
-      if (el) el.style.opacity = 1;
-    });
+    /* fallback: pokaż finalne klatki sekwencji */
+    document.querySelectorAll(".seq__frame").forEach(function (f) { f.style.opacity = 1; });
     document.querySelectorAll(".seq__step").forEach(function (s) { s.classList.add("is-active"); });
     return;
   }
@@ -183,93 +179,17 @@
     return tl;
   }
 
-  /* ── SEKWENCJA 1: od łąki do bocznicy ─────────────────── */
-  buildSequence("#realizacja", function (tl) {
-    var drawIn = function (sel, dur, at) {
-      document.querySelectorAll(sel).forEach(function (p) {
-        var len = p.getTotalLength ? p.getTotalLength() : 1200;
-        p.style.strokeDasharray = len;
-        p.style.strokeDashoffset = len;
-        tl.to(p, { strokeDashoffset: 0, duration: dur }, at);
-      });
-    };
-
-    /* faza 0→1: projekt */
-    tl.addLabel("survey", 0.5)
-      .to("#s1-survey", { opacity: 1, duration: 0.6 }, "survey");
-    drawIn("#s1-survey .draw path", 1.2, "survey+=0.2");
-    tl.from("#s1-surveyors g", { opacity: 0, y: 20, duration: 0.5, stagger: 0.15 }, "survey+=0.3");
-
-    /* faza 2: roboty ziemne */
-    tl.addLabel("earth", 2.4)
-      .to("#s1-survey", { opacity: 0.25, duration: 0.5 }, "earth")
-      .to("#s1-earth", { opacity: 1, duration: 0.5 }, "earth")
-      .from("#s1-earth path", { scaleY: 0, transformOrigin: "50% 100%", duration: 0.9, stagger: 0.2 }, "earth")
-      .from("#s1-digger", { x: 260, duration: 1.1 }, "earth+=0.2");
-
-    /* faza 3: hale */
-    tl.addLabel("build", 4.2)
-      .to("#s1-survey", { opacity: 0, duration: 0.4 }, "build")
-      .to("#s1-buildings", { opacity: 1, duration: 0.3 }, "build")
-      .from("#s1-hall-a", { y: 130, opacity: 0, duration: 0.7 }, "build")
-      .from("#s1-hall-b", { y: 150, opacity: 0, duration: 0.7 }, "build+=0.35")
-      .from("#s1-hall-c", { y: 110, opacity: 0, duration: 0.6 }, "build+=0.7")
-      .from("#s1-silo rect", { y: 90, opacity: 0, duration: 0.5, stagger: 0.12 }, "build+=1.0");
-
-    /* faza 4: bocznica + drogi */
-    tl.addLabel("siding", 6.0)
-      .to("#s1-road", { opacity: 1, duration: 0.4 }, "siding")
-      .from("#s1-parking", { opacity: 0, y: 30, duration: 0.5 }, "siding+=0.2")
-      .to("#s1-siding", { opacity: 1, duration: 0.3 }, "siding+=0.4")
-      .from("#s1-sleepers rect", { opacity: 0, duration: 0.02, stagger: 0.03 }, "siding+=0.5");
-    drawIn("#s1-siding line.draw, #s1-switch path.draw", 1.0, "siding+=0.7");
-    tl.from("#s1-buffer rect", { opacity: 0, scale: 0, transformOrigin: "50% 100%", duration: 0.3, stagger: 0.1 }, "siding+=1.5")
-      .from("#s1-wagon", { x: -420, duration: 1.4, ease: "power1.out" }, "siding+=1.5")
-      .to("#s1-flag", { opacity: 1, duration: 0.4 }, "siding+=2.4")
-      .from("#s1-flag path", { scaleX: 0, transformOrigin: "0 50%", duration: 0.5 }, "siding+=2.5")
-      .to({}, { duration: 0.8 }); /* oddech na końcu */
-  });
-
-  /* ── SEKWENCJA 2: przejazd GTP ────────────────────────── */
-  buildSequence("#gtp", function (tl) {
-    /* faza 0: stary przejazd — puls ostrzeżenia */
-    tl.to("#g-old-warning", { opacity: 1, duration: 0.4 }, 0.5)
-      .to("#g-old-warning", { opacity: 0.25, duration: 0.4 }, 1.0);
-
-    /* faza 1: rozbiórka */
-    tl.addLabel("demo", 1.8)
-      .to("#g-old-warning", { opacity: 0, duration: 0.2 }, "demo")
-      .to("#g-old-rails rect, #g-old-sleepers rect", { y: -260, opacity: 0, duration: 0.9, stagger: 0.08 }, "demo")
-      .to("#g-old-cracks path", { opacity: 0, duration: 0.4 }, "demo+=0.3")
-      .to("#g-old-asphalt rect", { opacity: 0, duration: 0.6 }, "demo+=0.5")
-      .to("#g-pit", { opacity: 1, duration: 0.6 }, "demo+=0.8");
-
-    /* faza 2: podbudowa */
-    tl.addLabel("base", 3.6)
-      .to("#g-layers", { opacity: 1, duration: 0.2 }, "base")
-      .to("#g-labels", { opacity: 1, duration: 0.2 }, "base");
-    ["#gl-1", "#gl-2", "#gl-3", "#gl-4"].forEach(function (id, i) {
-      tl.from(id, { opacity: 0, y: 40, duration: 0.5 }, "base+=" + (0.2 + i * 0.45));
-      tl.from("#lb-" + (i + 1), { opacity: 0, x: 30, duration: 0.4 }, "base+=" + (0.35 + i * 0.45));
+  /* ── SEKWENCJE: crossfade klatek kluczowych ───────────── */
+  function crossfadeFrames(tl, section) {
+    var frames = section.querySelectorAll(".seq__frame");
+    tl.fromTo(frames, { scale: 1.04 }, { scale: 1.0, duration: 10 }, 0);
+    frames.forEach(function (f, i) {
+      if (i === 0) return;
+      tl.to(f, { opacity: 1, duration: 0.8 }, i * 2.7 - 0.4);
     });
-
-    /* faza 3: tor + płyty GTP */
-    tl.addLabel("track", 5.8);
-    ["#gl-5", "#gl-6", "#gl-7"].forEach(function (id, i) {
-      tl.from(id, { opacity: 0, y: -60, duration: 0.55 }, "track+=" + (i * 0.5));
-    });
-    tl.from("#lb-5", { opacity: 0, x: 30, duration: 0.4 }, "track+=0.3");
-    tl.from("#lb-6", { opacity: 0, x: 30, duration: 0.4 }, "track+=1.1");
-
-    /* faza 4: asfalt + oznakowanie */
-    tl.addLabel("finish", 7.6)
-      .from("#gl-8 path", { scaleX: 0, transformOrigin: "0% 50%", duration: 0.8, stagger: 0.1 }, "finish")
-      .from("#gl-8 line", { opacity: 0, duration: 0.4 }, "finish+=0.7")
-      .from("#lb-8", { opacity: 0, x: 30, duration: 0.4 }, "finish+=0.6")
-      .from("#gl-9 line, #gl-9 path", { opacity: 0, y: 60, duration: 0.6 }, "finish+=0.9")
-      .from("#g-signal-lamp", { opacity: 0, scale: 0, transformOrigin: "center", duration: 0.4 }, "finish+=1.4")
-      .to({}, { duration: 0.8 });
-  });
+  }
+  buildSequence("#realizacja", crossfadeFrames);
+  buildSequence("#gtp", crossfadeFrames);
 
   /* ── wideo (Seedance): podmiana scen po dograniu klipów ─ */
   document.querySelectorAll("video[data-src]").forEach(function (video) {

@@ -327,17 +327,28 @@ address { font-style: normal; }
   align-self: center;
   width: min(100%, 1280px);
   margin-inline: auto;
-  aspect-ratio: 2 / 1;
+  aspect-ratio: 1920 / 1044;
   max-height: 58svh;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: 0 30px 70px -32px rgba(17, 20, 24, .55);
 }
-.seq__scene { width: 100%; height: 100%; }
+.seq__frames { position: absolute; inset: 0; }
+.seq__frame {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  will-change: opacity, transform;
+}
+.seq__frame:first-child { opacity: 1; }
 .seq__video {
   position: absolute; inset: 0; width: 100%; height: 100%;
   object-fit: cover; opacity: 0; pointer-events: none;
   transition: opacity .6s;
 }
 .seq.has-video .seq__video { opacity: 1; }
-.seq.has-video .seq__scene { opacity: 0; }
+.seq.has-video .seq__frames { opacity: 0; }
 .seq--gtp .seq__km { right: auto; left: 18px; }
 .seq__km {
   position: absolute; right: 18px; bottom: 14px;
@@ -379,9 +390,6 @@ address { font-style: normal; }
 .seq__dots i { width: 26px; height: 3px; background: color-mix(in srgb, var(--stal) 40%, transparent); transition: background var(--dur-1); }
 .seq__dots i.is-on { background: var(--zielony); }
 
-/* stany sceny 1 — sterowane przez GSAP; init w CSS dla no-JS: wszystko widoczne */
-.js #s1-survey, .js #s1-earth, .js #s1-buildings, .js #s1-road, .js #s1-siding, .js #s1-flag { opacity: 0; }
-.js #g-pit, .js #g-layers, .js #g-labels, .js #g-old-warning { opacity: 0; }
 
 /* ═══ MARQUEE ═══ */
 .marquee {
@@ -516,8 +524,9 @@ html:not(.js) .reveal { opacity: 1; translate: 0 0; }
   .reveal, .js .reveal { opacity: 1; translate: 0 0; }
   .seq__step { position: static; opacity: 1; translate: 0 0; margin-bottom: var(--space-2); }
   .seq__captions { min-height: 0; }
-  .js #s1-survey, .js #s1-earth, .js #s1-buildings, .js #s1-road, .js #s1-siding, .js #s1-flag,
-  .js #g-pit, .js #g-layers, .js #g-labels { opacity: 1; }
+  .seq__stage { aspect-ratio: auto; max-height: none; overflow: visible; box-shadow: none; }
+  .seq__frames { position: static; display: grid; gap: 10px; }
+  .seq__frame { position: static; opacity: 1; height: auto; aspect-ratio: 1920 / 1044; border-radius: var(--radius); }
   .preloader { display: none; }
 }
 

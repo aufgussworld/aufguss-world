@@ -207,169 +207,32 @@
     </header>
     <div class="seq__stage">
       <video class="seq__video" muted playsinline preload="none" data-src="assets/video/seq-siding.mp4"></video>
-      <svg class="seq__scene" id="scene-siding" viewBox="0 160 1280 480" preserveAspectRatio="xMidYMid meet" fill="none" role="img" aria-label="Animowana wizualizacja budowy zakładu przemysłowego z bocznicą kolejową — od łąki, przez projekt i roboty ziemne, po gotową fabrykę z torami">
-        <!-- niebo / tło -->
-        <rect width="1280" height="640" fill="#DDE0E3"/>
-        <g id="s1-meadow">
-          <rect x="0" y="400" width="1280" height="240" fill="#C9D2C4"/>
-          <path d="M0 400 Q320 384 640 398 T1280 396 V640 H0 Z" fill="#BFCBB8"/>
-          <g stroke="#9FAF96" stroke-width="2" stroke-linecap="round">
-            <path d="M150 460 q4 -14 8 0"/><path d="M162 462 q4 -12 8 0"/>
-            <path d="M980 500 q4 -14 8 0"/><path d="M992 502 q4 -12 8 0"/>
-            <path d="M540 560 q4 -14 8 0"/><path d="M300 530 q4 -12 8 0"/>
-            <path d="M1150 550 q4 -14 8 0"/><path d="M760 470 q4 -12 8 0"/>
-          </g>
-          <g stroke="#AEBBA6" stroke-width="1.4" fill="none" opacity=".7">
-            <ellipse cx="420" cy="500" rx="130" ry="26"/><ellipse cx="420" cy="500" rx="80" ry="15"/>
-            <ellipse cx="900" cy="560" rx="150" ry="30"/><ellipse cx="900" cy="560" rx="95" ry="18"/>
-          </g>
-        </g>
-        <!-- siatka geodezyjna + obrysy projektowe -->
-        <g id="s1-survey">
-          <g stroke="#7A7F87" stroke-opacity=".35" stroke-width="1">
-            <line x1="120" y1="420" x2="1200" y2="420"/><line x1="110" y1="470" x2="1210" y2="470"/>
-            <line x1="95"  y1="530" x2="1225" y2="530"/><line x1="80"  y1="600" x2="1240" y2="600"/>
-            <line x1="200" y1="405" x2="150" y2="640"/><line x1="440" y1="405" x2="410" y2="640"/>
-            <line x1="680" y1="405" x2="680" y2="640"/><line x1="920" y1="405" x2="950" y2="640"/>
-            <line x1="1140" y1="405" x2="1190" y2="640"/>
-          </g>
-          <g class="draw" stroke="#2DB24A" stroke-width="2" stroke-dasharray="7 6" fill="none">
-            <path d="M300 415 h220 v-96 h-220 Z"/>
-            <path d="M560 415 h220 v-120 h-220 Z"/>
-            <path d="M820 415 h180 v-78 h-180 Z"/>
-            <path d="M240 520 H1080"/>
-            <path d="M240 560 H1080"/>
-          </g>
-          <g fill="#111418" font-family="Inter,sans-serif" font-size="15" letter-spacing="1.4">
-            <text x="306" y="306">HALA A</text><text x="566" y="282">HALA B</text><text x="826" y="324">MAGAZYN</text>
-            <text x="245" y="510" fill="#2DB24A">OŚ TORU BOCZNICY</text>
-          </g>
-          <g id="s1-surveyors" stroke="#111418" stroke-width="2.4" stroke-linecap="round">
-            <g transform="translate(180 366)"><path d="M0 44 14 8M28 44 14 8M14 44 V8"/><circle cx="14" cy="4" r="5" fill="#2DB24A" stroke="none"/></g>
-            <g transform="translate(1060 350)"><path d="M0 44 14 8M28 44 14 8M14 44 V8"/><circle cx="14" cy="4" r="5" fill="#2DB24A" stroke="none"/></g>
-          </g>
-        </g>
-        <!-- roboty ziemne -->
-        <g id="s1-earth">
-          <path d="M60 640 L110 500 Q640 462 1170 500 L1220 640 Z" fill="#8D7B66"/>
-          <path d="M110 500 Q640 462 1170 500 L1150 540 Q640 505 130 540 Z" fill="#A5947E"/>
-          <g id="s1-digger" transform="translate(940 430)">
-            <rect x="0" y="26" width="66" height="26" rx="5" fill="#111418"/>
-            <circle cx="14" cy="58" r="9" fill="#22262C"/><circle cx="50" cy="58" r="9" fill="#22262C"/>
-            <rect x="8" y="4" width="26" height="24" rx="4" fill="#2DB24A"/>
-            <path d="M40 18 L86 6 L96 26 L82 30 Z" fill="#111418"/>
-          </g>
-        </g>
-        <!-- zakład: hale -->
-        <g id="s1-buildings">
-          <g id="s1-hall-a">
-            <rect x="300" y="322" width="220" height="94" fill="#3A4048"/>
-            <path d="M300 322 L340 296 H560 L520 322 Z" fill="#4C535D"/>
-            <path d="M560 296 L520 322 V416 L560 390 Z" fill="#2E343B"/>
-            <rect x="316" y="352" width="188" height="12" fill="#7A7F87" opacity=".55"/>
-            <rect x="420" y="376" width="52" height="40" fill="#2DB24A"/>
-          </g>
-          <g id="s1-hall-b">
-            <rect x="560" y="298" width="220" height="118" fill="#111418"/>
-            <path d="M560 298 L600 272 H820 L780 298 Z" fill="#22262C"/>
-            <path d="M820 272 L780 298 V416 L820 390 Z" fill="#0B0E11"/>
-            <g fill="#7A7F87" opacity=".6">
-              <rect x="576" y="326" width="188" height="10"/><rect x="576" y="346" width="188" height="10"/>
-            </g>
-            <rect x="700" y="380" width="46" height="36" fill="#2DB24A"/>
-            <text x="590" y="404" fill="#E6E8EA" font-family="Signika,sans-serif" font-weight="600" font-size="22" letter-spacing="3">ZAKŁAD</text>
-          </g>
-          <g id="s1-hall-c">
-            <rect x="820" y="344" width="180" height="72" fill="#3A4048"/>
-            <path d="M820 344 L852 322 H1032 L1000 344 Z" fill="#4C535D"/>
-            <path d="M1032 322 L1000 344 V416 L1032 394 Z" fill="#2E343B"/>
-            <rect x="900" y="382" width="40" height="34" fill="#7A7F87"/>
-          </g>
-          <g id="s1-silo">
-            <rect x="1060" y="330" width="26" height="86" rx="12" fill="#7A7F87"/>
-            <rect x="1096" y="330" width="26" height="86" rx="12" fill="#9AA0A7"/>
-          </g>
-        </g>
-        <!-- droga + parking -->
-        <g id="s1-road">
-          <path d="M0 620 H1280 V584 H0 Z" fill="#4C535D"/>
-          <g stroke="#E6E8EA" stroke-width="3" stroke-dasharray="26 20"><line x1="0" y1="602" x2="1280" y2="602"/></g>
-          <g id="s1-parking">
-            <rect x="96" y="430" width="176" height="72" fill="#5A616B"/>
-            <g stroke="#E6E8EA" stroke-width="2" opacity=".8">
-              <line x1="128" y1="430" x2="128" y2="502"/><line x1="164" y1="430" x2="164" y2="502"/>
-              <line x1="200" y1="430" x2="200" y2="502"/><line x1="236" y1="430" x2="236" y2="502"/>
-            </g>
-            <rect x="132" y="448" width="26" height="42" rx="5" fill="#2DB24A"/>
-            <rect x="204" y="448" width="26" height="42" rx="5" fill="#111418"/>
-          </g>
-        </g>
-        <!-- bocznica -->
-        <g id="s1-siding">
-          <path d="M0 576 H1280 V522 H0 Z" fill="#B9B2A6" opacity=".9"/>
-          <g id="s1-sleepers" fill="#5B554B">
-            <rect x="20"  y="532" width="14" height="36"/><rect x="80"  y="532" width="14" height="36"/>
-            <rect x="140" y="532" width="14" height="36"/><rect x="200" y="532" width="14" height="36"/>
-            <rect x="260" y="532" width="14" height="36"/><rect x="320" y="532" width="14" height="36"/>
-            <rect x="380" y="532" width="14" height="36"/><rect x="440" y="532" width="14" height="36"/>
-            <rect x="500" y="532" width="14" height="36"/><rect x="560" y="532" width="14" height="36"/>
-            <rect x="620" y="532" width="14" height="36"/><rect x="680" y="532" width="14" height="36"/>
-            <rect x="740" y="532" width="14" height="36"/><rect x="800" y="532" width="14" height="36"/>
-            <rect x="860" y="532" width="14" height="36"/><rect x="920" y="532" width="14" height="36"/>
-            <rect x="980" y="532" width="14" height="36"/><rect x="1040" y="532" width="14" height="36"/>
-            <rect x="1100" y="532" width="14" height="36"/><rect x="1160" y="532" width="14" height="36"/>
-            <rect x="1220" y="532" width="14" height="36"/>
-          </g>
-          <g stroke="#111418" stroke-width="5">
-            <line class="draw" x1="0" y1="540" x2="1280" y2="540"/>
-            <line class="draw" x1="0" y1="562" x2="1280" y2="562"/>
-          </g>
-          <g id="s1-switch" stroke="#111418" stroke-width="4">
-            <path class="draw" d="M640 540 Q700 528 760 500 L820 470"/>
-            <path class="draw" d="M668 562 Q740 546 800 512 L850 484"/>
-          </g>
-          <g id="s1-buffer">
-            <rect x="838" y="452" width="10" height="26" fill="#B02E2E"/>
-            <rect x="862" y="466" width="10" height="26" fill="#B02E2E"/>
-          </g>
-          <g id="s1-wagon">
-            <rect x="180" y="492" width="150" height="42" rx="4" fill="#2E343B"/>
-            <rect x="188" y="500" width="134" height="18" fill="#7A7F87" opacity=".4"/>
-            <circle cx="212" cy="540" r="10" fill="#111418"/><circle cx="298" cy="540" r="10" fill="#111418"/>
-            <text x="206" y="527" fill="#E6E8EA" font-family="Inter,sans-serif" font-size="12" letter-spacing="2">RIKIT</text>
-          </g>
-        </g>
-        <!-- flaga finał -->
-        <g id="s1-flag">
-          <line x1="640" y1="250" x2="640" y2="196" stroke="#111418" stroke-width="3"/>
-          <path d="M640 196 h86 l-12 12 12 12 h-86 Z" fill="#2DB24A"/>
-          <text x="652" y="213" fill="#0E2A15" font-family="Signika,sans-serif" font-weight="600" font-size="12">kolej na nas…</text>
-        </g>
-      </svg>
+      <div class="seq__frames">
+        <img class="seq__frame" src="assets/keyframes/a1.jpg" width="1920" height="1044" alt="Makieta: łąka z wytyczonym placem inwestycji, geodeci przy tachimetrze, obok linia kolejowa">
+        <img class="seq__frame" src="assets/keyframes/a2.jpg" width="1920" height="1044" loading="lazy" alt="Makieta: roboty ziemne — fundamenty hal, żuraw wieżowy i maszyny budowlane">
+        <img class="seq__frame" src="assets/keyframes/a3.jpg" width="1920" height="1044" loading="lazy" alt="Makieta: konstrukcje hal w budowie i maszyny torowe układające bocznicę kolejową">
+        <img class="seq__frame" src="assets/keyframes/a4.jpg" width="1920" height="1044" loading="lazy" alt="Makieta: gotowy zakład przemysłowy z bocznicą kolejową, rozjazdem i wagonami">
+      </div>
       <div class="seq__km" aria-hidden="true"><span id="seq1-km">KM 02+400</span></div>
     </div>
     <aside class="seq__captions" aria-live="polite">
       <div class="seq__step" data-step="0">
-        <h3>Łąka</h3>
-        <p>Tu, gdzie dziś szumi trawa, jutro stanie zakład przemysłowy z własną bocznicą kolejową.</p>
+        <h3>Projekt</h3>
+        <p>Geodeci wytyczają plac. Powstaje <strong>projekt infrastruktury kolejowej</strong>: hale, drogi, parkingi i układ torowy <strong>bocznicy</strong>.</p>
       </div>
       <div class="seq__step" data-step="1">
-        <h3>Projekt</h3>
-        <p>Na teren wchodzą geodeci i projektanci. Powstaje <strong>projekt infrastruktury kolejowej</strong>: hale, drogi, parkingi i układ torowy bocznicy.</p>
+        <h3>Roboty ziemne</h3>
+        <p>Znika humus, rosną fundamenty. Żuraw i ciężki sprzęt zamieniają łąkę w plac budowy.</p>
       </div>
       <div class="seq__step" data-step="2">
-        <h3>Roboty ziemne</h3>
-        <p>Znika humus, rośnie korpus ziemny, powstaje odwodnienie. Łąka zamienia się w plac budowy.</p>
+        <h3>Budowa zakładu i toru</h3>
+        <p>Hale pną się w górę, a maszyny torowe formują podtorze — trwa <strong>budowa infrastruktury kolejowej</strong>.</p>
       </div>
       <div class="seq__step" data-step="3">
-        <h3>Budowa zakładu</h3>
-        <p>Hale produkcyjne i magazyny stają jedna po drugiej. Równolegle prowadzimy <strong>budowę infrastruktury kolejowej</strong>.</p>
-      </div>
-      <div class="seq__step" data-step="4">
         <h3>Bocznica kolejowa</h3>
-        <p>Układamy tory, zabudowujemy <strong>rozjazdy kolejowe</strong>, oddajemy drogi i parkingi. Zakład ma połączenie z siecią. <em class="motto-inline">Kolej na nas…</em></p>
+        <p><strong>Rozjazd</strong> spina zakład z siecią, wagony stoją pod załadunkiem. <em class="motto-inline">Kolej na nas…</em></p>
       </div>
-      <div class="seq__dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="seq__dots" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
     </aside>
   </div>
 </section>
@@ -399,109 +262,33 @@
     </header>
     <div class="seq__stage">
       <video class="seq__video" muted playsinline preload="none" data-src="assets/video/seq-gtp.mp4"></video>
-      <svg class="seq__scene" id="scene-gtp" viewBox="0 240 1280 400" preserveAspectRatio="xMidYMid meet" fill="none" role="img" aria-label="Animowany przekrój przez przejazd kolejowo-drogowy typu GTP: rozbiórka starego przejazdu i budowa nowych warstw aż po masę asfaltową">
-        <rect width="1280" height="640" fill="#DDE0E3"/>
-        <line x1="0" y1="480" x2="1280" y2="480" stroke="#7A7F87" stroke-width="1" stroke-opacity=".5"/>
-        <!-- stary przejazd -->
-        <g id="g-old">
-          <g id="g-old-asphalt">
-            <rect x="0" y="440" width="420" height="40" fill="#6B7077"/>
-            <rect x="860" y="440" width="420" height="40" fill="#6B7077"/>
-          </g>
-          <g id="g-old-cracks" stroke="#3A4048" stroke-width="2.4" fill="none">
-            <path d="M60 444 l40 20 30 -12 44 24"/><path d="M950 448 l52 18 36 -10 40 22"/>
-            <path d="M260 442 l30 26"/><path d="M1120 444 l36 30"/>
-          </g>
-          <g id="g-old-sleepers" fill="#5B4A38">
-            <rect x="440" y="452" width="60" height="26" rx="2"/><rect x="540" y="452" width="60" height="26" rx="2"/>
-            <rect x="640" y="452" width="60" height="26" rx="2"/><rect x="740" y="452" width="60" height="26" rx="2"/>
-          </g>
-          <g id="g-old-rails" fill="#43494F">
-            <rect x="430" y="436" width="420" height="10"/><rect x="430" y="446" width="420" height="4" fill="#2E343B"/>
-          </g>
-          <g id="g-old-warning" stroke="#B02E2E" stroke-width="5" opacity="0">
-            <path d="M600 300 l80 80M680 300 l-80 80"/>
-          </g>
-        </g>
-        <!-- wykop -->
-        <g id="g-pit">
-          <path d="M400 480 L440 620 H840 L880 480" stroke="#7A7F87" stroke-width="2.5" stroke-dasharray="10 8" fill="#CFD3D6"/>
-          <g stroke="#7A7F87" stroke-width="1.6">
-            <line x1="360" y1="480" x2="360" y2="620"/><path d="M352 488 l8 -8 8 8M352 612 l8 8 8 -8"/>
-          </g>
-          <text x="300" y="556" fill="#43494F" font-family="Inter,sans-serif" font-size="15">≈ 0,9 m</text>
-        </g>
-        <!-- warstwy GTP (od dołu) -->
-        <g id="g-layers">
-          <g id="gl-1"><path d="M420 620 H860 L850 592 H430 Z" fill="#8D7B66"/></g>
-          <g id="gl-2"><rect x="430" y="586" width="420" height="7" rx="3" fill="#2DB24A"/></g>
-          <g id="gl-3"><path d="M432 586 H848 L842 556 H438 Z" fill="#B9B2A6"/></g>
-          <g id="gl-4">
-            <path d="M438 556 H842 L836 516 H444 Z" fill="#9AA0A7"/>
-            <g fill="#7A7F87"><circle cx="500" cy="536" r="5"/><circle cx="560" cy="542" r="4"/><circle cx="640" cy="534" r="5"/><circle cx="720" cy="541" r="4"/><circle cx="780" cy="533" r="5"/></g>
-          </g>
-          <g id="gl-5" fill="#DADDE0">
-            <rect x="470" y="498" width="52" height="20" rx="3"/><rect x="560" y="498" width="52" height="20" rx="3"/>
-            <rect x="650" y="498" width="52" height="20" rx="3"/><rect x="740" y="498" width="52" height="20" rx="3"/>
-          </g>
-          <g id="gl-6" fill="#111418">
-            <path d="M500 470 h12 v10 h6 v6 h-24 v-6 h6 Z"/><path d="M500 462 h12 v8 h-12 Z" fill="#22262C"/>
-            <path d="M756 470 h12 v10 h6 v6 h-24 v-6 h6 Z"/><path d="M756 462 h12 v8 h-12 Z" fill="#22262C"/>
-          </g>
-          <g id="gl-7">
-            <rect x="530" y="460" width="212" height="24" rx="3" fill="#22262C"/>
-            <g stroke="#43494F" stroke-width="2"><line x1="548" y1="460" x2="548" y2="484"/><line x1="584" y1="460" x2="584" y2="484"/><line x1="620" y1="460" x2="620" y2="484"/><line x1="656" y1="460" x2="656" y2="484"/><line x1="692" y1="460" x2="692" y2="484"/><line x1="724" y1="460" x2="724" y2="484"/></g>
-            <rect x="432" y="460" width="60" height="24" rx="3" fill="#2E343B"/>
-            <rect x="780" y="460" width="60" height="24" rx="3" fill="#2E343B"/>
-          </g>
-          <g id="gl-8">
-            <path d="M0 480 H432 V456 H60 Q20 456 0 466 Z" fill="#1C2129"/>
-            <path d="M1280 480 H848 V456 H1220 Q1260 456 1280 466 Z" fill="#1C2129"/>
-            <g stroke="#E6E8EA" stroke-width="3" stroke-dasharray="22 18"><line x1="30" y1="468" x2="420" y2="468"/><line x1="860" y1="468" x2="1250" y2="468"/></g>
-          </g>
-          <g id="gl-9">
-            <line x1="150" y1="456" x2="150" y2="320" stroke="#43494F" stroke-width="5"/>
-            <path d="M108 330 l84 32M108 362 l84 -32" stroke="#B02E2E" stroke-width="9"/>
-            <path d="M104 330 l84 32M104 362 l84 -32" stroke="#E6E8EA" stroke-width="4"/>
-            <circle id="g-signal-lamp" cx="150" cy="300" r="10" fill="#2DB24A"/>
-          </g>
-        </g>
-        <!-- etykiety warstw -->
-        <g id="g-labels" font-family="Inter,sans-serif" font-size="14" fill="#43494F">
-          <g id="lb-1"><line x1="900" y1="606" x2="990" y2="606" stroke="#7A7F87"/><text x="1000" y="610">podtorze / grunt</text></g>
-          <g id="lb-2"><line x1="900" y1="589" x2="990" y2="589" stroke="#2DB24A"/><text x="1000" y="593" fill="#1E7A34">geowłóknina</text></g>
-          <g id="lb-3"><line x1="900" y1="570" x2="990" y2="570" stroke="#7A7F87"/><text x="1000" y="574">warstwa ochronna</text></g>
-          <g id="lb-4"><line x1="900" y1="534" x2="990" y2="534" stroke="#7A7F87"/><text x="1000" y="538">podsypka tłuczniowa</text></g>
-          <g id="lb-5"><line x1="900" y1="508" x2="990" y2="508" stroke="#7A7F87"/><text x="1000" y="512">podkłady strunobetonowe</text></g>
-          <g id="lb-6"><line x1="900" y1="472" x2="990" y2="472" stroke="#7A7F87"/><text x="1000" y="476">szyny + płyty GTP</text></g>
-          <g id="lb-8"><line x1="1080" y1="450" x2="1130" y2="430" stroke="#7A7F87"/><text x="1000" y="422">masa asfaltowa</text></g>
-        </g>
-      </svg>
+      <div class="seq__frames">
+        <img class="seq__frame" src="assets/keyframes/g1.jpg" width="1920" height="1044" loading="lazy" alt="Makieta: wyeksploatowany przejazd kolejowo-drogowy z płyt CBP, inspektor w pomarańczowym ubraniu">
+        <img class="seq__frame" src="assets/keyframes/g2.jpg" width="1920" height="1044" loading="lazy" alt="Makieta: rozbiórka przejazdu — wykop z warstwami podbudowy, pracownicy torowi w pomarańczowych ubraniach i żółtych kaskach">
+        <img class="seq__frame" src="assets/keyframes/g3.jpg" width="1920" height="1044" loading="lazy" alt="Makieta: dźwig układa płyty nośne GTP, szyny wprowadzane w kanały szynowe płyt">
+        <img class="seq__frame" src="assets/keyframes/g4.jpg" width="1920" height="1044" loading="lazy" alt="Makieta: gotowy przejazd GTP ze świeżym asfaltem, oznakowaniem i rogatkami">
+      </div>
       <div class="seq__km" aria-hidden="true"><span>KM 03+600</span></div>
     </div>
     <aside class="seq__captions" aria-live="polite">
       <div class="seq__step" data-step="0">
-        <h3>Stary przejazd</h3>
-        <p>Wyeksploatowana nawierzchnia, pęknięty asfalt, zużyte podkłady. Czas na remont.</p>
+        <h3>Przejazd CBP przed remontem</h3>
+        <p>Wyeksploatowane płyty żelbetowe, ubytki i nierówności. <strong>Diagnostyka</strong> nie pozostawia złudzeń: czas na remont.</p>
       </div>
       <div class="seq__step" data-step="1">
-        <h3>Rozbiórka</h3>
-        <p>Demontujemy starą nawierzchnię przejazdu i korytujemy podtorze na pełną głębokość konstrukcji.</p>
+        <h3>Rozbiórka i podbudowa</h3>
+        <p>Demontujemy starą nawierzchnię, korytujemy przejazd i zagęszczamy kolejne warstwy kruszywa zgodnie z technologią <strong>GTP</strong>.</p>
       </div>
       <div class="seq__step" data-step="2">
-        <h3>Podbudowa</h3>
-        <p>Geowłóknina, warstwa ochronna i podsypka tłuczniowa — fundament trwałości każdego <strong>przejazdu GTP</strong>.</p>
+        <h3>Płyty nośne GTP</h3>
+        <p>Dźwig układa prefabrykowane płyty nośne, a szyny trafiają w kanały szynowe płyt — nawierzchnia zintegrowana.</p>
       </div>
       <div class="seq__step" data-step="3">
-        <h3>Tor i płyty GTP</h3>
-        <p>Nowe podkłady strunobetonowe, szyny oraz płyty przejazdowe <strong>GTP</strong> — wewnętrzne i zewnętrzne.</p>
+        <h3>Otwarcie przejazdu</h3>
+        <p>Dojazdy zamyka świeża masa asfaltowa, wraca oznakowanie i rogatki. <em class="motto-inline">Kolej na nas…</em></p>
       </div>
-      <div class="seq__step" data-step="4">
-        <h3>Wykończenie</h3>
-        <p>Dojazdy zamyka masa asfaltowa, wraca oznakowanie. Przejazd gotowy do ruchu. <em class="motto-inline">Kolej na nas…</em></p>
-      </div>
-      <p class="seq__note">Wykonujemy również <strong>przejazdy CBP</strong> oraz przejazdy w systemie <strong>Mirosław Ujski</strong>.</p>
-      <div class="seq__dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+      <p class="seq__note">Remontujemy także przejazdy w technologiach <strong>CBP</strong> i <strong>Mirosław Ujski</strong>.</p>
+      <div class="seq__dots" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
     </aside>
   </div>
 </section>
