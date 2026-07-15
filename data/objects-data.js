@@ -1,4 +1,5 @@
 // Wygenerowane: reverse-geocode-v2 (granice NE 10m + odległość do wybrzeża + geokodowanie OSM dryfujących pinów)
+// Pole website: z zestawienia użytkownika (spaobjects_websites.xlsx), dopasowane po nazwie.
 window.AUFGUSS_OBJECTS = [
   {
     "id": 1,
@@ -9,7 +10,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 50.944809,
     "lng": 18.224132,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "http://sommerresidence.pl/"
   },
   {
     "id": 2,
@@ -20,7 +22,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 54.432257,
     "lng": 18.294695,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://www.saunowystaw.pl/"
   },
   {
     "id": 3,
@@ -31,7 +34,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 51.091321,
     "lng": 18.658949,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "http://rzekamiodu.pl/"
   },
   {
     "id": 4,
@@ -42,7 +46,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 50.103242,
     "lng": 18.977663,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "http://www.wodnypark.tychy.pl/"
   },
   {
     "id": 5,
@@ -53,7 +58,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 54.481326,
     "lng": 17.011838,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://www.trzyfale.slupsk.pl/"
   },
   {
     "id": 6,
@@ -64,7 +70,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 50.948611,
     "lng": 23.9731,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://www.nadbuzanska-cisza.com.pl/"
   },
   {
     "id": 7,
@@ -75,7 +82,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 53.828819,
     "lng": 20.822112,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://www.azzun.pl/"
   },
   {
     "id": 8,
@@ -86,7 +94,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 53.423155,
     "lng": 18.336058,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "http://www.swiatyniaogniaiwody.pl/"
   },
   {
     "id": 9,
@@ -97,7 +106,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 52.40528,
     "lng": 16.974252,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "http://www.termymaltanskie.com.pl/"
   },
   {
     "id": 10,
@@ -108,7 +118,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 52.418707,
     "lng": 21.358354,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://www.facebook.com/p/Per-Natura-Wioska-Saunowa-100064160469174/?locale=pl_PL"
   },
   {
     "id": 11,
@@ -119,7 +130,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 49.784499,
     "lng": 21.622653,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://www.mojemalebieszczady.pl"
   },
   {
     "id": 12,
@@ -130,7 +142,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 50.06233,
     "lng": 19.910489,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "http://www.termykrakowskie.pl/"
   },
   {
     "id": 13,
@@ -141,7 +154,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 50.308109,
     "lng": 19.069891,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "http://termyrzymskie.pl/"
   },
   {
     "id": 14,
@@ -152,7 +166,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 49.351825,
     "lng": 19.82312,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "http://chocholowskietermy.pl/"
   },
   {
     "id": 15,
@@ -163,7 +178,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 50.438744,
     "lng": 18.837381,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "http://www.parkwodny.com.pl/"
   },
   {
     "id": 16,
@@ -174,7 +190,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 54.594674,
     "lng": 18.36612,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://www.aquaparkreda.pl/"
   },
   {
     "id": 17,
@@ -185,7 +202,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 50.854128,
     "lng": 20.608393,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://basenytropikalne.pl/"
   },
   {
     "id": 18,
@@ -196,7 +214,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 51.091046,
     "lng": 17.032217,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://aquapark.wroc.pl/"
   },
   {
     "id": 19,
@@ -207,7 +226,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 51.764155,
     "lng": 19.421186,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://aquapark.lodz.pl/?utm_source=Moja-Firma&utm_medium=Strona"
   },
   {
     "id": 20,
@@ -218,7 +238,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 51.987697,
     "lng": 20.459783,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://parkofpoland.com/"
   },
   {
     "id": 21,
@@ -229,7 +250,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 52.487952,
     "lng": 19.04961,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://www.facebook.com/LewandoweZacisze"
   },
   {
     "id": 22,
@@ -240,7 +262,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 52.141036,
     "lng": 21.263179,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://zdrowonagrzani.pl/"
   },
   {
     "id": 23,
@@ -251,7 +274,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 51.738785,
     "lng": 19.461924,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "http://www.destresso.pl/"
   },
   {
     "id": 24,
@@ -262,7 +286,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 50.103389,
     "lng": 18.753551,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://www.facebook.com/profile.php?id=100088870312537"
   },
   {
     "id": 25,
@@ -273,7 +298,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 49.399958,
     "lng": 20.022592,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://goracypotok.pl/"
   },
   {
     "id": 26,
@@ -284,7 +310,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 53.732541,
     "lng": 19.831833,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://www.facebook.com/profile.php?id=100089710347555"
   },
   {
     "id": 27,
@@ -295,7 +322,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 50.043351,
     "lng": 19.969661,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://hotspot.com.pl/"
   },
   {
     "id": 28,
@@ -306,7 +334,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 52.045508,
     "lng": 19.947929,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://www.facebook.com/groups/984946102081889/"
   },
   {
     "id": 29,
@@ -317,7 +346,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 54.277411,
     "lng": 18.551249,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://saunawanga.pl/"
   },
   {
     "id": 30,
@@ -328,7 +358,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 52.824974,
     "lng": 16.403418,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://www.facebook.com/p/Leśne-Saunowanie-Kruteczkowo-100082948461349/?locale=pl_PL"
   },
   {
     "id": 31,
@@ -339,7 +370,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 51.302145,
     "lng": 20.904758,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://www.chatararoga.pl/"
   },
   {
     "id": 32,
@@ -350,7 +382,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 50.007469,
     "lng": 14.571526,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://www.aquapalace.cz/"
   },
   {
     "id": 33,
@@ -361,7 +394,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 50.047189,
     "lng": 14.413545,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://saunyvltava.cz/"
   },
   {
     "id": 34,
@@ -372,7 +406,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 49.897396,
     "lng": 14.714615,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://sen.infinit.cz/"
   },
   {
     "id": 35,
@@ -383,7 +418,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 49.129328,
     "lng": 18.682215,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "http://www.spa.sk/"
   },
   {
     "id": 36,
@@ -394,7 +430,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 50.228999,
     "lng": 12.878052,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://www.thermal.saunia.cz/"
   },
   {
     "id": 37,
@@ -405,7 +442,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 50.150682,
     "lng": 16.814974,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://www.melori.cz/"
   },
   {
     "id": 38,
@@ -416,7 +454,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 49.100211,
     "lng": 19.43472,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "http://www.besenova.sk/"
   },
   {
     "id": 39,
@@ -427,7 +466,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 49.243353,
     "lng": 16.516041,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://maximus.infinit.cz/"
   },
   {
     "id": 40,
@@ -438,7 +478,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 50.101189,
     "lng": 14.483401,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://step.infinit.cz/"
   },
   {
     "id": 41,
@@ -449,7 +490,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 49.191679,
     "lng": 16.612558,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://www.saunia.cz/"
   },
   {
     "id": 42,
@@ -460,7 +502,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 50.964995,
     "lng": 7.136539,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://www.mediterana.de/"
   },
   {
     "id": 43,
@@ -471,7 +514,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 50.511555,
     "lng": 7.308192,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://www.kristall-rheinpark-therme.de/"
   },
   {
     "id": 44,
@@ -482,7 +526,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 49.236075,
     "lng": 8.884299,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "http://www.badewelt-sinsheim.de/"
   },
   {
     "id": 45,
@@ -493,7 +538,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 50.188526,
     "lng": 10.063723,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "http://www.kisssalis.de/"
   },
   {
     "id": 46,
@@ -504,7 +550,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 50.31927,
     "lng": 10.765113,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://www.therme-natur.de/"
   },
   {
     "id": 47,
@@ -515,7 +562,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 50.782937,
     "lng": 6.097521,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://www.carolus-thermen.de/"
   },
   {
     "id": 48,
@@ -526,7 +574,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 50.110173,
     "lng": 10.989405,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://www.obermaintherme.de/saunaland/termine-2/"
   },
   {
     "id": 49,
@@ -537,7 +586,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 49.4067,
     "lng": 11.006322,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "http://www.palm-beach.de/"
   },
   {
     "id": 50,
@@ -548,7 +598,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 48.290231,
     "lng": 11.888578,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://www.therme-erding.de/"
   },
   {
     "id": 51,
@@ -559,7 +610,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 47.655948,
     "lng": 11.354286,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "http://www.kristall-trimini.de/"
   },
   {
     "id": 52,
@@ -570,7 +622,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 51.306857,
     "lng": 12.239606,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "http://www.meri-sauna.de/"
   },
   {
     "id": 53,
@@ -581,7 +634,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 50.505178,
     "lng": 12.598408,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://www.badegaerten.de/"
   },
   {
     "id": 54,
@@ -592,7 +646,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 51.857057,
     "lng": 13.952863,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "http://www.spreewelten.de/"
   },
   {
     "id": 55,
@@ -603,7 +658,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 52.21502,
     "lng": 14.01027,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://www.satama-saunapark.de/"
   },
   {
     "id": 56,
@@ -614,7 +670,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 47.715239,
     "lng": 11.753491,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "http://www.monte-mare.de/tegernsee"
   },
   {
     "id": 57,
@@ -625,7 +682,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 52.291017,
     "lng": 14.060493,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://therme.bad-saarow.de/"
   },
   {
     "id": 58,
@@ -636,7 +694,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 52.399407,
     "lng": 12.924038,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "http://www.havel-therme.de/"
   },
   {
     "id": 59,
@@ -647,7 +706,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 50.667,
     "lng": 6.802423,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://www.badewelt-euskirchen.de/de"
   },
   {
     "id": 60,
@@ -658,7 +718,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 50.53803,
     "lng": 9.72332,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "http://www.siebenwelten.de/"
   },
   {
     "id": 61,
@@ -669,7 +730,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 52.528545,
     "lng": 13.359277,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://www.vabali.de/berlin/"
   },
   {
     "id": 62,
@@ -680,7 +742,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 51.86223,
     "lng": 6.6097,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "http://www.bahia.de/oeffnungszeiten"
   },
   {
     "id": 63,
@@ -691,7 +754,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 53.535729,
     "lng": 10.207791,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://www.vabali.de/hamburg/"
   },
   {
     "id": 64,
@@ -702,7 +766,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 49.236075,
     "lng": 8.884299,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "http://www.badewelt-sinsheim.de/"
   },
   {
     "id": 65,
@@ -713,7 +778,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 52.096006,
     "lng": 8.752592,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "http://www.vitasol.de/"
   },
   {
     "id": 66,
@@ -724,7 +790,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 48.021135,
     "lng": 10.590433,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "http://www.therme-badwoerishofen.de/"
   },
   {
     "id": 67,
@@ -735,7 +802,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 52.038993,
     "lng": 13.748653,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://www.tropical-islands.de/?utm_id=GMBtraffic&utm_medium=OrganicGMB&utm_source=google"
   },
   {
     "id": 68,
@@ -746,7 +814,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 47.548846,
     "lng": 9.716436,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "http://www.therme-lindau.com/"
   },
   {
     "id": 69,
@@ -757,7 +826,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 52.963512,
     "lng": 11.948233,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "http://www.kristalltherme-bad-wilsnack.de/"
   },
   {
     "id": 70,
@@ -768,7 +838,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 52.397532,
     "lng": 9.601045,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "http://www.kristalltherme-seelze.de/"
   },
   {
     "id": 71,
@@ -779,7 +850,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 47.719657,
     "lng": 10.292288,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "http://www.cambomare.de/"
   },
   {
     "id": 72,
@@ -790,7 +862,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 47.575627,
     "lng": 10.726526,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "http://www.kristalltherme-schwangau.de/"
   },
   {
     "id": 73,
@@ -801,7 +874,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 50.948812,
     "lng": 4.603209,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://thewhiteoak.be/"
   },
   {
     "id": 74,
@@ -812,7 +886,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 52.527916,
     "lng": 4.928467,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://www.fortresortbeemster.nl/?utm_source=Organic&utm_medium=SERP&utm_id=GBP"
   },
   {
     "id": 75,
@@ -823,7 +898,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 50.859997,
     "lng": 5.8238,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "http://www.thermae.nl/"
   },
   {
     "id": 76,
@@ -834,7 +910,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 52.375205,
     "lng": 6.253518,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "http://www.thermenbussloo.nl/"
   },
   {
     "id": 77,
@@ -845,7 +922,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 53.144488,
     "lng": 6.484239,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "http://www.spawell.nl/"
   },
   {
     "id": 78,
@@ -856,7 +934,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 51.994323,
     "lng": 4.543316,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "http://www.elysium.nl/"
   },
   {
     "id": 79,
@@ -867,7 +946,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 52.121436,
     "lng": 5.298855,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://www.thermensoesterberg.nl/"
   },
   {
     "id": 80,
@@ -878,7 +958,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 50.854304,
     "lng": 5.647295,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://www.thermenmaastricht.nl/"
   },
   {
     "id": 81,
@@ -889,7 +970,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 53.17958,
     "lng": 7.20365,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "http://www.thermenbadnieuweschans.nl/"
   },
   {
     "id": 82,
@@ -900,7 +982,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 52.146355,
     "lng": 5.083096,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://www.thermenmaarssen.nl/"
   },
   {
     "id": 83,
@@ -911,7 +994,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 52.425652,
     "lng": 4.620399,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://www.saunaridderrode.nl/"
   },
   {
     "id": 84,
@@ -922,7 +1006,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 52.646912,
     "lng": 6.430201,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://www.sauna-zuidwolde.nl/"
   },
   {
     "id": 85,
@@ -933,7 +1018,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 50.494281,
     "lng": 5.864062,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "http://www.thermesdespa.com/"
   },
   {
     "id": 86,
@@ -944,7 +1030,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 50.876133,
     "lng": 4.2445,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://www.waerwaters.com/"
   },
   {
     "id": 87,
@@ -955,7 +1042,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 51.143534,
     "lng": 4.091613,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://www.katara.be/"
   },
   {
     "id": 88,
@@ -966,7 +1054,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 51.001723,
     "lng": 5.682439,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://www.elaisawellness.com/"
   },
   {
     "id": 89,
@@ -977,7 +1066,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 51.808498,
     "lng": 5.780089,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "http://www.thermenberendonck.nl/"
   },
   {
     "id": 90,
@@ -988,7 +1078,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 47.169762,
     "lng": 13.104415,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://www.alpentherme.com/"
   },
   {
     "id": 91,
@@ -999,7 +1090,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 48.263259,
     "lng": 13.298215,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://www.sparesortgeinberg.at/de/hotel/angebote"
   },
   {
     "id": 92,
@@ -1010,7 +1102,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 47.069668,
     "lng": 10.964717,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://www.aqua-dome.at/#gbp"
   },
   {
     "id": 93,
@@ -1021,7 +1114,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 46.999349,
     "lng": 9.504329,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://www.taminatherme.ch/wellness-erlebnis"
   },
   {
     "id": 94,
@@ -1032,7 +1126,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 47.013269,
     "lng": 10.288815,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "http://www.silvrettatherme.at/"
   },
   {
     "id": 95,
@@ -1043,7 +1138,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 47.043713,
     "lng": 8.466102,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://www.aqua-spa-resorts.ch/de/mineralbad-spa-rigi-kaltbad"
   },
   {
     "id": 96,
@@ -1054,7 +1150,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 47.364942,
     "lng": 8.525115,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://www.aqua-spa-resorts.ch/de/huerlimannbad-spa-zuerich"
   },
   {
     "id": 97,
@@ -1065,7 +1162,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 47.58922,
     "lng": 8.290646,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "http://www.thermezurzach.ch/"
   },
   {
     "id": 98,
@@ -1076,7 +1174,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 46.984825,
     "lng": 16.110814,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://www.therme.at/?utm_source=google&utm_medium=organic&utm_campaign=business-eintrag"
   },
   {
     "id": 99,
@@ -1087,7 +1186,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 45.505999,
     "lng": 10.826955,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "http://www.aquardens.it/"
   },
   {
     "id": 100,
@@ -1098,7 +1198,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 46.554866,
     "lng": 10.144203,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "http://www.aquagrandalivigno.com/"
   },
   {
     "id": 101,
@@ -1109,7 +1210,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 46.779453,
     "lng": 11.937196,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "http://www.cron4.it/"
   },
   {
     "id": 102,
@@ -1120,7 +1222,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 43.831328,
     "lng": 11.148899,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://www.asmana.it/"
   },
   {
     "id": 103,
@@ -1131,7 +1234,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 46.769952,
     "lng": 11.922206,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "http://www.winklerhotels.com/"
   },
   {
     "id": 104,
@@ -1142,7 +1246,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 59.049461,
     "lng": 10.020538,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://farrisbad.no/?utm_campaign=gmb_hp&utm_medium=organic&utm_source=googlemybusiness"
   },
   {
     "id": 105,
@@ -1153,7 +1258,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 60.152066,
     "lng": 24.930274,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "http://www.loylyhelsinki.fi/"
   },
   {
     "id": 106,
@@ -1164,7 +1270,8 @@ window.AUFGUSS_OBJECTS = [
     "lat": 44.605123,
     "lng": 26.085435,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "https://www.therme.ro/"
   },
   {
     "id": 107,
@@ -1175,6 +1282,7 @@ window.AUFGUSS_OBJECTS = [
     "lat": 47.489092,
     "lng": 19.047836,
     "tags": [],
-    "next": "Brak danych o wydarzeniach"
+    "next": "Brak danych o wydarzeniach",
+    "website": "http://www.rudasfurdo.hu/"
   }
 ];
