@@ -149,7 +149,10 @@ section.block{margin:46px 0;}
 .v-action{display:inline-flex;align-items:center;gap:9px;padding:12px 20px;border-radius:100px;font-size:0.84rem;font-weight:600;cursor:pointer;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);transition:all .2s;}
 .v-action:hover{border-color:var(--ember-1);color:var(--ember-2);transform:translateY(-2px);}
 .v-action.primary{background:linear-gradient(120deg,#ff8a3d,#ff5a3d);color:#2a0e02;border-color:transparent;box-shadow:0 8px 22px rgba(255,90,50,0.28);}
-.v-action .ic{font-size:1.05rem;}
+.v-action .ic{font-size:1.05rem;display:inline-flex;}
+.v-action .ic svg{width:17px;height:17px;display:block;}
+.v-action.www{border-color:rgba(255,122,61,0.4);color:var(--ember-3);font-weight:700;}
+.v-action.www:hover{background:linear-gradient(120deg,#ff8a3d,#e8552a);color:#fff6ea;border-color:transparent;}
 .v-soc{width:44px;height:44px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line-strong);color:var(--ember-3);background:var(--surface);transition:all .2s;}
 .v-soc svg{width:19px;height:19px;}
 .v-soc:hover{background:linear-gradient(120deg,#ff8a3d,#e8552a);color:#fff;border-color:transparent;transform:translateY(-2px);}
@@ -252,7 +255,7 @@ section.block{margin:46px 0;}
 
   <div class="venue-actions">
     <button class="v-action primary" onclick="document.getElementById('planModal').classList.add('open')"><span class="ic">📋</span> Plan ceremonii</button>
-    <a class="v-action" href="https://www.satama-saunapark.de" target="_blank" rel="noopener"><span class="ic">🌐</span> Strona obiektu</a>
+    <a class="v-action www" href="https://www.satama-saunapark.de" target="_blank" rel="noopener"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 3.5 6 3.5 9s-1 6.5-3.5 9c-2.5-2.5-3.5-6-3.5-9s1-6.5 3.5-9z"/></svg></span> Strona obiektu</a>
     <a class="v-soc" href="https://www.facebook.com/satamasaunapark" target="_blank" rel="noopener" title="Facebook obiektu" aria-label="Facebook"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 22v-8h2.8l.42-3.2H13.5V8.75c0-.93.26-1.56 1.6-1.56h1.7V4.3c-.3-.04-1.3-.13-2.48-.13-2.46 0-4.14 1.5-4.14 4.26v2.34H7.4V14h2.28v8z"/></svg></a>
     <a class="v-soc" href="https://www.instagram.com/satama_saunapark" target="_blank" rel="noopener" title="Instagram obiektu" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5.2"/><circle cx="12" cy="12" r="4"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none"/></svg></a>
     <a class="v-action" href="#ceny"><span class="ic">🎟️</span> Bilety i ceny</a>
