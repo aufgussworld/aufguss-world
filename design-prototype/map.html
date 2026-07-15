@@ -231,6 +231,12 @@ function rebuildMarkers(){
 const SVG_FB='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 22v-8h2.8l.42-3.2H13.5V8.75c0-.93.26-1.56 1.6-1.56h1.7V4.3c-.3-.04-1.3-.13-2.48-.13-2.46 0-4.14 1.5-4.14 4.26v2.34H7.4V14h2.28v8z"/></svg>';
 const SVG_IG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5.2"/><circle cx="12" cy="12" r="4"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor" stroke="none"/></svg>';
 const SVG_NAV='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 11l18-8-8 18-2-8-8-2z"/></svg>';
+const SVG_WWW='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 3.5 6 3.5 9s-1 6.5-3.5 9c-2.5-2.5-3.5-6-3.5-9s1-6.5 3.5-9z"/></svg>';
+// link do strony obiektu: pole o.website, a gdy brak — wizytówka w Mapach Google (tam jest link do strony)
+function websiteUrl(o){
+  if(o.website) return o.website;
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([o.name,o.city,o.country].filter(Boolean).join(' '))}`;
+}
 // demo: nie każdy obiekt ma linki (docelowo z profilu obiektu). Zróżnicowanie po id.
 function socialsFor(o){
   const m=o.id%5;
@@ -244,6 +250,7 @@ function cardSocials(o){
   let html='<div class="card-soc-row">';
   // Dojazd (Google Maps) — na każdej karcie
   html+=`<a class="card-nav" href="https://www.google.com/maps/dir/?api=1&destination=${o.lat},${o.lng}" target="_blank" rel="noopener" title="Wskazówki dojazdu" onclick="event.stopPropagation()">${SVG_NAV} Dojazd</a>`;
+  html+=`<a class="card-soc" href="${websiteUrl(o)}" target="_blank" rel="noopener" title="Strona internetowa" aria-label="Strona internetowa" onclick="event.stopPropagation()">${SVG_WWW}</a>`;
   if(s.fb) html+=`<a class="card-soc" href="${s.fb}" target="_blank" rel="noopener" title="Facebook" aria-label="Facebook" onclick="event.stopPropagation()">${SVG_FB}</a>`;
   if(s.ig) html+=`<a class="card-soc" href="${s.ig}" target="_blank" rel="noopener" title="Instagram" aria-label="Instagram" onclick="event.stopPropagation()">${SVG_IG}</a>`;
   return html+'</div>';
