@@ -203,6 +203,66 @@ input[type=checkbox]{width:16px;height:16px;accent-color:var(--ember);cursor:poi
 .role-i b{display:block;font-size:0.87rem;font-weight:600;}
 .role-i span{font-size:0.75rem;color:var(--stone);}
 
+/* ── EDYTOR TREŚCI ────────────────────────────────────────────
+   Świadomie BRAK kontrolek wyglądu (czcionka, rozmiar, kolor, wyrównanie).
+   Autor wybiera ZNACZENIE bloku, wygląd narzuca system designu. */
+/* gradienty okładek — te same warianty co w portalu (blog.html / post.html) */
+.pc1{background:linear-gradient(150deg,#ffd9a8,#ff8a3d);} .pc2{background:linear-gradient(150deg,#e8552a,#a8320f);}
+.pc3{background:linear-gradient(150deg,#7a3618,#c9651f);} .pc4{background:linear-gradient(150deg,#2a1208,#7a3618);}
+.ed-grid{display:grid;grid-template-columns:1fr 420px;gap:18px;align-items:start;}
+.ed-note{display:flex;gap:10px;background:var(--info-bg);border:1px solid rgba(58,107,138,0.25);border-radius:var(--r-card);padding:12px 14px;margin-bottom:16px;font-size:0.82rem;color:var(--ink-dim);line-height:1.6;}
+.ed-note svg{color:var(--info);flex-shrink:0;margin-top:2px;}
+.ed-note b{color:var(--ink);}
+.counter{font-size:0.72rem;color:var(--stone);margin-top:4px;}
+.counter.over{color:var(--dan);font-weight:600;}
+/* wybór okładki — presety, nie próbnik kolorów */
+.cov-opts{display:flex;gap:9px;flex-wrap:wrap;}
+.cov{width:82px;border:2px solid transparent;border-radius:var(--r-ctl);padding:0;overflow:hidden;background:none;cursor:pointer;}
+.cov .sw2{height:46px;border-radius:6px;}
+.cov .cl{font-size:0.68rem;color:var(--stone);padding:4px 0 0;font-weight:600;}
+.cov.on{border-color:var(--ember);}
+.cov.on .cl{color:var(--ember-deep);}
+/* bloki treści */
+.blocks{display:flex;flex-direction:column;gap:10px;}
+.blk{border:1px solid var(--line);border-radius:var(--r-ctl);background:var(--surface-2);transition:border-color .15s;}
+.blk:focus-within{border-color:var(--ember);background:var(--surface);}
+.blk-bar{display:flex;align-items:center;gap:6px;padding:6px 8px;border-bottom:1px solid var(--line);}
+.blk-bar select{height:26px;padding:0 24px 0 8px;border:1px solid var(--line-strong);border-radius:6px;background:var(--surface);color:var(--ink);font-family:inherit;font-size:0.74rem;font-weight:600;outline:none;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%237a6a52' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 7px center;}
+.fmt{width:26px;height:26px;border-radius:6px;border:1px solid transparent;background:none;color:var(--ink-dim);display:flex;align-items:center;justify-content:center;font-size:0.78rem;font-weight:700;}
+.fmt:hover{background:var(--surface-3);color:var(--ink);}
+.fmt i{font-family:'Fraunces',serif;font-style:italic;font-weight:600;}
+.blk-bar .sp{flex:1;}
+.blk-bar .mv{width:24px;height:24px;border-radius:5px;border:none;background:none;color:var(--stone);display:flex;align-items:center;justify-content:center;}
+.blk-bar .mv:hover{background:var(--surface-3);color:var(--ink);}
+.blk-bar .mv.del:hover{background:var(--dan-bg);color:var(--dan);}
+.blk-in{padding:10px 12px;min-height:44px;outline:none;font-size:0.9rem;line-height:1.65;color:var(--ink);}
+.blk-in:empty::before{content:attr(data-ph);color:var(--stone);}
+.blk-in b,.blk-in strong{font-weight:700;} .blk-in i,.blk-in em{font-style:italic;}
+.blk-in a{color:var(--ember-deep);text-decoration:underline;}
+.blk[data-t="h"] .blk-in{font-family:'Fraunces',serif;font-size:1.15rem;font-weight:500;}
+.blk[data-t="quote"] .blk-in{border-left:3px solid var(--ember);padding-left:12px;font-style:italic;color:var(--ink-dim);}
+.add-blk{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
+/* podgląd — dokładnie tak, jak zobaczy to czytelnik */
+.prev{position:sticky;top:72px;}
+.prev-h{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--surface-3);border:1px solid var(--line);border-bottom:none;border-radius:var(--r-card) var(--r-card) 0 0;font-size:0.76rem;font-weight:600;color:var(--ink-dim);}
+.prev-b{border:1px solid var(--line);border-radius:0 0 var(--r-card) var(--r-card);background:#fbf5ea;color:#2a1b10;padding:0 0 18px;max-height:66vh;overflow:auto;}
+.prev-cover{height:104px;}
+.prev-in{padding:16px 20px 0;}
+.prev-cat{display:inline-block;font-size:0.6rem;text-transform:uppercase;letter-spacing:0.08em;font-weight:700;color:#2a0e02;background:#ffb56b;padding:3px 10px;border-radius:100px;margin-bottom:10px;}
+.prev-b h2{font-family:'Fraunces',serif;font-weight:500;font-size:1.35rem;line-height:1.14;margin-bottom:9px;color:#2a1b10;}
+.prev-lead{font-family:'Fraunces',serif;font-style:italic;font-size:0.95rem;line-height:1.55;color:#6b5a47;margin-bottom:12px;}
+.prev-meta{display:flex;align-items:center;gap:8px;font-size:0.74rem;color:#8a7960;padding-bottom:10px;border-bottom:1px solid rgba(42,27,16,0.1);margin-bottom:12px;}
+.prev-meta .sc{font-family:'Fraunces',serif;color:#d6491f;font-size:1.05rem;margin-left:auto;}
+.prev-body p{font-size:0.87rem;line-height:1.75;margin-bottom:11px;}
+.prev-body h3{font-family:'Fraunces',serif;font-weight:500;font-size:1.05rem;margin:14px 0 7px;}
+.prev-body blockquote{border-left:3px solid #e8552a;padding-left:12px;font-family:'Fraunces',serif;font-style:italic;color:#6b5a47;margin-bottom:11px;font-size:0.9rem;}
+.prev-body ul{margin:0 0 11px 18px;} .prev-body li{font-size:0.87rem;line-height:1.7;}
+.prev-body .pimg{height:88px;border-radius:8px;margin-bottom:6px;}
+.prev-body .pcap{font-size:0.72rem;color:#8a7960;margin-bottom:11px;}
+.prev-empty{padding:26px 20px;text-align:center;color:#8a7960;font-size:0.83rem;}
+@media(max-width:1180px){ .ed-grid{grid-template-columns:1fr;} .prev{position:static;} .prev-b{max-height:none;} }
+
 .ds-note{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--ember);border-radius:var(--r-card);padding:15px 18px;margin-bottom:16px;}
 .ds-note h3{font-size:0.92rem;font-weight:600;margin-bottom:6px;font-family:'Instrument Sans';}
 .ds-note p{font-size:0.86rem;color:var(--ink-dim);line-height:1.65;} .ds-note p+p{margin-top:8px;}
@@ -314,6 +374,7 @@ const I={
   inbox:'<svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13h5l1.5 3h5L16 13h5"/><path d="M4.5 6h15l1.5 7v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5z"/></svg>',
   ticket:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9V7a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v2a2.5 2.5 0 0 0 0 5v2a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-2a2.5 2.5 0 0 0 0-5z"/><path d="M14 6v3M14 14v3"/></svg>',
   plus:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  link:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1.5 1.5M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1.5-1.5"/></svg>',
 };
 const sm=s=>s.replace(/width="18" height="18"/,'width="14" height="14"');
 const OBJECTS=window.AUFGUSS_OBJECTS||[], POSTS=window.AUFGUSS_POSTS||{}, TOURN=window.AUFGUSS_TOURNAMENTS||[], EVENTS=window.AUFGUSS_EVENTS||[];
@@ -584,13 +645,155 @@ V.oceny=()=>`<div class="crumb">Panel · Zarządzanie</div>
 
 V.wpisy=()=>{const p=scopedPosts();return `<div class="crumb">Panel · Zarządzanie</div>
   <div class="page-head"><div><h1>Wpisy</h1><p>Aktualności i wpisy blogowe publikowane na portalu.</p></div>
-    <div class="acts"><button class="btn pri">+ Nowy wpis</button></div></div>
+    <div class="acts"><button class="btn pri" data-newpost>${I.plus} Nowy wpis</button></div></div>
   ${scopeBar(has('admin')?'Rola <b>Administrator</b>: wpisy wszystkich autorów.':`Widzisz wyłącznie wpisy autorstwa <b>${A().name}</b>.`)}
   <div class="card"><div class="twrap"><table><thead><tr><th>Tytuł</th><th>Kategoria</th><th>Data</th><th>Ocena</th><th>Status</th><th style="width:70px"></th></tr></thead>
   <tbody>${p.map(x=>`<tr><td><div class="nm">${x.title}</div>${x.obj?`<div class="sub">${x.obj}</div>`:''}</td>
     <td>${x.cat}</td><td>${x.date}</td><td>${x.score?`<b>${x.score}</b><span style="color:var(--stone)">/10</span>`:'—'}</td>
     <td><span class="tag ok">${I.check} Opublikowany</span></td>
     <td class="right"><div class="rowacts"><button class="icon-btn" style="width:28px;height:28px" title="Edytuj" aria-label="Edytuj wpis">${I.pen}</button></div></td></tr>`).join('')}</tbody></table></div></div>`;};
+
+/* ══ EDYTOR TREŚCI ═════════════════════════════════════════════
+   Zasada: autor decyduje o ZNACZENIU, system o WYGLĄDZIE.
+   Brak kontrolek czcionki, rozmiaru, koloru i wyrównania — celowo. */
+const COVERS=[['pc1','Piaskowa'],['pc2','Ognista'],['pc3','Miedziana'],['pc4','Nocna']];
+const BLOCK_TYPES={p:'Akapit',h:'Śródtytuł',quote:'Cytat',list:'Lista',img:'Zdjęcie'};
+let ed={cat:'Recenzja',title:'',lead:'',cover:'pc1',objId:'',score:'',blocks:[{t:'p',v:''}]};
+
+/* dozwolone są WYŁĄCZNIE znaczniki znaczeniowe — reszta jest usuwana */
+function cleanHTML(html){
+  const d=document.createElement('div'); d.innerHTML=html;
+  const ok={B:1,STRONG:1,I:1,EM:1,A:1,BR:1};
+  (function walk(n){
+    [...n.childNodes].forEach(c=>{
+      if(c.nodeType===1){
+        walk(c);
+        if(!ok[c.tagName]){ c.replaceWith(...c.childNodes); return; }
+        [...c.attributes].forEach(a=>{ if(!(c.tagName==='A'&&a.name==='href')) c.removeAttribute(a.name); });
+        if(c.tagName==='A'){ c.setAttribute('target','_blank'); c.setAttribute('rel','noopener'); }
+      }
+    });
+  })(d);
+  return d.innerHTML.replace(/<br>\s*$/,'');
+}
+const esc=s=>String(s).replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
+
+function previewHTML(){
+  const body=ed.blocks.map(b=>{
+    const v=b.v||'';
+    if(!v.trim()&&b.t!=='img') return '';
+    if(b.t==='h') return `<h3>${v}</h3>`;
+    if(b.t==='quote') return `<blockquote>${v}</blockquote>`;
+    if(b.t==='list') return `<ul>${v.split('\n').filter(Boolean).map(li=>`<li>${li}</li>`).join('')}</ul>`;
+    if(b.t==='img') return `<div class="pimg ${ed.cover}"></div>${v?`<div class="pcap">${v}</div>`:''}`;
+    return `<p>${v}</p>`;
+  }).join('');
+  const hasAny=ed.title||ed.lead||body;
+  if(!hasAny) return `<div class="prev-empty">Zacznij pisać — podgląd pokaże wpis dokładnie tak, jak zobaczy go czytelnik.</div>`;
+  const obj=ed.objId?OBJECTS.find(o=>o.id===+ed.objId):null;
+  return `<div class="prev-cover ${ed.cover}"></div><div class="prev-in">
+    <span class="prev-cat">${esc(ed.cat)}</span>
+    <h2>${ed.title?esc(ed.title):'Tytuł wpisu'}</h2>
+    ${ed.lead?`<p class="prev-lead">${esc(ed.lead)}</p>`:''}
+    <div class="prev-meta"><span>${A().name}</span><span>·</span><span>dziś</span>
+      ${ed.score?`<span class="sc">${String(ed.score).replace('.',',')}<span style="font-size:0.62rem;color:#8a7960">/10</span></span>`:''}</div>
+    ${obj?`<div style="font-size:0.74rem;color:#d6491f;font-weight:600;margin-bottom:10px">${esc(obj.name)}</div>`:''}
+    <div class="prev-body">${body}</div></div>`;
+}
+function syncPreview(){ const p=document.getElementById('prevBody'); if(p) p.innerHTML=previewHTML(); }
+
+V.edytor=()=>{
+  const isRev=ed.cat==='Recenzja';
+  return `<div class="crumb"><a href="#" data-go="wpisy">Wpisy</a> · Nowy wpis</div>
+  <div class="page-head"><div><h1>Nowy wpis</h1><p>Treść składasz z bloków znaczeniowych. Wygląd nadaje portal — dzięki temu każdy wpis wygląda spójnie.</p></div>
+    <div class="acts"><button class="btn" data-go="wpisy">Anuluj</button><button class="btn" data-save>Zapisz szkic</button><button class="btn pri" data-publish>Opublikuj</button></div></div>
+  <div class="ed-note">${I.info}<div><b>Dlaczego nie ma czcionek, rozmiarów i kolorów?</b> Bo wygląd wpisu jest wspólny dla całego portalu i wynika z systemu designu. Ty decydujesz, <b>czym jest</b> dany fragment — akapitem, śródtytułem czy cytatem — a portal nada mu właściwą formę. Wklejany tekst jest zawsze czyszczony z obcego formatowania.</div></div>
+  <div class="ed-grid">
+    <div>
+      <div class="card"><div class="card-h"><h2>Podstawy</h2></div><div class="card-b">
+        <div class="fgrid">
+          <div class="f"><label>Kategoria <span class="req">*</span></label>
+            <select id="edCat">${['Recenzja','Wydarzenie','Aktualność','Felieton','Turnieje','Ceremonie'].map(c=>`<option${c===ed.cat?' selected':''}>${c}</option>`).join('')}</select></div>
+          ${isRev?`<div class="f"><label>Oceniany obiekt <span class="req">*</span></label>
+            <select id="edObj"><option value="">— wybierz —</option>${OBJECTS.slice().sort((a,b)=>a.name.localeCompare(b.name,'pl')).map(o=>`<option value="${o.id}"${+ed.objId===o.id?' selected':''}>${o.name}</option>`).join('')}</select>
+            <div class="help">Wpis trafi do rankingu obiektów autora.</div></div>
+          <div class="f"><label>Ocena <span class="req">*</span></label><input id="edScore" type="number" min="1" max="10" step="0.1" value="${ed.score}" placeholder="np. 8,8">
+            <div class="help">Skala 1–10, jedno miejsce po przecinku.</div></div>`:''}
+        </div>
+        <div class="f" style="margin-top:15px"><label>Tytuł <span class="req">*</span></label>
+          <input id="edTitle" value="${esc(ed.title)}" placeholder="Konkretny tytuł — bez wielkich liter i wykrzykników">
+          <div class="counter" id="cTitle">0 / 80 znaków</div></div>
+        <div class="f" style="margin-top:15px"><label>Lead <span class="req">*</span></label>
+          <textarea id="edLead" placeholder="Jedno–dwa zdania, które zachęcą do przeczytania.">${esc(ed.lead)}</textarea>
+          <div class="counter" id="cLead">0 / 180 znaków</div></div>
+      </div></div>
+
+      <div class="card"><div class="card-h"><h2>Okładka</h2><span class="sub">gotowe warianty z palety portalu</span></div><div class="card-b">
+        <div class="cov-opts">${COVERS.map(([k,n])=>`<button class="cov${ed.cover===k?' on':''}" data-cov="${k}" aria-pressed="${ed.cover===k}"><span class="sw2 ${k}" style="display:block"></span><span class="cl">${n}</span></button>`).join('')}</div>
+        <div class="help" style="margin-top:9px;font-size:0.74rem;color:var(--stone)">Brak własnych kolorów — cztery warianty pilnują, by karty wpisów tworzyły spójną siatkę.</div>
+      </div></div>
+
+      <div class="card"><div class="card-h"><h2>Treść</h2><span class="sub">${ed.blocks.length} ${pl(ed.blocks.length,'blok','bloki','bloków')}</span></div><div class="card-b">
+        <div class="blocks" id="blocks">${ed.blocks.map((b,i)=>blockHTML(b,i)).join('')}</div>
+        <div class="add-blk">${Object.entries(BLOCK_TYPES).map(([k,n])=>`<button class="btn sm" data-add="${k}">${I.plus} ${n}</button>`).join('')}</div>
+      </div></div>
+    </div>
+
+    <div class="prev">
+      <div class="prev-h">${I.eye} Podgląd — tak zobaczy to czytelnik</div>
+      <div class="prev-b" id="prevBody">${previewHTML()}</div>
+    </div>
+  </div>`;
+};
+function blockHTML(b,i){
+  const ph={p:'Napisz akapit…',h:'Śródtytuł',quote:'Cytat lub wyróżniona myśl',list:'Każda pozycja w nowej linii',img:'Podpis zdjęcia (opcjonalny)'}[b.t];
+  return `<div class="blk" data-t="${b.t}" data-i="${i}">
+    <div class="blk-bar">
+      <select data-type="${i}" aria-label="Typ bloku">${Object.entries(BLOCK_TYPES).map(([k,n])=>`<option value="${k}"${b.t===k?' selected':''}>${n}</option>`).join('')}</select>
+      ${b.t!=='img'?`<button class="fmt" data-fmt="bold" title="Pogrubienie (Ctrl+B)" aria-label="Pogrubienie">B</button>
+      <button class="fmt" data-fmt="italic" title="Kursywa (Ctrl+I)" aria-label="Kursywa"><i>I</i></button>
+      <button class="fmt" data-fmt="link" title="Wstaw odnośnik" aria-label="Wstaw odnośnik">${I.link}</button>`:''}
+      <span class="sp"></span>
+      <button class="mv" data-mv="${i}:-1" title="W górę" aria-label="Przenieś w górę">↑</button>
+      <button class="mv" data-mv="${i}:1" title="W dół" aria-label="Przenieś w dół">↓</button>
+      <button class="mv del" data-del="${i}" title="Usuń blok" aria-label="Usuń blok">${I.x.replace('<svg','<svg width="13" height="13"')}</button>
+    </div>
+    <div class="blk-in" contenteditable="true" data-in="${i}" data-ph="${ph}">${b.v||''}</div>
+  </div>`;
+}
+function wireEditor(){
+  const S=(id,ev,fn)=>{const e=document.getElementById(id); if(e) e.addEventListener(ev,fn);};
+  S('edCat','change',e=>{ed.cat=e.target.value;render('edytor');});
+  S('edObj','change',e=>{ed.objId=e.target.value;syncPreview();});
+  S('edScore','input',e=>{ed.score=e.target.value;syncPreview();});
+  const count=(id,cid,max,key)=>{const el=document.getElementById(id),c=document.getElementById(cid);
+    if(!el)return; const upd=()=>{ed[key]=el.value;c.textContent=`${el.value.length} / ${max} znaków`;c.classList.toggle('over',el.value.length>max);syncPreview();};
+    el.addEventListener('input',upd);upd();};
+  count('edTitle','cTitle',80,'title'); count('edLead','cLead',180,'lead');
+  document.querySelectorAll('[data-cov]').forEach(b=>b.onclick=()=>{ed.cover=b.dataset.cov;render('edytor');});
+  document.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{ed.blocks.push({t:b.dataset.add,v:''});render('edytor');});
+  document.querySelectorAll('[data-type]').forEach(s=>s.onchange=()=>{ed.blocks[+s.dataset.type].t=s.value;render('edytor');});
+  document.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{if(ed.blocks.length>1){ed.blocks.splice(+b.dataset.del,1);render('edytor');}else toast('Wpis musi mieć co najmniej jeden blok.');});
+  document.querySelectorAll('[data-mv]').forEach(b=>b.onclick=()=>{const[i,d]=b.dataset.mv.split(':').map(Number),j=i+d;
+    if(j<0||j>=ed.blocks.length)return; [ed.blocks[i],ed.blocks[j]]=[ed.blocks[j],ed.blocks[i]]; render('edytor');});
+  document.querySelectorAll('[data-in]').forEach(el=>{
+    const i=+el.dataset.in;
+    el.addEventListener('input',()=>{ed.blocks[i].v=el.dataset.t==='list'?el.innerText:cleanHTML(el.innerHTML);syncPreview();});
+    /* WKLEJANIE ZAWSZE JAKO CZYSTY TEKST — główna droga, którą obce style trafiają do CMS-a */
+    el.addEventListener('paste',e=>{e.preventDefault();
+      const txt=(e.clipboardData||window.clipboardData).getData('text/plain');
+      document.execCommand('insertText',false,txt);
+      toast('Wklejono jako czysty tekst — formatowanie źródła zostało usunięte.');});
+    el.addEventListener('keydown',e=>{ if((e.ctrlKey||e.metaKey)&&['u'].includes(e.key.toLowerCase())) e.preventDefault(); }); /* bez podkreśleń — mylą się z linkiem */
+  });
+  document.querySelectorAll('[data-fmt]').forEach(b=>b.onmousedown=e=>{
+    e.preventDefault(); const f=b.dataset.fmt;
+    if(f==='link'){ const u=prompt('Adres odnośnika (https://…)'); if(u) document.execCommand('createLink',false,u); }
+    else document.execCommand(f);
+    const blk=b.closest('.blk'), inp=blk.querySelector('[data-in]');
+    ed.blocks[+inp.dataset.in].v=cleanHTML(inp.innerHTML); syncPreview();
+  });
+}
 
 /* ── moduły wyłącznie dla konta obiektu ── */
 V.mistrzowie=()=>{const m=venueMasters();return `<div class="crumb">Panel · Zarządzanie</div>
@@ -707,12 +910,15 @@ function renderNav(){
   }).join('');
 }
 function render(v){
-  if(!visible().some(m=>m.id===v)) v='pulpit';
+  /* 'edytor' to podwidok modułu Wpisy — nie ma własnej pozycji w nawigacji */
+  if(v!=='edytor'&&!visible().some(m=>m.id===v)) v='pulpit';
   cur=v; renderNav();
+  if(v==='edytor') document.querySelectorAll('.nav-i').forEach(b=>b.classList.toggle('on',b.dataset.v==='wpisy'));
   document.getElementById('view').innerHTML=(V[v]||V.pulpit)();
   document.getElementById('side').classList.remove('open');
-  window.scrollTo(0,0);
+  if(v!=='edytor') window.scrollTo(0,0);
   if(v==='obiekty'&&has('admin')) wireObjects();
+  if(v==='edytor') wireEditor();
 }
 function wireObjects(){
   const q=document.getElementById('oq'); if(q) q.oninput=e=>{objState.q=e.target.value;objState.page=1;render('obiekty');const n=document.getElementById('oq');n.focus();n.setSelectionRange(n.value.length,n.value.length);};
@@ -736,6 +942,11 @@ document.addEventListener('click',e=>{
   const a=e.target.closest('[data-acc]'); if(a) return setAcc(a.dataset.acc);
   const nav=e.target.closest('[data-v]'); if(nav) return render(nav.dataset.v);
   const go=e.target.closest('[data-go]'); if(go) return render(go.dataset.go);
+  if(e.target.closest('[data-newpost]')){ ed={cat:'Recenzja',title:'',lead:'',cover:'pc1',objId:'',score:'',blocks:[{t:'p',v:''}]}; return render('edytor'); }
+  if(e.target.closest('[data-publish]')){
+    if(!ed.title.trim()||!ed.lead.trim()) return toast('Uzupełnij tytuł i lead przed publikacją.');
+    toast('Wpis opublikowany.'); return render('wpisy');
+  }
   if(e.target.closest('[data-save]')) return toast('Zmiany zapisane.');
   const act=e.target.closest('[data-act]');
   if(act){const row=act.closest('.q'),ok=act.dataset.act==='acc';
