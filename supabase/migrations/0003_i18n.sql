@@ -41,9 +41,11 @@ insert into public.locales (code, name_native, name_en, is_active, is_default, f
   ('lt','Lietuvių',   'Lithuanian',false, false, 'en', 120),
   ('lv','Latviešu',   'Latvian',   false, false, 'en', 130),
   ('et','Eesti',      'Estonian',  false, false, 'en', 140),
-  -- kraje, w których MAMY obiekty, a nie było ich w planie językowym
+  -- Europa Środkowa: rynki saunowe, w których działamy lub będziemy działać.
+  -- Słowacki ma zapasowy czeski (języki wzajemnie zrozumiałe) — lepszy niż angielski.
   ('sk','Slovenčina', 'Slovak',    false, false, 'cs', 150),
-  ('ro','Română',     'Romanian',  false, false, 'en', 160);
+  ('sl','Slovenščina','Slovenian', false, false, 'en', 160),
+  ('ro','Română',     'Romanian',  false, false, 'en', 170);
 
 -- ── KRAJE ───────────────────────────────────────────────────────────────────
 -- Dotąd `venues.country` trzymał WOLNY TEKST PO POLSKU ('Niemcy'). Przy 14 językach
@@ -65,7 +67,8 @@ insert into public.countries (code, name_en) values
   ('pl','Poland'),('de','Germany'),('nl','Netherlands'),('cz','Czechia'),('it','Italy'),
   ('be','Belgium'),('at','Austria'),('ch','Switzerland'),('sk','Slovakia'),('hu','Hungary'),
   ('ro','Romania'),('no','Norway'),('fi','Finland'),('dk','Denmark'),('fr','France'),
-  ('se','Sweden'),('gb','United Kingdom'),('lt','Lithuania'),('lv','Latvia'),('ee','Estonia')
+  ('se','Sweden'),('gb','United Kingdom'),('lt','Lithuania'),('lv','Latvia'),('ee','Estonia'),
+  ('si','Slovenia')
 on conflict do nothing;
 
 insert into public.country_translations (country_code, locale, name) values
@@ -73,7 +76,8 @@ insert into public.country_translations (country_code, locale, name) values
   ('it','pl','Włochy'),('be','pl','Belgia'),('at','pl','Austria'),('ch','pl','Szwajcaria'),
   ('sk','pl','Słowacja'),('hu','pl','Węgry'),('ro','pl','Rumunia'),('no','pl','Norwegia'),
   ('fi','pl','Finlandia'),('dk','pl','Dania'),('fr','pl','Francja'),('se','pl','Szwecja'),
-  ('gb','pl','Wielka Brytania'),('lt','pl','Litwa'),('lv','pl','Łotwa'),('ee','pl','Estonia')
+  ('gb','pl','Wielka Brytania'),('lt','pl','Litwa'),('lv','pl','Łotwa'),('ee','pl','Estonia'),
+  ('si','pl','Słowenia')
 on conflict do nothing;
 insert into public.country_translations (country_code, locale, name)
   select code, 'en', name_en from public.countries on conflict do nothing;

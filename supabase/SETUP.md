@@ -166,8 +166,16 @@ Odczyt z łańcuchem zapasowym (czytelnik nigdy nie zobaczy pustego pola):
 select * from public.venues_l10n('cs') limit 5;   -- czeski → angielski → oryginał
 ```
 
-Języki włączone na start: **pl, en, de, cs, nl, it**. Pozostałe (hu, fr, fi, no, da, lt, lv, et
-oraz sk i ro) są wgrane, ale nieaktywne — włącza się je zmianą `is_active`, gdy tłumaczenia będą gotowe.
+**17 języków** w bazie. Włączone na start: **pl, en, de, cs, nl, it**. Pozostałe — hu, fr, fi, no,
+da, lt, lv, et oraz **sk, sl, ro** (Europa Środkowa) — są wgrane, ale nieaktywne. Włącza się je
+pojedynczo, gdy tłumaczenia będą gotowe:
+
+```sql
+update public.locales set is_active = true where code = 'sk';
+```
+
+Słowacki ma zapasowy **czeski**, nie angielski — języki są wzajemnie zrozumiałe, więc czytelnik
+dostanie lepszy tekst zanim powstanie tłumaczenie słowackie.
 
 ## Znane luki w danych
 
