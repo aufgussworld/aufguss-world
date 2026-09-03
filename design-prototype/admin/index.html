@@ -479,6 +479,16 @@ const REPORTS=[
 ];
 const RKIND={tlumaczenie:['Tłumaczenie','info'],nieaktualne:['Nieaktualne','warn'],'blad-merytoryczny':['Błąd merytoryczny','dan'],
   literowka:['Literówka','mute'],niestosowne:['Niestosowne','dan'],inne:['Inne','mute']};
+/* Reputacja zgłaszającego (widok reporter_reputation). Właściciel treści od razu
+   widzi, czy pisze do niego ktoś trafiający, czy ktoś, komu odrzucono wszystko. */
+const REPUT={'Klaus M.':{n:9,ok:8},'Anna K.':{n:14,ok:12},'Petr N.':{n:3,ok:3},'Bartek S.':{n:6,ok:4},
+  'Ola R.':{n:2,ok:2},'Marco B.':{n:1,ok:0},'Tomasz P.':{n:11,ok:1},'Jonas W.':{n:4,ok:3}};
+function reputTag(who){
+  const r=REPUT[who]; if(!r||r.n<2) return '<span class="tag mute" title="Za mało zgłoszeń, by ocenić">nowy zgłaszający</span>';
+  const p=Math.round(100*r.ok/r.n);
+  const cls=p>=70?'ok':p>=40?'warn':'dan';
+  return `<span class="tag ${cls}" title="${r.ok} z ${r.n} zgłoszeń potwierdzonych">trafność ${p}%</span>`;
+}
 /* Odpowiednik polityki RLS `cr_read`: administrator widzi wszystko, właściciel
    treści swoje. Dla osób kierowanie idzie po KONKRETNYM koncie (route_profile_id),
    nie po roli — dlatego Robert nie zobaczy zgłoszeń do szkoleń Macieja. */
@@ -868,8 +878,43 @@ V.zgloszenia=()=>{
     <span class="sub">${rs.length} łącznie</span>
     <div class="acts"><select><option>Wszystkie typy</option><option>Tłumaczenie</option><option>Nieaktualne</option><option>Błąd merytoryczny</option></select></div></div>
     <div class="qlist">${rs.length?rs.map(reportRow).join('')
-      :`<div class="empty">${I.inbox}<h3>Brak zgłoszeń</h3><p>Nikt nie zgłosił uwag do Twoich treści. Gdy to zrobi, pojawią się tutaj.</p></div>`}</div></div>`;
+      :`<div class="empty">${I.inbox}<h3>Brak zgłoszeń</h3><p>Nikt nie zgłosił uwag do Twoich treści. Gdy to zrobi, pojawią się tutaj.</p></div>`}</div></div>
+  ${has('admin')?abuseCard():''}`;
 };
+/* Nadużycia idą w OBIE strony: spamer zalewa skrzynkę, a właściciel treści może
+   odrzucać wszystko, żeby uciszyć niewygodne uwagi. Administrator widzi jedno i drugie. */
+function abuseCard(){
+  const bloki=[
+    {kto:'Tomasz P.',powod:'Automat: 5 odrzuconych zgłoszeń bez potwierdzonego.',do:'za 27 dni',auto:true},
+    {kto:'promo@sauna-ads.example',powod:'Reklama w treści zgłoszeń.',do:'bezterminowo',auto:false},
+  ];
+  const czujka=[{obszar:'Aquapark Fala',n:8,odrz:7},{obszar:'Termy Cieplickie',n:6,odrz:5}];
+  return `<div class="card"><div class="card-h"><h2>Ochrona przed nadużyciami</h2>
+    <span class="sub">widoczne tylko dla administratora</span></div><div class="card-b">
+    <div style="font-size:0.8rem;color:var(--stone);margin-bottom:9px">Wstrzymane zgłoszenia</div>
+    <div class="mini-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:18px">
+      ${bloki.map(b=>`<div style="display:flex;align-items:center;gap:11px;padding:11px 13px;border:1px solid var(--line);border-radius:var(--r-ctl)">
+        <span class="tag ${b.auto?'warn':'dan'}">${b.auto?'automat':'ręczna'}</span>
+        <div style="flex:1;min-width:0"><b style="font-size:0.87rem">${b.kto}</b>
+          <div style="font-size:0.76rem;color:var(--stone)">${b.powod}</div></div>
+        <span style="font-size:0.78rem;color:var(--ink-dim)">${b.do}</span>
+        <button class="btn sm">Odblokuj</button></div>`).join('')}
+    </div>
+    <div style="font-size:0.8rem;color:var(--stone);margin-bottom:9px">Właściciele odrzucający ponad połowę zgłoszeń</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      ${czujka.map(c=>`<div style="display:flex;align-items:center;gap:11px;padding:11px 13px;border:1px solid var(--line);border-left:3px solid var(--warn);border-radius:var(--r-ctl)">
+        <div style="flex:1"><b style="font-size:0.87rem">${c.obszar}</b>
+          <div style="font-size:0.76rem;color:var(--stone)">odrzucono ${c.odrz} z ${c.n} rozpatrzonych</div></div>
+        <span class="tag warn">${Math.round(100*c.odrz/c.n)}% odrzuceń</span>
+        <button class="btn sm">Przejrzyj</button></div>`).join('')}
+    </div>
+    <div style="font-size:0.76rem;color:var(--stone);margin-top:14px;line-height:1.55">
+      Limity: <b>10 zgłoszeń na dobę</b> dla zalogowanych, <b>3</b> dla niezalogowanych;
+      jedno otwarte zgłoszenie do tej samej treści i wersji językowej.
+      Automat wstrzymuje na 30 dni po 5 odrzuceniach bez ani jednego trafienia —
+      jedno potwierdzone zgłoszenie kasuje licznik.
+    </div></div></div>`;
+}
 function reportRow(r){
   const [kl,kc]=RKIND[r.kind]||['Inne','mute'];
   const loc = r.locale ? `<span class="tag info">${I.globe} wersja ${r.locale.toUpperCase()}</span>` : '<span class="tag mute">oryginał</span>';
@@ -879,7 +924,7 @@ function reportRow(r){
     <div>
       <h4>${r.name} <span class="tag ${kc}">${kl}</span> ${loc}
         ${r.status==='in_progress'?`<span class="tag warn">${I.clock} W toku</span>`:''}</h4>
-      <div class="meta">„${r.msg}" · zgłosił <b>${r.who}</b> · ${r.age} · dotyczy: ${r.target}</div>
+      <div class="meta">„${r.msg}" · zgłosił <b>${r.who}</b> ${reputTag(r.who)} · ${r.age} · dotyczy: ${r.target}</div>
     </div>
     <div class="qa">
       ${r.locale?`<button class="btn sm" data-retrans="${r.id}" title="Usuwa tłumaczenie — agent przetłumaczy od nowa">Przetłumacz ponownie</button>`:''}

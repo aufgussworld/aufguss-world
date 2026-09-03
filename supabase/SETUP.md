@@ -9,6 +9,7 @@ programować — wystarczy założyć projekt i wykonać trzy pliki SQL po kolei
 | `migrations/0002_rls.sql` | polityki dostępu (kto co widzi i może zmieniać) |
 | `migrations/0003_i18n.sql` | wielojęzyczność, słownik krajów, kolejka dla agentów AI, przejmowanie wizytówek |
 | `migrations/0004_content_reports.sql` | zgłoszenia uwag do treści z automatycznym kierowaniem do właściciela |
+| `migrations/0005_report_abuse.sql` | ochrona zgłoszeń: limity, blokady, reputacja zgłaszających |
 | `seed.sql` | dane startowe: 107 obiektów, 9 saunamistrzów, 25 wydarzeń, 9 turniejów, 19 wpisów |
 | `generate-seed.js` | generator `seed.sql` z plików `data/*.js` (`node supabase/generate-seed.js`) |
 
@@ -41,6 +42,7 @@ W panelu Supabase otwórz **SQL Editor** (ikona po lewej) i wykonaj pliki **w te
 4. Wklej całą zawartość `migrations/0003_i18n.sql` → **Run**.
    (po seedzie, bo nakłada klucz obcy na kody krajów już wgranych obiektów)
 5. Wklej całą zawartość `migrations/0004_content_reports.sql` → **Run**.
+6. Wklej całą zawartość `migrations/0005_report_abuse.sql` → **Run**.
 
 Po każdym kroku powinno pojawić się `Success`. Gdy coś zgłosi błąd — zatrzymaj się i wyślij mi
 treść komunikatu; poprawimy, zanim pójdziemy dalej.
@@ -185,6 +187,28 @@ select public.invalidate_translation(42);   -- id zgłoszenia
 
 Tłumaczenie znika, `translation_queue` natychmiast pokazuje brak, agent tłumaczy od nowa.
 Skrzynka dla panelu: widok **`my_content_reports`** (respektuje RLS, więc każdy widzi swoje).
+
+### Ochrona przed nadużyciami
+
+Otwarta skrzynka to łakomy cel — wystarczy zalać właściciela obiektu spamem, żeby przestał
+ją czytać. Cztery warstwy (migracja 0005), wszystkie egzekwowane przez bazę:
+
+1. **Limity** — 10 zgłoszeń na dobę dla zalogowanych, 3 dla niezalogowanych
+   (tabela `report_limits`, do zmiany bez ruszania kodu).
+2. **Bez duplikatów** — jedno otwarte zgłoszenie do tej samej treści i wersji językowej.
+3. **Reputacja** — widok `reporter_reputation` pokazuje trafność zgłaszającego. Właściciel
+   inaczej czyta uwagę od kogoś z 89% trafności, a inaczej od kogoś, komu odrzucono wszystko.
+4. **Blokady** — `report_blocks`. Automat wstrzymuje na 30 dni po **5 odrzuceniach bez ani
+   jednego trafienia**; jedno potwierdzone zgłoszenie kasuje licznik, więc nie karzemy ludzi,
+   którzy czasem się mylą. Administrator może zablokować bezterminowo.
+
+Nadużycie działa też w drugą stronę: właściciel może odrzucać wszystko, żeby uciszyć niewygodne
+uwagi. Widok **`report_rejection_watch`** pokazuje administratorowi tych, którzy odrzucili
+ponad połowę z co najmniej pięciu rozpatrzonych zgłoszeń.
+
+> **Czego baza nie zrobi.** Nie blokujemy po adresie IP — nie trzymamy go (RODO) i łatwo go
+> zmienić. Warstwa aplikacji powinna dołożyć **CAPTCHA dla niezalogowanych** i limit po IP
+> na brzegu sieci (Vercel/Cloudflare). Baza jest ostatnią linią obrony, nie jedyną.
 
 Odczyt z łańcuchem zapasowym (czytelnik nigdy nie zobaczy pustego pola):
 
