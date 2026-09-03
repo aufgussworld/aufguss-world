@@ -3,33 +3,30 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Panel administracyjny — aufguss.world</title>
+<title>Panel — aufguss.world</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* ══════════════════════════════════════════════════════════════════
-   AUFGUSS ADMIN — „tryb pracy"
-   Ta sama rodzina marki co portal publiczny (ember + Fraunces),
-   ale gęstsza siatka, chłodniejsze płótno i mniejsze promienie.
-   Fraunces WYŁĄCZNIE na liczbach i tytułach stron — reszta Instrument Sans.
+   AUFGUSS — PANEL (backend)
+   Korzystają z niego WSZYSTKIE role poza zarejestrowanym użytkownikiem
+   i recenzentem (ci zostają w portalu): administrator, obiekt,
+   saunamistrz, szkoleniowiec, sędzia, organizator.
+   Konta są WIELOROLOWE — nawigacja to suma modułów aktywnych ról.
+   Ta sama rodzina marki co portal, ale zestrojona pod pracę.
    ══════════════════════════════════════════════════════════════════ */
 :root{
-  /* płótno pracy — odbarwiony krem portalu, spokojniejszy przy długich sesjach */
   --bg:#f2efe9; --surface:#ffffff; --surface-2:#faf8f4; --surface-3:#f0ece5;
   --sidebar:#211711; --sidebar-ink:#e8ddd1; --sidebar-dim:#a08d78;
-  --ink:#23180f; --ink-dim:#6b5a47; --stone:#7a6a52; /* stone przyciemniony vs portal (#8a7960) — AA na tabelach */
+  --ink:#23180f; --ink-dim:#6b5a47; --stone:#7a6a52;   /* AA na tabelach */
   --line:rgba(35,24,15,0.10); --line-strong:rgba(35,24,15,0.18);
-  /* marka */
   --ember:#e8552a; --ember-hi:#ff7a3d; --ember-deep:#b8420f; --ember-soft:rgba(232,85,42,0.10);
-  /* semantyka statusów — portal publiczny jej nie ma, panel bez niej nie działa */
   --ok:#2f6b34;   --ok-bg:rgba(63,125,58,0.13);
   --warn:#8a5200; --warn-bg:rgba(181,86,15,0.15);
   --dan:#a8301a;  --dan-bg:rgba(192,52,31,0.12);
   --info:#2f5f7a; --info-bg:rgba(58,107,138,0.12);
-  /* geometria — ciaśniejsza niż w portalu (tam 16–24px) */
-  --r-card:10px; --r-ctl:8px; --r-pill:100px;
-  --row:44px;
+  --r-card:10px; --r-ctl:8px; --r-pill:100px; --row:44px;
   --shadow:0 1px 2px rgba(35,24,15,0.06), 0 4px 12px rgba(35,24,15,0.04);
 }
 [data-theme="dark"]{
@@ -38,46 +35,47 @@
   --ink:#f2e9df; --ink-dim:#b5a693; --stone:#94836e;
   --line:rgba(255,235,215,0.10); --line-strong:rgba(255,235,215,0.18);
   --ember:#ff7a3d; --ember-deep:#ff9257; --ember-soft:rgba(255,122,61,0.14);
-  --ok:#7fc47f;   --ok-bg:rgba(127,196,127,0.14);
+  --ok:#7fc47f; --ok-bg:rgba(127,196,127,0.14);
   --warn:#e0a44c; --warn-bg:rgba(224,164,76,0.14);
-  --dan:#ef8a72;  --dan-bg:rgba(239,138,114,0.14);
+  --dan:#ef8a72; --dan-bg:rgba(239,138,114,0.14);
   --info:#84b6d4; --info-bg:rgba(132,182,212,0.14);
   --shadow:0 1px 2px rgba(0,0,0,0.4), 0 4px 14px rgba(0,0,0,0.3);
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 body{background:var(--bg);color:var(--ink);font-family:'Instrument Sans',system-ui,sans-serif;font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;}
-a{color:inherit;text-decoration:none;}
-button{font-family:inherit;font-size:inherit;cursor:pointer;}
-svg{flex-shrink:0;}
+a{color:inherit;text-decoration:none;} button{font-family:inherit;font-size:inherit;cursor:pointer;} svg{flex-shrink:0;}
 :focus-visible{outline:2px solid var(--ember);outline-offset:2px;border-radius:4px;}
 .num{font-family:'Fraunces',serif;font-variant-numeric:tabular-nums;}
 table{font-variant-numeric:tabular-nums;}
 
-/* ── SZKIELET ─────────────────────────────────────────────── */
-.app{display:grid;grid-template-columns:236px 1fr;min-height:100vh;}
+.app{display:grid;grid-template-columns:244px 1fr;min-height:100vh;}
 .side{background:var(--sidebar);color:var(--sidebar-ink);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;}
-.side-head{padding:18px 18px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,0.07);}
-.side-head .mark{width:30px;height:30px;border-radius:8px;background:linear-gradient(140deg,var(--ember-hi,#ff7a3d),#e8552a);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.side-head .nm{font-weight:600;font-size:0.92rem;letter-spacing:-0.01em;line-height:1.15;}
-.side-head .env{font-size:0.62rem;text-transform:uppercase;letter-spacing:0.09em;color:var(--sidebar-dim);}
-.side-nav{flex:1;overflow-y:auto;padding:12px 10px;}
+.side-head{padding:16px 16px 14px;border-bottom:1px solid rgba(255,255,255,0.07);}
+.brand-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.brand-row .mark{width:30px;height:30px;border-radius:8px;background:linear-gradient(140deg,#ff7a3d,#e8552a);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.brand-row .nm{font-weight:600;font-size:0.92rem;letter-spacing:-0.01em;}
+/* przełącznik kontekstu: kim jestem i czym zarządzam */
+.ctx{width:100%;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:var(--r-ctl);background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.09);color:inherit;text-align:left;transition:background .15s;}
+.ctx:hover{background:rgba(255,255,255,0.12);}
+.ctx .cav{width:26px;height:26px;border-radius:6px;background:linear-gradient(140deg,#ffd9a8,#e8552a);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.62rem;color:#2a0e02;flex-shrink:0;}
+.ctx .cw{min-width:0;flex:1;}
+.ctx .cw b{display:block;font-size:0.79rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.ctx .cw span{font-size:0.66rem;color:var(--sidebar-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;}
+.side-nav{flex:1;overflow-y:auto;padding:10px 10px 16px;}
 .nav-grp{font-size:0.62rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--sidebar-dim);padding:14px 10px 6px;}
 .nav-i{width:100%;display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:var(--r-ctl);background:none;border:none;color:var(--sidebar-ink);font-weight:500;font-size:0.86rem;text-align:left;transition:background .15s,color .15s;position:relative;}
 .nav-i:hover{background:rgba(255,255,255,0.07);}
 .nav-i.on{background:rgba(255,122,61,0.16);color:#ffc9a3;font-weight:600;}
-.nav-i.on::before{content:'';position:absolute;left:-10px;top:8px;bottom:8px;width:3px;border-radius:0 3px 3px 0;background:var(--ember-hi,#ff7a3d);}
+.nav-i.on::before{content:'';position:absolute;left:-10px;top:8px;bottom:8px;width:3px;border-radius:0 3px 3px 0;background:#ff7a3d;}
 .nav-i .cnt{margin-left:auto;font-size:0.68rem;font-weight:700;padding:2px 7px;border-radius:var(--r-pill);background:rgba(255,255,255,0.12);}
-.nav-i.on .cnt,.nav-i .cnt.alert{background:var(--ember);color:#fff;}
-.side-foot{padding:12px;border-top:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;gap:10px;}
-.side-foot .av{width:32px;height:32px;border-radius:8px;background:linear-gradient(140deg,#ffd9a8,#e8552a);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.72rem;color:#2a0e02;flex-shrink:0;}
-.side-foot .who{min-width:0;flex:1;}
-.side-foot .who b{display:block;font-size:0.8rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.side-foot .who span{font-size:0.68rem;color:var(--sidebar-dim);}
+.nav-i .cnt.alert{background:var(--ember);color:#fff;}
+.side-foot{padding:11px 12px;border-top:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;gap:8px;}
+.side-foot .lbl{font-size:0.68rem;color:var(--sidebar-dim);flex:1;}
 
 .main{min-width:0;display:flex;flex-direction:column;}
-.top{position:sticky;top:0;z-index:20;background:var(--surface);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;padding:0 20px;height:56px;}
-.search{flex:1;max-width:420px;position:relative;display:flex;align-items:center;}
-.search svg{position:absolute;left:11px;color:var(--stone);}
+.top{position:sticky;top:0;z-index:20;background:var(--surface);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;padding:0 20px;height:56px;}
+.search{flex:1;max-width:400px;position:relative;display:flex;align-items:center;}
+.search>svg{position:absolute;left:11px;color:var(--stone);}
 .search input{width:100%;height:36px;padding:0 60px 0 34px;border:1px solid var(--line-strong);border-radius:var(--r-ctl);background:var(--surface-2);color:var(--ink);font-family:inherit;font-size:0.86rem;outline:none;}
 .search input:focus{border-color:var(--ember);background:var(--surface);}
 .search kbd{position:absolute;right:9px;font:600 0.66rem 'Instrument Sans';color:var(--stone);background:var(--surface-3);border:1px solid var(--line);border-radius:5px;padding:2px 6px;}
@@ -90,10 +88,13 @@ table{font-variant-numeric:tabular-nums;}
 .crumb{font-size:0.76rem;color:var(--stone);margin-bottom:8px;}
 .page-head{display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:22px;}
 .page-head h1{font-family:'Fraunces',serif;font-weight:500;font-size:1.7rem;line-height:1.1;letter-spacing:-0.01em;}
-.page-head p{color:var(--ink-dim);font-size:0.88rem;margin-top:5px;max-width:620px;}
+.page-head p{color:var(--ink-dim);font-size:0.88rem;margin-top:5px;max-width:640px;}
 .page-head .acts{margin-left:auto;display:flex;gap:8px;}
+/* pasek zakresu — mówi wprost, jakie dane widzisz w tej roli */
+.scope{display:inline-flex;align-items:center;gap:8px;font-size:0.78rem;color:var(--ink-dim);background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--info);border-radius:var(--r-ctl);padding:8px 13px;margin-bottom:16px;}
+.scope svg{color:var(--info);}
+.scope b{color:var(--ink);font-weight:600;}
 
-/* ── PRZYCISKI ────────────────────────────────────────────── */
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;height:36px;padding:0 15px;border-radius:var(--r-ctl);border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);font-weight:600;font-size:0.82rem;transition:all .15s;white-space:nowrap;}
 .btn:hover{border-color:var(--ember);color:var(--ember-deep);}
 .btn.pri{background:var(--ember);border-color:var(--ember);color:#fff;}
@@ -105,14 +106,14 @@ table{font-variant-numeric:tabular-nums;}
 .btn.dan:hover{background:var(--dan-bg);border-color:var(--dan-bg);}
 .btn.sm{height:30px;padding:0 11px;font-size:0.76rem;}
 
-/* ── KARTY / KPI ──────────────────────────────────────────── */
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);box-shadow:var(--shadow);}
+.card+.card{margin-top:16px;}
 .card-h{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line);}
 .card-h h2{font-size:0.95rem;font-weight:600;font-family:'Instrument Sans';}
 .card-h .sub{font-size:0.76rem;color:var(--stone);}
 .card-h .acts{margin-left:auto;display:flex;gap:6px;}
 .card-b{padding:16px;}
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:22px;}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:20px;}
 .kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);padding:15px 17px;box-shadow:var(--shadow);}
 .kpi .lbl{font-size:0.72rem;text-transform:uppercase;letter-spacing:0.07em;color:var(--stone);display:flex;align-items:center;gap:7px;margin-bottom:9px;}
 .kpi .lbl svg{color:var(--ember);}
@@ -120,31 +121,26 @@ table{font-variant-numeric:tabular-nums;}
 .kpi .delta{font-size:0.74rem;margin-top:7px;display:inline-flex;align-items:center;gap:5px;font-weight:600;}
 .kpi .delta.up{color:var(--ok);} .kpi .delta.down{color:var(--dan);} .kpi .delta.flat{color:var(--stone);}
 
-/* ── ODZNAKI STATUSU (ikona + tekst, nie sam kolor) ───────── */
 .tag{display:inline-flex;align-items:center;gap:5px;font-size:0.72rem;font-weight:600;padding:3px 9px;border-radius:var(--r-pill);white-space:nowrap;}
 .tag svg{width:12px;height:12px;}
-.tag.ok{background:var(--ok-bg);color:var(--ok);}
-.tag.warn{background:var(--warn-bg);color:var(--warn);}
-.tag.dan{background:var(--dan-bg);color:var(--dan);}
-.tag.info{background:var(--info-bg);color:var(--info);}
+.tag.ok{background:var(--ok-bg);color:var(--ok);} .tag.warn{background:var(--warn-bg);color:var(--warn);}
+.tag.dan{background:var(--dan-bg);color:var(--dan);} .tag.info{background:var(--info-bg);color:var(--info);}
 .tag.mute{background:var(--surface-3);color:var(--ink-dim);}
 
-/* ── TABELA ───────────────────────────────────────────────── */
 .tbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--line);}
 .tbar .fsearch{position:relative;display:flex;align-items:center;}
 .tbar .fsearch svg{position:absolute;left:10px;color:var(--stone);}
 .tbar input[type=search]{height:32px;width:230px;padding:0 12px 0 31px;border:1px solid var(--line-strong);border-radius:var(--r-ctl);background:var(--surface-2);color:var(--ink);font-family:inherit;font-size:0.82rem;outline:none;}
 .tbar input[type=search]:focus{border-color:var(--ember);}
 .tbar select{height:32px;padding:0 28px 0 10px;border:1px solid var(--line-strong);border-radius:var(--r-ctl);background:var(--surface-2);color:var(--ink);font-family:inherit;font-size:0.82rem;outline:none;appearance:none;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238a7960' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;}
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237a6a52' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 9px center;}
 .tbar .right{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:0.78rem;color:var(--stone);}
 .twrap{overflow-x:auto;}
 table{width:100%;border-collapse:collapse;font-size:0.85rem;}
 thead th{text-align:left;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.07em;color:var(--stone);font-weight:700;padding:9px 14px;border-bottom:1px solid var(--line);background:var(--surface-2);white-space:nowrap;position:sticky;top:0;}
 thead th.sortable{cursor:pointer;user-select:none;}
 thead th.sortable:hover{color:var(--ink);}
-thead th .arr{opacity:0.35;margin-left:3px;}
-thead th[aria-sort] .arr{opacity:1;color:var(--ember-deep);}
+thead th .arr{opacity:0.35;margin-left:3px;} thead th[aria-sort] .arr{opacity:1;color:var(--ember-deep);}
 tbody td{padding:0 14px;height:var(--row);border-bottom:1px solid var(--line);vertical-align:middle;}
 tbody tr:hover{background:var(--surface-2);}
 tbody tr.sel{background:var(--ember-soft);}
@@ -163,11 +159,9 @@ input[type=checkbox]{width:16px;height:16px;accent-color:var(--ember);cursor:poi
 .bulkbar{display:none;align-items:center;gap:10px;padding:10px 16px;background:var(--ember-soft);border-bottom:1px solid var(--line);font-size:0.82rem;font-weight:600;}
 .bulkbar.on{display:flex;}
 
-/* ── KOLEJKA MODERACJI ────────────────────────────────────── */
 .qlist{display:flex;flex-direction:column;}
 .q{display:grid;grid-template-columns:42px 1fr auto;gap:14px;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line);}
-.q:last-child{border-bottom:none;}
-.q:hover{background:var(--surface-2);}
+.q:last-child{border-bottom:none;} .q:hover{background:var(--surface-2);}
 .q .av{width:42px;height:42px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.78rem;color:#fff;background:linear-gradient(140deg,#ff8a3d,#e8552a);}
 .q h4{font-size:0.9rem;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
 .q .meta{font-size:0.76rem;color:var(--stone);margin-top:3px;}
@@ -175,35 +169,46 @@ input[type=checkbox]{width:16px;height:16px;accent-color:var(--ember);cursor:poi
 .q .qa{display:flex;gap:6px;align-items:center;}
 .qdone{padding:14px 16px;border-bottom:1px solid var(--line);font-size:0.84rem;color:var(--ink-dim);display:flex;align-items:center;gap:9px;}
 
-/* ── FORMULARZE ───────────────────────────────────────────── */
 .fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:15px;}
 .f label{display:block;font-size:0.78rem;font-weight:600;margin-bottom:5px;}
 .f label .req{color:var(--dan);}
 .f input,.f textarea,.f select{width:100%;height:36px;padding:0 11px;border:1px solid var(--line-strong);border-radius:var(--r-ctl);background:var(--surface-2);color:var(--ink);font-family:inherit;font-size:0.86rem;outline:none;}
-.f textarea{height:auto;min-height:74px;padding:9px 11px;resize:vertical;}
+.f textarea{height:auto;min-height:80px;padding:9px 11px;resize:vertical;}
 .f input:focus,.f textarea:focus{border-color:var(--ember);background:var(--surface);}
 .f .help{font-size:0.74rem;color:var(--stone);margin-top:4px;}
 .f.err input{border-color:var(--dan);}
 .f .errmsg{font-size:0.74rem;color:var(--dan);margin-top:4px;display:flex;align-items:center;gap:5px;font-weight:600;}
+.f.full{grid-column:1/-1;}
 
-/* ── STAN PUSTY / TOAST ───────────────────────────────────── */
 .empty{text-align:center;padding:46px 20px;color:var(--stone);}
 .empty svg{color:var(--line-strong);margin-bottom:12px;}
 .empty h3{font-size:1rem;font-weight:600;color:var(--ink);margin-bottom:5px;font-family:'Instrument Sans';}
-.empty p{font-size:0.84rem;max-width:340px;margin:0 auto 16px;}
+.empty p{font-size:0.84rem;max-width:360px;margin:0 auto 16px;}
 .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--sidebar);color:var(--sidebar-ink);padding:12px 16px;border-radius:var(--r-ctl);display:flex;align-items:center;gap:11px;font-size:0.85rem;font-weight:500;box-shadow:0 12px 34px rgba(0,0,0,0.32);z-index:200;opacity:0;transition:all .28s cubic-bezier(.2,.8,.2,1);pointer-events:none;}
 .toast.on{transform:translateX(-50%) translateY(0);opacity:1;pointer-events:auto;}
-.toast .u{color:var(--ember-hi);font-weight:700;background:none;border:none;padding:0;}
+.toast .u{color:#ff9257;font-weight:700;background:none;border:none;padding:0;}
 
-/* ── SYSTEM DESIGNU ───────────────────────────────────────── */
-.ds-note{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--ember);border-radius:var(--r-card);padding:15px 18px;margin-bottom:20px;}
+/* przełącznik roli (podgląd prototypu) */
+.rolebox{position:fixed;inset:0;background:rgba(20,12,6,0.5);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;z-index:300;padding:20px;}
+.rolebox.on{display:flex;}
+.rolecard{background:var(--surface);border-radius:14px;max-width:520px;width:100%;box-shadow:0 30px 70px rgba(0,0,0,0.4);overflow:hidden;}
+.rolecard .rh{padding:16px 20px;border-bottom:1px solid var(--line);}
+.rolecard .rh h3{font-size:1rem;font-weight:600;font-family:'Instrument Sans';}
+.rolecard .rh p{font-size:0.8rem;color:var(--stone);margin-top:3px;}
+.rolecard .rb{padding:10px;max-height:60vh;overflow:auto;}
+.role-i{width:100%;display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:var(--r-ctl);border:1px solid transparent;background:none;text-align:left;color:var(--ink);}
+.role-i:hover{background:var(--surface-2);border-color:var(--line);}
+.role-i.on{background:var(--ember-soft);border-color:rgba(232,85,42,0.35);}
+.role-i .rav{width:34px;height:34px;border-radius:8px;background:linear-gradient(140deg,#ffd9a8,#e8552a);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.7rem;color:#2a0e02;flex-shrink:0;}
+.role-i b{display:block;font-size:0.87rem;font-weight:600;}
+.role-i span{font-size:0.75rem;color:var(--stone);}
+
+.ds-note{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--ember);border-radius:var(--r-card);padding:15px 18px;margin-bottom:16px;}
 .ds-note h3{font-size:0.92rem;font-weight:600;margin-bottom:6px;font-family:'Instrument Sans';}
-.ds-note p{font-size:0.86rem;color:var(--ink-dim);line-height:1.65;}
-.ds-note p+p{margin-top:8px;}
+.ds-note p{font-size:0.86rem;color:var(--ink-dim);line-height:1.65;} .ds-note p+p{margin-top:8px;}
 .sw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:12px;}
 .sw{border:1px solid var(--line);border-radius:var(--r-ctl);overflow:hidden;}
-.sw .chip{height:56px;}
-.sw .meta{padding:8px 10px;font-size:0.72rem;}
+.sw .chip{height:56px;} .sw .meta{padding:8px 10px;font-size:0.72rem;}
 .sw .meta b{display:block;font-size:0.78rem;font-weight:600;margin-bottom:1px;}
 .sw .meta span{color:var(--stone);font-family:ui-monospace,monospace;font-size:0.68rem;}
 .cmp{display:flex;flex-wrap:wrap;gap:10px;align-items:center;}
@@ -211,23 +216,22 @@ input[type=checkbox]{width:16px;height:16px;accent-color:var(--ember);cursor:poi
 .ds-row:last-child{border-bottom:none;}
 .ds-row .k{font-size:0.79rem;font-weight:600;color:var(--ink-dim);}
 .cmp-mono{font-family:ui-monospace,monospace;font-size:0.74rem;color:var(--stone);}
+.matrix td,.matrix th{font-size:0.78rem;}
+.matrix td{height:38px;}
+.matrix .yes{color:var(--ok);font-weight:700;} .matrix .no{color:var(--line-strong);}
 
 @media(max-width:1000px){
   .app{grid-template-columns:1fr;}
-  .side{position:fixed;inset:0 auto 0 0;width:236px;transform:translateX(-100%);transition:transform .25s;z-index:60;}
+  .side{position:fixed;inset:0 auto 0 0;width:244px;transform:translateX(-100%);transition:transform .25s;z-index:60;}
   .side.open{transform:none;}
-  .view{padding:18px 16px 50px;}
-  .search{max-width:none;}
+  .view{padding:18px 16px 50px;} .search{max-width:none;}
   .dash-grid{grid-template-columns:1fr !important;}
 }
 @media(max-width:620px){
-  /* kolejka: akcje schodzą pod treść, żeby nie rozpychać wiersza */
   .q{grid-template-columns:38px 1fr;row-gap:10px;}
-  .q .qa{grid-column:2;justify-content:flex-start;}
-  .q .av{width:38px;height:38px;}
+  .q .qa{grid-column:2;justify-content:flex-start;} .q .av{width:38px;height:38px;}
   .page-head .acts{margin-left:0;width:100%;}
-  .card-h{flex-wrap:wrap;}
-  .card-h .acts{margin-left:0;}
+  .card-h{flex-wrap:wrap;} .card-h .acts{margin-left:0;}
   .kpis{grid-template-columns:repeat(auto-fit,minmax(140px,1fr));}
 }
 @media(min-width:1001px){ .menu-btn{display:none;} }
@@ -238,14 +242,20 @@ input[type=checkbox]{width:16px;height:16px;accent-color:var(--ember);cursor:poi
 <div class="app">
   <aside class="side" id="side">
     <div class="side-head">
-      <div class="mark"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c1.2 3-2 4.2-2 7a2 2 0 0 0 4 .2c2 1.8 3 3.8 3 5.8a5 5 0 0 1-10 0c0-3.8 3-6 5-9z"/></svg></div>
-      <div><div class="nm">aufguss.world</div><div class="env">Panel administracyjny</div></div>
+      <div class="brand-row">
+        <div class="mark"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c1.2 3-2 4.2-2 7a2 2 0 0 0 4 .2c2 1.8 3 3.8 3 5.8a5 5 0 0 1-10 0c0-3.8 3-6 5-9z"/></svg></div>
+        <div class="nm">aufguss.world</div>
+      </div>
+      <button class="ctx" id="ctxBtn" aria-haspopup="dialog">
+        <span class="cav" id="ctxAv">KP</span>
+        <span class="cw"><b id="ctxName">—</b><span id="ctxRoles">—</span></span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" style="color:var(--sidebar-dim)"><path d="M8 9l4-4 4 4M8 15l4 4 4-4"/></svg>
+      </button>
     </div>
     <nav class="side-nav" id="nav"></nav>
     <div class="side-foot">
-      <div class="av">KP</div>
-      <div class="who"><b>Kamil Poradziński</b><span>Administrator</span></div>
-      <button class="icon-btn" style="width:30px;height:30px;color:var(--sidebar-dim)" id="themeBtn" title="Przełącz motyw" aria-label="Przełącz motyw jasny/ciemny">
+      <span class="lbl">Motyw</span>
+      <button class="icon-btn" style="width:30px;height:30px;color:var(--sidebar-dim)" id="themeBtn" aria-label="Przełącz motyw jasny i ciemny">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3a9 9 0 1 0 9 9c-5 0-9-4-9-9z"/></svg>
       </button>
     </div>
@@ -253,20 +263,14 @@ input[type=checkbox]{width:16px;height:16px;accent-color:var(--ember);cursor:poi
 
   <div class="main">
     <header class="top">
-      <button class="icon-btn menu-btn" id="menuBtn" aria-label="Menu">
-        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
-      </button>
+      <button class="icon-btn menu-btn" id="menuBtn" aria-label="Menu"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
       <div class="search">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-        <input type="text" placeholder="Szukaj obiektu, osoby, wpisu…" aria-label="Szukaj w panelu">
-        <kbd>Ctrl K</kbd>
+        <input type="text" placeholder="Szukaj…" aria-label="Szukaj w panelu"><kbd>Ctrl K</kbd>
       </div>
       <div class="top-sp"></div>
       <button class="icon-btn" aria-label="Powiadomienia"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="dot"></span></button>
-      <a class="btn ghost" href="../index.html" target="_blank" rel="noopener">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6M10 14L21 3"/></svg>
-        Zobacz portal
-      </a>
+      <a class="btn ghost" href="../index.html" target="_blank" rel="noopener"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6M10 14L21 3"/></svg> Portal</a>
     </header>
     <main class="view" id="view"></main>
   </div>
@@ -274,12 +278,19 @@ input[type=checkbox]{width:16px;height:16px;accent-color:var(--ember);cursor:poi
 
 <div class="toast" id="toast"><span id="toastMsg"></span><button class="u" id="toastUndo">Cofnij</button></div>
 
+<div class="rolebox" id="rolebox" role="dialog" aria-label="Zmiana konta">
+  <div class="rolecard">
+    <div class="rh"><h3>Zobacz panel jako</h3><p>Prototyp: konta są wielorolowe, a nawigacja to suma modułów aktywnych ról.</p></div>
+    <div class="rb" id="roleList"></div>
+  </div>
+</div>
+
 <script src="../../data/objects-data.js"></script>
 <script src="../../data/posts-data.js"></script>
 <script src="../../data/tournaments-data.js"></script>
+<script src="../../data/events-data.js"></script>
 <script>
-/* ══ IKONY (SVG — zero emoji, spójna grubość 2) ══ */
-const I = {
+const I={
   grid:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>',
   shield:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg>',
   venue:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6"/></svg>',
@@ -287,258 +298,386 @@ const I = {
   trophy:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4h8v4a4 4 0 0 1-8 0zM8 6H5v1a3 3 0 0 0 3 3M16 6h3v1a3 3 0 0 1-3 3M9 20h6M12 14v6"/></svg>',
   post:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v14H7l-3 3z"/><path d="M8 9h8M8 13h5"/></svg>',
   users:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3 2.7-5 6-5s6 2 6 5M16 5.5a3 3 0 0 1 0 5.5M21 20c0-2.2-1.4-3.8-3.5-4.5"/></svg>',
+  user:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>',
   cog:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>',
   palette:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18c1 0 1.6-.8 1.6-1.6 0-1.5 1.2-2 2.4-2H18a3 3 0 0 0 3-3c0-6-4-11.4-9-11.4z"/><circle cx="7.5" cy="11" r="1.2" fill="currentColor"/><circle cx="12" cy="7.5" r="1.2" fill="currentColor"/><circle cx="16.5" cy="11" r="1.2" fill="currentColor"/></svg>',
+  gauge:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 14l4-4"/><path d="M4 18a9 9 0 1 1 16 0"/></svg>',
+  book:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4.5A2 2 0 0 1 6 3h13v16H6a2 2 0 0 0-2 2z"/><path d="M8 8h7"/></svg>',
   check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>',
   clock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
   x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>',
   warn:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9 16H3z"/><path d="M12 9v4M12 16.5v.5"/></svg>',
+  info:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.5"/></svg>',
   eye:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>',
   pen:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16z"/></svg>',
   up:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>',
   inbox:'<svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13h5l1.5 3h5L16 13h5"/><path d="M4.5 6h15l1.5 7v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5z"/></svg>',
 };
-const OBJECTS = window.AUFGUSS_OBJECTS||[], POSTS = window.AUFGUSS_POSTS||{}, TOURN = window.AUFGUSS_TOURNAMENTS||[];
+const sm=s=>s.replace(/width="18" height="18"/,'width="14" height="14"');
+const OBJECTS=window.AUFGUSS_OBJECTS||[], POSTS=window.AUFGUSS_POSTS||{}, TOURN=window.AUFGUSS_TOURNAMENTS||[], EVENTS=window.AUFGUSS_EVENTS||[];
 
-/* ══ NAWIGACJA ══ */
-const NAV = [
+/* ══ ROLE I KONTA ══════════════════════════════════════════════
+   Backend obsługuje wszystkie role poza „zarejestrowany" i „recenzent". */
+const ROLE_LABEL={admin:'Administrator',obiekt:'Obiekt',saunamistrz:'Saunamistrz',szkoleniowiec:'Szkoleniowiec',sedzia:'Sędzia',organizator:'Organizator'};
+const ACCOUNTS={
+  kamil:  {name:'Kamil Poradziński', init:'KP', roles:['admin'], scope:'Cały portal'},
+  satama: {name:'SATAMA SAUNA RESORT & SPA', init:'SAT', roles:['obiekt'], objId:55, scope:'Twój obiekt'},
+  maciej: {name:'Maciej Piczura', init:'MP', roles:['saunamistrz','szkoleniowiec'], person:'Maciej Piczura', scope:'Twój profil i występy'},
+  robert: {name:'Robert Zídek', init:'RZ', roles:['saunamistrz','sedzia'], person:'Robert Zídek', scope:'Twój profil i oceny'},
+  pts:    {name:'Polskie Towarzystwo Saunowe', init:'PTS', roles:['organizator'], orgKey:'PTS', scope:'Twoje turnieje'},
+};
+let acc='kamil';
+const A=()=>ACCOUNTS[acc];
+const has=r=>A().roles.includes(r);
+
+/* moduły: każdy deklaruje, które role go widzą */
+const MODULES=[
   {g:'Przegląd'},
-  {id:'pulpit',  t:'Pulpit',     ic:I.grid},
-  {id:'moderacja',t:'Moderacja', ic:I.shield, cnt:5, alert:true},
-  {g:'Treść'},
-  {id:'obiekty', t:'Obiekty',    ic:I.venue,  cnt:OBJECTS.length},
-  {id:'wpisy',   t:'Wpisy',      ic:I.post,   cnt:Object.keys(POSTS).length},
-  {id:'turnieje',t:'Turnieje',   ic:I.trophy, cnt:TOURN.length},
-  {id:'wydarzenia',t:'Wydarzenia',ic:I.cal},
-  {g:'System'},
-  {id:'uzytkownicy',t:'Użytkownicy i role', ic:I.users},
-  {id:'system',  t:'System designu', ic:I.palette},
-  {id:'ustawienia',t:'Ustawienia', ic:I.cog},
+  {id:'pulpit',   t:'Pulpit',            ic:I.grid,    roles:'*'},
+  {id:'moderacja',t:'Moderacja',         ic:I.shield,  roles:['admin'], cnt:()=>QUEUE.length, alert:true},
+  {g:'Zarządzanie'},
+  {id:'obiekty',  t:()=>has('admin')?'Obiekty':'Mój obiekt', ic:I.venue, roles:['admin','obiekt'], cnt:()=>has('admin')?OBJECTS.length:1},
+  {id:'wydarzenia',t:'Wydarzenia',       ic:I.cal,     roles:['admin','obiekt'], cnt:()=>scopedEvents().length},
+  {id:'wystepy',  t:'Moje występy',      ic:I.cal,     roles:['saunamistrz'], cnt:()=>scopedEvents().length},
+  {id:'szkolenia',t:'Szkolenia',         ic:I.book,    roles:['szkoleniowiec'], cnt:()=>TRAININGS.length},
+  {id:'turnieje', t:()=>has('admin')?'Turnieje':'Moje turnieje', ic:I.trophy, roles:['admin','organizator'], cnt:()=>scopedTournaments().length},
+  {id:'oceny',    t:'Karty ocen',        ic:I.gauge,   roles:['sedzia'], cnt:()=>JUDGING.length},
+  {id:'wpisy',    t:'Wpisy',             ic:I.post,    roles:['admin','obiekt','organizator'], cnt:()=>scopedPosts().length},
+  {g:'Konto'},
+  {id:'profil',   t:'Profil publiczny',  ic:I.user,    roles:['saunamistrz','sedzia','szkoleniowiec','obiekt','organizator']},
+  {id:'uzytkownicy',t:'Użytkownicy i role', ic:I.users, roles:['admin']},
+  {id:'system',   t:'System designu',    ic:I.palette, roles:'*'},
+  {id:'ustawienia',t:'Ustawienia',       ic:I.cog,     roles:'*'},
 ];
-document.getElementById('nav').innerHTML = NAV.map(n=> n.g
-  ? `<div class="nav-grp">${n.g}</div>`
-  : `<button class="nav-i" data-v="${n.id}">${n.ic}<span>${n.t}</span>${n.cnt!=null?`<span class="cnt${n.alert?' alert':''}">${n.cnt}</span>`:''}</button>`).join('');
+const visible=()=>MODULES.filter(m=>m.g||m.roles==='*'||m.roles.some(r=>has(r)));
 
-/* ══ TOAST ══ */
-let tT;
-function toast(msg,undo){
-  const t=document.getElementById('toast');
-  document.getElementById('toastMsg').textContent=msg;
-  document.getElementById('toastUndo').style.display=undo?'':'none';
-  t.classList.add('on'); clearTimeout(tT); tT=setTimeout(()=>t.classList.remove('on'),4000);
+/* ══ ZAKRESOWANIE DANYCH ══ */
+function scopedEvents(){
+  const a=A();
+  if(a.objId){ const o=OBJECTS.find(x=>x.id===a.objId); return EVENTS.filter(e=>e.venue&&o&&e.venue.name.toLowerCase().includes('satama')); }
+  if(a.person) return EVENTS.filter(e=>e.masters&&e.masters.some(m=>m.name===a.person));
+  return EVENTS;
 }
-document.getElementById('toastUndo').onclick=()=>{ document.getElementById('toast').classList.remove('on'); render(cur); toast('Cofnięto'); };
-
-/* ══ WIDOKI ══ */
-const V = {};
-
-V.pulpit = () => `
-  <div class="crumb">Panel</div>
-  <div class="page-head"><div><h1>Pulpit</h1><p>Stan portalu i to, co czeka na Twoją decyzję.</p></div>
-    <div class="acts"><button class="btn">Eksport</button><button class="btn pri">${I.post.replace('18','15').replace('18','15')} Nowy wpis</button></div></div>
-  <div class="kpis">
-    <div class="kpi"><div class="lbl">${I.venue.replace(/18/g,'14')} Obiekty</div><div class="val num">${OBJECTS.length}</div><div class="delta up">${I.up} +4 w tym miesiącu</div></div>
-    <div class="kpi"><div class="lbl">${I.shield.replace(/18/g,'14')} Do moderacji</div><div class="val num">5</div><div class="delta down">2 czekają &gt; 48 h</div></div>
-    <div class="kpi"><div class="lbl">${I.users.replace(/18/g,'14')} Konta</div><div class="val num">1 284</div><div class="delta up">${I.up} +9%</div></div>
-    <div class="kpi"><div class="lbl">${I.trophy.replace(/18/g,'14')} Turnieje</div><div class="val num">${TOURN.length}</div><div class="delta flat">bez zmian</div></div>
-  </div>
-  <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:16px;align-items:start" class="dash-grid">
-    <div class="card">
-      <div class="card-h"><h2>Wymaga decyzji</h2><span class="sub">najstarsze u góry</span><div class="acts"><button class="btn sm ghost" data-go="moderacja">Otwórz kolejkę</button></div></div>
-      <div class="qlist">${QUEUE.slice(0,3).map(qRow).join('')}</div>
-    </div>
-    <div class="card">
-      <div class="card-h"><h2>Ostatnia aktywność</h2></div>
-      <div class="card-b" style="display:flex;flex-direction:column;gap:13px">
-        ${[['Satama Sauna Resort','dodał wydarzenie „Noc aufguss"','12 min'],
-           ['Wojciech Kadź','opublikował recenzję Termy Rzymskie','1 godz.'],
-           ['PTS','zaktualizował turniej PTS Classic','3 godz.'],
-           ['Anna K.','zgłosiła komentarz do moderacji','wczoraj']].map(([w,a,t])=>
-          `<div style="display:flex;gap:10px;align-items:flex-start;font-size:0.84rem">
-             <div style="width:6px;height:6px;border-radius:50%;background:var(--ember);margin-top:7px;flex-shrink:0"></div>
-             <div style="flex:1"><b style="font-weight:600">${w}</b> <span style="color:var(--ink-dim)">${a}</span>
-               <div style="font-size:0.74rem;color:var(--stone);margin-top:2px">${t} temu</div></div>
-           </div>`).join('')}
-      </div>
-    </div>
-  </div>`;
-
-/* ── kolejka moderacji ── */
-const QUEUE = [
+function scopedTournaments(){ const a=A(); return a.orgKey?TOURN.filter(t=>(t.org||'').includes(a.orgKey)):TOURN; }
+function scopedPosts(){
+  const a=A(), all=Object.entries(POSTS).map(([id,p])=>({id,...p}));
+  if(a.objId) return all.filter(p=>p.author==='satama');
+  if(a.orgKey) return all.filter(p=>p.author==='pts');
+  return all;
+}
+const TRAININGS=[
+  {d:'12 wrz 2026',t:'Aufguss od podstaw — praca z ręcznikiem i temperaturą',lvl:'Podstawowy',pl:'Chochołowskie Termy',sp:'6 / 12',st:'ok'},
+  {d:'4 paź 2026', t:'Choreografia i storytelling w ceremonii',lvl:'Zaawansowany',pl:'Termy Rzymskie',sp:'3 / 8',st:'ok'},
+  {d:'22 lis 2026',t:'Przygotowanie do turnieju aufguss',lvl:'Turniejowy',pl:'Satama Sauna Resort',sp:'2 / 6',st:'draft'},
+];
+const JUDGING=[
+  {t:'The Battle of Gladiators — finał',v:'Termy Rzymskie, Czeladź',d:'8 mar 2026',n:12,done:12},
+  {t:'Mistrzostwa Polski PTS Classic — półfinał',v:'Suntago',d:'19 kwi 2026',n:9,done:4},
+  {t:'Puchar Polski Aufguss — eliminacje',v:'Aquapark Wrocław',d:'23 maj 2026',n:8,done:0},
+];
+const QUEUE=[
   {id:1,init:'SB',t:'Sauna Bad — wniosek o zarządzanie profilem obiektu',kind:'Rola: Obiekt',who:'manager@saunabad.de',age:'3 dni temu',flag:true},
   {id:2,init:'JK',t:'Jan Kowalski — wniosek o status blogera',kind:'Rola: Bloger',who:'3 przykładowe recenzje w załączniku',age:'2 dni temu',flag:true},
   {id:3,init:'VN',t:'VNSWB — wniosek o rolę organizatora turniejów',kind:'Rola: Organizator',who:'Federacja saunowa (NL)',age:'wczoraj'},
   {id:4,init:'AK',t:'Zgłoszony komentarz pod wpisem „Noc aufguss"',kind:'Treść',who:'Zgłosił: Anna K. — spam',age:'6 godz. temu'},
   {id:5,init:'WK',t:'Recenzja „Berliński minimalizm pod wodą" — do zatwierdzenia',kind:'Treść',who:'Wojciech Kadź',age:'2 godz. temu'},
 ];
-function qRow(q){
-  return `<div class="q" data-q="${q.id}">
-    <div class="av">${q.init}</div>
-    <div>
-      <h4>${q.t} ${q.flag?`<span class="tag warn">${I.clock} czeka &gt; 48 h</span>`:''}</h4>
-      <div class="meta"><b>${q.kind}</b> · ${q.who} · ${q.age}</div>
-    </div>
-    <div class="qa">
-      <button class="btn sm" data-act="rej" data-id="${q.id}">Odrzuć</button>
-      <button class="btn sm pri" data-act="acc" data-id="${q.id}">Zatwierdź</button>
-    </div>
-  </div>`;
-}
-V.moderacja = () => `
-  <div class="crumb">Panel · Moderacja</div>
-  <div class="page-head"><div><h1>Moderacja</h1><p>Wnioski o role i treści zgłoszone do sprawdzenia. Decyzję można cofnąć przez 10 sekund.</p></div>
-    <div class="acts"><button class="btn">Historia decyzji</button></div></div>
-  <div class="card">
-    <div class="tbar">
-      <select><option>Wszystkie typy</option><option>Wnioski o rolę</option><option>Treści</option><option>Zgłoszenia</option></select>
-      <select><option>Najstarsze</option><option>Najnowsze</option></select>
-      <div class="right"><span class="tag warn">${I.clock} 2 przeterminowane</span></div>
-    </div>
-    <div class="qlist" id="qlist">${QUEUE.map(qRow).join('')}</div>
-  </div>`;
 
-/* ── obiekty: gęsta tabela na prawdziwych danych ── */
-let objState={q:'',country:'',sort:'name',dir:1,page:1,per:12,sel:new Set()};
-function objFiltered(){
-  let r=OBJECTS.filter(o=>(!objState.q||o.name.toLowerCase().includes(objState.q.toLowerCase()))&&(!objState.country||o.country===objState.country));
-  const d=objState.dir;
-  r.sort((a,b)=> objState.sort==='name' ? d*a.name.localeCompare(b.name,'pl') : d*(a.country.localeCompare(b.country,'pl')||a.name.localeCompare(b.name,'pl')));
-  return r;
-}
-V.obiekty = () => {
-  const all=objFiltered(), pages=Math.max(1,Math.ceil(all.length/objState.per));
-  objState.page=Math.min(objState.page,pages);
-  const rows=all.slice((objState.page-1)*objState.per,objState.page*objState.per);
-  const countries=[...new Set(OBJECTS.map(o=>o.country))].sort((a,b)=>a.localeCompare(b,'pl'));
-  return `
-  <div class="crumb">Panel · Treść</div>
-  <div class="page-head"><div><h1>Obiekty</h1><p>Baza obiektów saunowych widocznych na mapie i w wyszukiwarce portalu.</p></div>
-    <div class="acts"><button class="btn">Import CSV</button><button class="btn pri">+ Dodaj obiekt</button></div></div>
-  <div class="card">
-    <div class="tbar">
-      <div class="fsearch"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-        <input type="search" id="oq" placeholder="Filtruj po nazwie…" value="${objState.q}" aria-label="Filtruj obiekty"></div>
-      <select id="oc" aria-label="Filtruj po kraju"><option value="">Wszystkie kraje (${countries.length})</option>${countries.map(c=>`<option${c===objState.country?' selected':''}>${c}</option>`).join('')}</select>
-      <div class="right">${all.length} z ${OBJECTS.length} obiektów</div>
-    </div>
-    <div class="bulkbar${objState.sel.size?' on':''}">
-      <span>Zaznaczono: ${objState.sel.size}</span>
-      <button class="btn sm">Zmień kraj</button><button class="btn sm">Ukryj na mapie</button>
-      <button class="btn sm dan" style="margin-left:auto">Usuń</button>
-    </div>
-    <div class="twrap"><table>
-      <thead><tr>
-        <th style="width:38px"><input type="checkbox" id="oall" aria-label="Zaznacz wszystkie"></th>
-        <th class="sortable" data-s="name" ${objState.sort==='name'?`aria-sort="${objState.dir>0?'ascending':'descending'}"`:''}>Nazwa <span class="arr">${objState.sort==='name'&&objState.dir<0?'↓':'↑'}</span></th>
-        <th class="sortable" data-s="country" ${objState.sort==='country'?`aria-sort="${objState.dir>0?'ascending':'descending'}"`:''}>Kraj <span class="arr">${objState.sort==='country'&&objState.dir<0?'↓':'↑'}</span></th>
-        <th>Strona www</th><th>Status</th><th style="width:96px"></th>
-      </tr></thead>
-      <tbody>${rows.map(o=>`
-        <tr class="${objState.sel.has(o.id)?'sel':''}">
-          <td><input type="checkbox" data-sel="${o.id}" ${objState.sel.has(o.id)?'checked':''} aria-label="Zaznacz ${o.name}"></td>
-          <td><div class="nm"><img src="https://flagcdn.com/20x15/${o.flag}.png" alt="">${o.name}</div><div class="sub">ID ${o.id}</div></td>
-          <td>${o.country}</td>
-          <td>${o.website?`<a href="${o.website}" target="_blank" rel="noopener" style="color:var(--ember-deep);font-weight:600">${o.website.replace(/^https?:\/\/(www\.)?/,'').replace(/\/$/,'').slice(0,26)}</a>`:`<span class="tag mute">brak</span>`}</td>
-          <td>${o.id%9===0?`<span class="tag warn">${I.clock} Szkic</span>`:`<span class="tag ok">${I.check} Opublikowany</span>`}</td>
-          <td class="right"><div class="rowacts">
-            <button class="icon-btn" style="width:28px;height:28px" title="Podgląd" aria-label="Podgląd ${o.name}">${I.eye}</button>
-            <button class="icon-btn" style="width:28px;height:28px" title="Edytuj" aria-label="Edytuj ${o.name}">${I.pen}</button>
-          </div></td>
-        </tr>`).join('')}</tbody>
-    </table></div>
-    ${rows.length?`<div class="tfoot"><span>Strona ${objState.page} z ${pages}</span>
-      <div class="pg"><button class="pgb" data-pg="${objState.page-1}" ${objState.page===1?'disabled':''} aria-label="Poprzednia">‹</button>
-      ${Array.from({length:Math.min(pages,5)},(_,i)=>i+1).map(p=>`<button class="pgb${p===objState.page?' on':''}" data-pg="${p}">${p}</button>`).join('')}
-      <button class="pgb" data-pg="${objState.page+1}" ${objState.page===pages?'disabled':''} aria-label="Następna">›</button></div></div>`
-    :`<div class="empty">${I.inbox}<h3>Brak wyników</h3><p>Żaden obiekt nie pasuje do filtrów. Zmień kryteria lub wyczyść filtrowanie.</p><button class="btn" id="oclear">Wyczyść filtry</button></div>`}
+/* ══ POMOCNICZE ══ */
+const scopeBar=txt=>`<div class="scope">${I.info}<span>${txt}</span></div>`;
+/* polska odmiana liczebnika: 1 / 2–4 / reszta */
+const pl=(n,one,few,many)=>n===1?one:(n%10>=2&&n%10<=4&&(n%100<12||n%100>14)?few:many);
+const MON=['sty','lut','mar','kwi','maj','cze','lip','sie','wrz','paź','lis','gru'];
+const fdate=s=>{const[y,m,d]=s.split('-').map(Number);return `${d} ${MON[m-1]} ${y}`;};
+let tT; function toast(msg,undo){const t=document.getElementById('toast');document.getElementById('toastMsg').textContent=msg;
+  document.getElementById('toastUndo').style.display=undo?'':'none';t.classList.add('on');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('on'),4000);}
+
+/* ══ WIDOKI ══ */
+const V={};
+
+V.pulpit=()=>{
+  const a=A();
+  let kpis,panel;
+  if(has('admin')){
+    kpis=[[I.venue,'Obiekty',OBJECTS.length,'up','+4 w tym miesiącu'],[I.shield,'Do moderacji',QUEUE.length,'down','2 czekają > 48 h'],
+          [I.users,'Konta','1 284','up','+9%'],[I.trophy,'Turnieje',TOURN.length,'flat','bez zmian']];
+    panel=`<div class="card"><div class="card-h"><h2>Wymaga decyzji</h2><span class="sub">najstarsze u góry</span>
+      <div class="acts"><button class="btn sm ghost" data-go="moderacja">Otwórz kolejkę</button></div></div>
+      <div class="qlist">${QUEUE.slice(0,3).map(qRow).join('')}</div></div>`;
+  } else if(has('obiekt')){
+    kpis=[[I.cal,'Wydarzenia',scopedEvents().length,'up','+2 w planie'],[I.post,'Wpisy',scopedPosts().length,'flat','ostatni 4 dni temu'],
+          [I.users,'Obserwujący','1 142','up','+38'],[I.eye,'Wyświetlenia wizytówki','8,4 tys.','up','+12%']];
+    panel=`<div class="card"><div class="card-h"><h2>Najbliższe wydarzenia</h2></div><div class="qlist">${eventRows(scopedEvents().slice(0,3))}</div></div>`;
+  } else if(has('sedzia')){
+    kpis=[[I.gauge,'Karty do wypełnienia',JUDGING.reduce((s,j)=>s+(j.n-j.done),0),'down','1 turniej pilny'],
+          [I.trophy,'Turnieje w sezonie',JUDGING.length,'flat',''],[I.cal,'Najbliższy panel','19 kwi','flat','Suntago'],[I.check,'Zamknięte karty','16','up','+4']];
+    panel=`<div class="card"><div class="card-h"><h2>Turnieje do oceny</h2><div class="acts"><button class="btn sm ghost" data-go="oceny">Otwórz karty</button></div></div><div class="qlist">${JUDGING.map(judgeRow).join('')}</div></div>`;
+  } else if(has('organizator')){
+    const t=scopedTournaments();
+    kpis=[[I.trophy,'Moje turnieje',t.length,'flat',''],[I.users,'Zgłoszenia','41','up','+7 w tym tygodniu'],
+          [I.cal,'Najbliższy etap','19 kwi','flat','półfinał'],[I.post,'Wpisy',scopedPosts().length,'flat','']];
+    panel=`<div class="card"><div class="card-h"><h2>Moje turnieje</h2><div class="acts"><button class="btn sm ghost" data-go="turnieje">Zarządzaj</button></div></div><div class="qlist">${t.map(tournRow).join('')}</div></div>`;
+  } else {
+    const ev=scopedEvents();
+    kpis=[[I.cal,'Nadchodzące występy',ev.length,'flat',''],[I.book,'Szkolenia',has('szkoleniowiec')?TRAININGS.length:0,'up',has('szkoleniowiec')?'11 zapisanych osób':''],
+          [I.users,'Obserwujący','318','up','+12'],[I.eye,'Wyświetlenia profilu','2,4 tys.','up','+6%']];
+    panel=`<div class="card"><div class="card-h"><h2>Najbliższe występy</h2><div class="acts"><button class="btn sm ghost" data-go="wystepy">Zobacz wszystkie</button></div></div><div class="qlist">${eventRows(ev.slice(0,3))}</div></div>`;
+  }
+  return `<div class="crumb">Panel</div>
+  <div class="page-head"><div><h1>Pulpit</h1><p>${has('admin')?'Stan portalu i to, co czeka na Twoją decyzję.':'Skrót tego, czym zarządzasz na aufguss.world.'}</p></div></div>
+  ${scopeBar(`Zakres danych: <b>${a.scope}</b> · role: <b>${a.roles.map(r=>ROLE_LABEL[r]).join(', ')}</b>`)}
+  <div class="kpis">${kpis.map(([ic,l,v,d,dt])=>`<div class="kpi"><div class="lbl">${sm(ic)} ${l}</div><div class="val num">${v}</div>${dt?`<div class="delta ${d}">${d==='up'?I.up:''} ${dt}</div>`:''}</div>`).join('')}</div>
+  <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:16px;align-items:start" class="dash-grid">
+    ${panel}
+    <div class="card"><div class="card-h"><h2>Ostatnia aktywność</h2></div><div class="card-b" style="display:flex;flex-direction:column;gap:13px">
+      ${[['Satama Sauna Resort','dodał wydarzenie „Noc aufguss"','12 min'],['Wojciech Kadź','opublikował recenzję Termy Rzymskie','1 godz.'],['PTS','zaktualizował turniej PTS Classic','3 godz.'],['Anna K.','zgłosiła komentarz do moderacji','wczoraj']]
+        .map(([w,x,t])=>`<div style="display:flex;gap:10px;align-items:flex-start;font-size:0.84rem"><div style="width:6px;height:6px;border-radius:50%;background:var(--ember);margin-top:7px;flex-shrink:0"></div><div style="flex:1"><b style="font-weight:600">${w}</b> <span style="color:var(--ink-dim)">${x}</span><div style="font-size:0.74rem;color:var(--stone);margin-top:2px">${t} temu</div></div></div>`).join('')}
+    </div></div>
   </div>`;
 };
 
-/* ── system designu (dokumentacja propozycji) ── */
-const SWATCH=[['--ember','#e8552a','Akcja główna'],['--ember-hi','#ff7a3d','Akcent na ciemnym'],['--sidebar','#211711','Nawigacja / chrome'],['--bg','#f2efe9','Płótno pracy'],['--surface','#ffffff','Karty, tabele'],['--ok','#2f6b34','Zatwierdzone'],['--warn','#8a5200','Oczekuje'],['--dan','#a8301a','Odrzucone / usuń'],['--info','#2f5f7a','Informacja']];
-V.system = () => `
-  <div class="crumb">Panel · System</div>
-  <div class="page-head"><div><h1>System designu</h1><p>Propozycja oprawy graficznej backendu — ta sama rodzina marki co portal, ale zestrojona pod pracę.</p></div></div>
+function qRow(q){return `<div class="q" data-q="${q.id}"><div class="av">${q.init}</div>
+  <div><h4>${q.t} ${q.flag?`<span class="tag warn">${I.clock} czeka &gt; 48 h</span>`:''}</h4><div class="meta"><b>${q.kind}</b> · ${q.who} · ${q.age}</div></div>
+  <div class="qa"><button class="btn sm" data-act="rej">Odrzuć</button><button class="btn sm pri" data-act="acc">Zatwierdź</button></div></div>`;}
+function eventRows(list){return list.length?list.map(e=>`<div class="q"><div class="av">${e.venue.flag?`<img src="https://flagcdn.com/20x15/${e.venue.flag}.png" alt="" style="width:20px;border-radius:2px">`:''}</div>
+  <div><h4>${e.title}</h4><div class="meta"><b>${e.venue.name}</b>, ${e.venue.city} · ${fdate(e.start)}</div></div>
+  <div class="qa"><span class="tag ${e.scope==='miedzynarodowe'?'dan':e.scope==='krajowe'?'warn':'mute'}">${e.scope==='miedzynarodowe'?'Międzynarodowe':e.scope==='krajowe'?'Krajowe':'Lokalne'}</span></div></div>`).join('')
+  :`<div class="empty">${I.inbox}<h3>Brak zaplanowanych wydarzeń</h3><p>Gdy dodasz wydarzenie, pojawi się w kalendarzu portalu i u Twoich obserwujących.</p></div>`;}
+function tournRow(t){return `<div class="q"><div class="av">${I.trophy.replace(/18/g,'19').replace('currentColor','#fff')}</div>
+  <div><h4>${t.name}</h4><div class="meta"><b>${t.org}</b> · ${t.host?t.host.venue+', '+t.host.city:''} · ${t.season||''}</div></div>
+  <div class="qa"><span class="tag ${t.scope==='miedzynarodowe'?'dan':'warn'}">${t.scope==='miedzynarodowe'?'Międzynarodowy':'Krajowy'}</span></div></div>`;}
+function judgeRow(j){const left=j.n-j.done;return `<div class="q"><div class="av">${I.gauge.replace(/18/g,'19').replace('currentColor','#fff')}</div>
+  <div><h4>${j.t}</h4><div class="meta"><b>${j.v}</b> · ${j.d} · ${j.done}/${j.n} kart wypełnionych</div></div>
+  <div class="qa">${left?`<span class="tag warn">${I.clock} ${left} do wypełnienia</span><button class="btn sm pri">Wypełnij</button>`:`<span class="tag ok">${I.check} Zamknięte</span>`}</div></div>`;}
 
-  <div class="ds-note">
-    <h3>Zasada: to samo DNA, inny tryb</h3>
-    <p>Portal publiczny ma uwodzić — stąd ciepły krem, Fraunces w nagłówkach, duże promienie i powietrze. Panel ma <b>nie męczyć przez osiem godzin</b>, dlatego te same składniki są przestrojone: płótno odbarwione (<span class="cmp-mono">#f2efe9</span> zamiast <span class="cmp-mono">#fbf5ea</span>), promienie 10 px zamiast 16–24 px, gęstość wiersza 44 px.</p>
-    <p><b>Fraunces zostaje wyłącznie na liczbach i tytułach stron</b> — marka jest słyszalna, ale nie przeszkadza w skanowaniu tabel. Ember przestaje być dekoracją: oznacza <b>akcję główną i aktywną pozycję</b>, nic więcej. Doszła paleta statusów, której portal nie potrzebował, a panel bez niej nie działa.</p>
-  </div>
+V.moderacja=()=>`<div class="crumb">Panel · Moderacja</div>
+  <div class="page-head"><div><h1>Moderacja</h1><p>Wnioski o role i treści zgłoszone do sprawdzenia. Decyzję można cofnąć przez 10 sekund.</p></div>
+  <div class="acts"><button class="btn">Historia decyzji</button></div></div>
+  ${scopeBar('Widoczne dla roli <b>Administrator</b> — obejmuje wnioski ze wszystkich kont.')}
+  <div class="card"><div class="tbar">
+    <select><option>Wszystkie typy</option><option>Wnioski o rolę</option><option>Treści</option></select>
+    <select><option>Najstarsze</option><option>Najnowsze</option></select>
+    <div class="right"><span class="tag warn">${I.clock} 2 przeterminowane</span></div></div>
+    <div class="qlist">${QUEUE.map(qRow).join('')}</div></div>`;
 
-  <div class="card" style="margin-bottom:16px"><div class="card-h"><h2>Kolor</h2><span class="sub">9 tokenów — marka + semantyka</span></div>
-    <div class="card-b"><div class="sw-grid">${SWATCH.map(([k,v,d])=>`<div class="sw"><div class="chip" style="background:var(${k})"></div><div class="meta"><b>${d}</b><span>${k}</span></div></div>`).join('')}</div></div></div>
+/* obiekty — admin widzi wszystkie, obiekt tylko swój (z formularzem wizytówki) */
+let objState={q:'',country:'',sort:'name',dir:1,page:1,per:12,sel:new Set()};
+function objFiltered(){let r=OBJECTS.filter(o=>(!objState.q||o.name.toLowerCase().includes(objState.q.toLowerCase()))&&(!objState.country||o.country===objState.country));
+  const d=objState.dir;r.sort((a,b)=>objState.sort==='name'?d*a.name.localeCompare(b.name,'pl'):d*(a.country.localeCompare(b.country,'pl')||a.name.localeCompare(b.name,'pl')));return r;}
+V.obiekty=()=>{
+  if(!has('admin')){
+    const o=OBJECTS.find(x=>x.id===A().objId)||OBJECTS[0];
+    return `<div class="crumb">Panel · Zarządzanie</div>
+    <div class="page-head"><div><h1>Mój obiekt</h1><p>Dane widoczne na wizytówce, mapie i w wyszukiwarce portalu.</p></div>
+      <div class="acts"><a class="btn" href="../object.html" target="_blank" rel="noopener">${I.eye} Podgląd</a><button class="btn pri" data-save>Zapisz zmiany</button></div></div>
+    ${scopeBar(`Zarządzasz jednym obiektem: <b>${o.name}</b>. Pozostałe obiekty widzi tylko administrator.`)}
+    <div class="card"><div class="card-h"><h2>Wizytówka</h2><span class="sub">ID ${o.id}</span></div><div class="card-b"><div class="fgrid">
+      <div class="f"><label>Nazwa obiektu <span class="req">*</span></label><input value="${o.name}"><div class="help">Widoczna na mapie i w wyszukiwarce.</div></div>
+      <div class="f"><label>Kraj</label><input value="${o.country}"></div>
+      <div class="f"><label>Miasto</label><input value="${o.city||''}" placeholder="np. Bad Saarow"></div>
+      <div class="f"><label>Strona www</label><input value="${o.website||''}"></div>
+      <div class="f"><label>Szerokość geogr.</label><input value="${o.lat}"></div>
+      <div class="f"><label>Długość geogr.</label><input value="${o.lng}"></div>
+      <div class="f full"><label>Opis</label><textarea>Kameralny resort saunowy nad jeziorem, słynący z mistrzowskich ceremonii aufguss.</textarea><div class="help">Pierwszy akapit wizytówki. 2–3 zdania działają najlepiej.</div></div>
+    </div></div></div>
+    <div class="card"><div class="card-h"><h2>Widoczność</h2></div><div class="card-b">
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <span class="tag ok">${I.check} Opublikowany</span>
+        <span style="font-size:0.84rem;color:var(--ink-dim)">Obiekt jest widoczny na mapie i w wynikach wyszukiwania.</span>
+        <button class="btn sm" style="margin-left:auto">Ukryj tymczasowo</button></div></div></div>`;
+  }
+  const all=objFiltered(),pages=Math.max(1,Math.ceil(all.length/objState.per));objState.page=Math.min(objState.page,pages);
+  const rows=all.slice((objState.page-1)*objState.per,objState.page*objState.per);
+  const countries=[...new Set(OBJECTS.map(o=>o.country))].sort((a,b)=>a.localeCompare(b,'pl'));
+  return `<div class="crumb">Panel · Zarządzanie</div>
+  <div class="page-head"><div><h1>Obiekty</h1><p>Baza obiektów saunowych widocznych na mapie i w wyszukiwarce portalu.</p></div>
+    <div class="acts"><button class="btn">Import CSV</button><button class="btn pri">+ Dodaj obiekt</button></div></div>
+  ${scopeBar('Rola <b>Administrator</b>: pełna baza. Konto obiektu widzi w tym miejscu wyłącznie swoją wizytówkę.')}
+  <div class="card"><div class="tbar">
+    <div class="fsearch"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <input type="search" id="oq" placeholder="Filtruj po nazwie…" value="${objState.q}" aria-label="Filtruj obiekty"></div>
+    <select id="oc" aria-label="Filtruj po kraju"><option value="">Wszystkie kraje (${countries.length})</option>${countries.map(c=>`<option${c===objState.country?' selected':''}>${c}</option>`).join('')}</select>
+    <div class="right">${all.length} z ${OBJECTS.length} obiektów</div></div>
+  <div class="bulkbar${objState.sel.size?' on':''}"><span>Zaznaczono: ${objState.sel.size}</span>
+    <button class="btn sm">Zmień kraj</button><button class="btn sm">Ukryj na mapie</button><button class="btn sm dan" style="margin-left:auto">Usuń</button></div>
+  <div class="twrap"><table><thead><tr>
+    <th style="width:38px"><input type="checkbox" id="oall" aria-label="Zaznacz wszystkie"></th>
+    <th class="sortable" data-s="name" ${objState.sort==='name'?`aria-sort="${objState.dir>0?'ascending':'descending'}"`:''}>Nazwa <span class="arr">${objState.sort==='name'&&objState.dir<0?'↓':'↑'}</span></th>
+    <th class="sortable" data-s="country" ${objState.sort==='country'?`aria-sort="${objState.dir>0?'ascending':'descending'}"`:''}>Kraj <span class="arr">${objState.sort==='country'&&objState.dir<0?'↓':'↑'}</span></th>
+    <th>Strona www</th><th>Status</th><th style="width:96px"></th></tr></thead>
+    <tbody>${rows.map(o=>`<tr class="${objState.sel.has(o.id)?'sel':''}">
+      <td><input type="checkbox" data-sel="${o.id}" ${objState.sel.has(o.id)?'checked':''} aria-label="Zaznacz ${o.name}"></td>
+      <td><div class="nm"><img src="https://flagcdn.com/20x15/${o.flag}.png" alt="">${o.name}</div><div class="sub">ID ${o.id}</div></td>
+      <td>${o.country}</td>
+      <td>${o.website?`<a href="${o.website}" target="_blank" rel="noopener" style="color:var(--ember-deep);font-weight:600">${o.website.replace(/^https?:\/\/(www\.)?/,'').replace(/\/$/,'').slice(0,26)}</a>`:'<span class="tag mute">brak</span>'}</td>
+      <td>${o.id%9===0?`<span class="tag warn">${I.clock} Szkic</span>`:`<span class="tag ok">${I.check} Opublikowany</span>`}</td>
+      <td class="right"><div class="rowacts"><button class="icon-btn" style="width:28px;height:28px" title="Podgląd" aria-label="Podgląd ${o.name}">${I.eye}</button><button class="icon-btn" style="width:28px;height:28px" title="Edytuj" aria-label="Edytuj ${o.name}">${I.pen}</button></div></td></tr>`).join('')}</tbody></table></div>
+  ${rows.length?`<div class="tfoot"><span>Strona ${objState.page} z ${pages}</span><div class="pg">
+    <button class="pgb" data-pg="${objState.page-1}" ${objState.page===1?'disabled':''} aria-label="Poprzednia">‹</button>
+    ${Array.from({length:Math.min(pages,5)},(_,i)=>i+1).map(p=>`<button class="pgb${p===objState.page?' on':''}" data-pg="${p}">${p}</button>`).join('')}
+    <button class="pgb" data-pg="${objState.page+1}" ${objState.page===pages?'disabled':''} aria-label="Następna">›</button></div></div>`
+   :`<div class="empty">${I.inbox}<h3>Brak wyników</h3><p>Żaden obiekt nie pasuje do filtrów.</p><button class="btn" id="oclear">Wyczyść filtry</button></div>`}</div>`;
+};
 
-  <div class="card" style="margin-bottom:16px"><div class="card-h"><h2>Komponenty</h2></div><div class="card-b">
-    <div class="ds-row"><div class="k">Przyciski</div><div class="cmp">
-      <button class="btn pri">Zatwierdź</button><button class="btn">Drugorzędny</button><button class="btn ghost">Ghost</button><button class="btn dan">Usuń</button><button class="btn sm">Mały</button></div></div>
-    <div class="ds-row"><div class="k">Statusy<div style="font-weight:400;color:var(--stone);font-size:0.72rem;margin-top:2px">ikona + tekst, nigdy sam kolor</div></div><div class="cmp">
-      <span class="tag ok">${I.check} Opublikowany</span><span class="tag warn">${I.clock} Oczekuje</span><span class="tag dan">${I.x} Odrzucony</span><span class="tag info">${I.eye} Podgląd</span><span class="tag mute">Szkic</span></div></div>
-    <div class="ds-row"><div class="k">Pole formularza</div><div style="max-width:320px"><div class="f"><label>Nazwa obiektu <span class="req">*</span></label><input value="Termy Rzymskie"><div class="help">Widoczna na mapie i w wyszukiwarce.</div></div></div></div>
-    <div class="ds-row"><div class="k">Błąd walidacji</div><div style="max-width:320px"><div class="f err"><label>Adres www</label><input value="termy rzymskie"><div class="errmsg">${I.warn.replace('<svg','<svg width="13" height="13"')} Adres musi zaczynać się od https://</div></div></div></div>
+V.wydarzenia=()=>{const ev=scopedEvents();return `<div class="crumb">Panel · Zarządzanie</div>
+  <div class="page-head"><div><h1>Wydarzenia</h1><p>Ceremonie, noce aufguss i turnieje w Twoim kalendarzu.</p></div>
+    <div class="acts"><button class="btn pri">+ Dodaj wydarzenie</button></div></div>
+  ${scopeBar(has('admin')?'Rola <b>Administrator</b>: wydarzenia ze wszystkich obiektów.':'Widzisz wyłącznie wydarzenia <b>swojego obiektu</b>. Dodanie powiadomi obserwujących.')}
+  <div class="card"><div class="card-h"><h2>${ev.length} ${pl(ev.length,'wydarzenie','wydarzenia','wydarzeń')}</h2></div><div class="qlist">${eventRows(ev)}</div></div>`;};
+
+V.wystepy=()=>{const ev=scopedEvents();return `<div class="crumb">Panel · Zarządzanie</div>
+  <div class="page-head"><div><h1>Moje występy</h1><p>Wydarzenia, w których występujesz — te same, które widzi publiczność na Twoim profilu.</p></div>
+    <div class="acts"><button class="btn">Synchronizuj z Google Calendar</button><button class="btn pri">+ Zgłoś występ</button></div></div>
+  ${scopeBar(`Zakres: występy przypisane do <b>${A().person}</b>.`)}
+  <div class="card"><div class="card-h"><h2>${ev.length} ${pl(ev.length,'nadchodzący występ','nadchodzące występy','nadchodzących występów')}</h2></div><div class="qlist">${eventRows(ev)}</div></div>`;};
+
+V.szkolenia=()=>`<div class="crumb">Panel · Zarządzanie</div>
+  <div class="page-head"><div><h1>Szkolenia</h1><p>Terminy i miejsca szkoleń publikowane na Twoim profilu.</p></div>
+    <div class="acts"><button class="btn pri">+ Dodaj termin</button></div></div>
+  ${scopeBar('Moduł roli <b>Szkoleniowiec</b> — widoczny tylko dla trenerów.')}
+  <div class="card"><div class="twrap"><table><thead><tr><th>Termin</th><th>Szkolenie</th><th>Miejsce</th><th>Zapisy</th><th>Status</th><th style="width:70px"></th></tr></thead>
+  <tbody>${TRAININGS.map(t=>`<tr><td><b>${t.d}</b></td>
+    <td><div class="nm">${t.t}</div><div class="sub">${t.lvl}</div></td><td>${t.pl}</td>
+    <td><b>${t.sp}</b></td>
+    <td>${t.st==='ok'?`<span class="tag ok">${I.check} Opublikowane</span>`:`<span class="tag mute">Szkic</span>`}</td>
+    <td class="right"><div class="rowacts"><button class="icon-btn" style="width:28px;height:28px" title="Edytuj" aria-label="Edytuj ${t.t}">${I.pen}</button></div></td></tr>`).join('')}</tbody></table></div></div>`;
+
+V.turnieje=()=>{const t=scopedTournaments();return `<div class="crumb">Panel · Zarządzanie</div>
+  <div class="page-head"><div><h1>${has('admin')?'Turnieje':'Moje turnieje'}</h1><p>Etapy, zgłoszenia zawodników i wyniki.</p></div>
+    <div class="acts"><button class="btn">Zgłoszenia</button><button class="btn pri">+ Nowy turniej</button></div></div>
+  ${scopeBar(has('admin')?'Rola <b>Administrator</b>: wszystkie turnieje w portalu.':`Widzisz turnieje organizowane przez <b>${A().name}</b>.`)}
+  <div class="card"><div class="card-h"><h2>${t.length} ${pl(t.length,'turniej','turnieje','turniejów')}</h2></div><div class="qlist">${t.length?t.map(tournRow).join(''):`<div class="empty">${I.inbox}<h3>Brak turniejów</h3><p>Dodaj pierwszy turniej, aby pojawił się w kalendarzu portalu.</p></div>`}</div></div>`;};
+
+V.oceny=()=>`<div class="crumb">Panel · Zarządzanie</div>
+  <div class="page-head"><div><h1>Karty ocen</h1><p>Turnieje, w których zasiadasz w jury. Karty zapisują się automatycznie.</p></div></div>
+  ${scopeBar('Moduł roli <b>Sędzia</b> — karty przypisane wyłącznie do Ciebie, niewidoczne dla innych sędziów do czasu zamknięcia panelu.')}
+  <div class="card"><div class="card-h"><h2>Do wypełnienia</h2></div><div class="qlist">${JUDGING.map(judgeRow).join('')}</div></div>`;
+
+V.wpisy=()=>{const p=scopedPosts();return `<div class="crumb">Panel · Zarządzanie</div>
+  <div class="page-head"><div><h1>Wpisy</h1><p>Aktualności i wpisy blogowe publikowane na portalu.</p></div>
+    <div class="acts"><button class="btn pri">+ Nowy wpis</button></div></div>
+  ${scopeBar(has('admin')?'Rola <b>Administrator</b>: wpisy wszystkich autorów.':`Widzisz wyłącznie wpisy autorstwa <b>${A().name}</b>.`)}
+  <div class="card"><div class="twrap"><table><thead><tr><th>Tytuł</th><th>Kategoria</th><th>Data</th><th>Ocena</th><th>Status</th><th style="width:70px"></th></tr></thead>
+  <tbody>${p.map(x=>`<tr><td><div class="nm">${x.title}</div>${x.obj?`<div class="sub">${x.obj}</div>`:''}</td>
+    <td>${x.cat}</td><td>${x.date}</td><td>${x.score?`<b>${x.score}</b><span style="color:var(--stone)">/10</span>`:'—'}</td>
+    <td><span class="tag ok">${I.check} Opublikowany</span></td>
+    <td class="right"><div class="rowacts"><button class="icon-btn" style="width:28px;height:28px" title="Edytuj" aria-label="Edytuj wpis">${I.pen}</button></div></td></tr>`).join('')}</tbody></table></div></div>`;};
+
+V.profil=()=>{const a=A();const isVenue=has('obiekt');return `<div class="crumb">Panel · Konto</div>
+  <div class="page-head"><div><h1>Profil publiczny</h1><p>Tak widzą Cię użytkownicy portalu.</p></div>
+    <div class="acts"><a class="btn" href="../${isVenue?'object.html':'saunamaster.html'}" target="_blank" rel="noopener">${I.eye} Podgląd</a><button class="btn pri" data-save>Zapisz</button></div></div>
+  ${scopeBar(`Edytujesz profil: <b>${a.name}</b>.`)}
+  <div class="card"><div class="card-b"><div class="fgrid">
+    <div class="f"><label>Nazwa wyświetlana <span class="req">*</span></label><input value="${a.name}"></div>
+    <div class="f"><label>Obiekt macierzysty</label><input value="Chochołowskie Termy"><div class="help">Saunamistrz może występować w wielu obiektach — jeden oznacza się jako macierzysty.</div></div>
+    <div class="f full"><label>Bio</label><textarea>Saunamistrz z Podhala, Mistrz Świata Aufguss. Aufguss traktuję jak spektakl — z narracją, muzyką i wyczuciem temperatury.</textarea></div>
+  </div></div></div>`;};
+
+V.uzytkownicy=()=>{const U=[['Kamil Poradziński','k.poradzinski@gmail.com',['admin'],'ok'],['SATAMA SAUNA RESORT & SPA','manager@satama.de',['obiekt'],'ok'],
+  ['Maciej Piczura','m.piczura@example.com',['saunamistrz','szkoleniowiec'],'ok'],['Robert Zídek','r.zidek@example.cz',['saunamistrz','sedzia'],'ok'],
+  ['Polskie Towarzystwo Saunowe','biuro@pts.pl',['organizator'],'ok'],['Jan Kowalski','j.kowalski@example.com',['bloger'],'warn'],['Sauna Bad','manager@saunabad.de',['obiekt'],'warn']];
+  return `<div class="crumb">Panel · Konto</div>
+  <div class="page-head"><div><h1>Użytkownicy i role</h1><p>Konta są wielorolowe — nadanie roli odblokowuje odpowiednie moduły panelu.</p></div>
+    <div class="acts"><button class="btn pri">+ Zaproś użytkownika</button></div></div>
+  ${scopeBar('Rola <b>Administrator</b>: pełna lista kont oraz nadawanie i odbieranie ról.')}
+  <div class="card"><div class="twrap"><table><thead><tr><th>Konto</th><th>E-mail</th><th>Role</th><th>Status</th><th style="width:70px"></th></tr></thead>
+  <tbody>${U.map(([n,e,r,s])=>`<tr><td><div class="nm">${n}</div></td><td style="color:var(--ink-dim)">${e}</td>
+    <td><div style="display:flex;gap:5px;flex-wrap:wrap">${r.map(x=>`<span class="tag ${x==='admin'?'info':'mute'}">${ROLE_LABEL[x]||'Bloger'}</span>`).join('')}</div></td>
+    <td>${s==='ok'?`<span class="tag ok">${I.check} Aktywne</span>`:`<span class="tag warn">${I.clock} Wniosek</span>`}</td>
+    <td class="right"><div class="rowacts"><button class="icon-btn" style="width:28px;height:28px" title="Zarządzaj rolami" aria-label="Zarządzaj rolami ${n}">${I.pen}</button></div></td></tr>`).join('')}</tbody></table></div></div>`;};
+
+const SWATCH=[['--ember','Akcja główna'],['--ember-hi','Akcent na ciemnym'],['--sidebar','Nawigacja / chrome'],['--bg','Płótno pracy'],['--surface','Karty, tabele'],['--ok','Zatwierdzone'],['--warn','Oczekuje'],['--dan','Odrzucone / usuń'],['--info','Zakres i informacja']];
+const ALLROLES=['admin','obiekt','saunamistrz','szkoleniowiec','sedzia','organizator'];
+V.system=()=>`<div class="crumb">Panel · System</div>
+  <div class="page-head"><div><h1>System designu</h1><p>Propozycja oprawy graficznej backendu — ta sama rodzina marki co portal, zestrojona pod pracę.</p></div></div>
+  <div class="ds-note"><h3>Zasada: to samo DNA, inny tryb</h3>
+    <p>Portal publiczny ma uwodzić — ciepły krem, Fraunces w nagłówkach, promienie 16–24 px. Panel ma <b>nie męczyć przez osiem godzin</b>, więc te same składniki są przestrojone: płótno odbarwione (<span class="cmp-mono">#f2efe9</span> zamiast <span class="cmp-mono">#fbf5ea</span>), promienie 10 px, wiersz 44 px.</p>
+    <p><b>Fraunces zostaje wyłącznie na liczbach i tytułach stron</b> — marka jest słyszalna, ale nie przeszkadza w skanowaniu tabel. Ember oznacza <b>akcję główną i aktywną pozycję</b>, nic więcej. Doszła paleta statusów, której portal nie potrzebował.</p>
+    <p><b>Panel jest wielorolowy.</b> Nawigacja to suma modułów aktywnych ról konta, a każdy widok otwiera <b>pasek zakresu</b> mówiący wprost, jakie dane widzisz — to jedyna obrona przed pomyleniem „moich" danych z „wszystkimi".</p></div>
+  <div class="card"><div class="card-h"><h2>Macierz ról i modułów</h2><span class="sub">kto co widzi w panelu</span></div><div class="twrap"><table class="matrix">
+    <thead><tr><th>Moduł</th>${ALLROLES.map(r=>`<th style="text-align:center">${ROLE_LABEL[r]}</th>`).join('')}</tr></thead>
+    <tbody>${MODULES.filter(m=>!m.g).map(m=>`<tr><td><b>${typeof m.t==='function'?(m.id==='obiekty'?'Obiekty / Mój obiekt':m.id==='turnieje'?'Turnieje / Moje turnieje':m.id):m.t}</b></td>
+      ${ALLROLES.map(r=>`<td style="text-align:center">${m.roles==='*'||m.roles.includes(r)?`<span class="yes">${I.check.replace('<svg','<svg width="15" height="15"')}</span>`:'<span class="no">—</span>'}</td>`).join('')}</tr>`).join('')}</tbody></table></div></div>
+  <div class="card"><div class="card-h"><h2>Kolor</h2><span class="sub">9 tokenów — marka + semantyka</span></div><div class="card-b">
+    <div class="sw-grid">${SWATCH.map(([k,d])=>`<div class="sw"><div class="chip" style="background:var(${k})"></div><div class="meta"><b>${d}</b><span>${k}</span></div></div>`).join('')}</div></div></div>
+  <div class="card"><div class="card-h"><h2>Komponenty</h2></div><div class="card-b">
+    <div class="ds-row"><div class="k">Przyciski</div><div class="cmp"><button class="btn pri">Zatwierdź</button><button class="btn">Drugorzędny</button><button class="btn ghost">Ghost</button><button class="btn dan">Usuń</button></div></div>
+    <div class="ds-row"><div class="k">Statusy<div style="font-weight:400;color:var(--stone);font-size:0.72rem;margin-top:2px">ikona + tekst, nigdy sam kolor</div></div>
+      <div class="cmp"><span class="tag ok">${I.check} Opublikowany</span><span class="tag warn">${I.clock} Oczekuje</span><span class="tag dan">${I.x} Odrzucony</span><span class="tag info">${I.eye} Podgląd</span><span class="tag mute">Szkic</span></div></div>
+    <div class="ds-row"><div class="k">Pasek zakresu</div><div style="max-width:520px">${scopeBar('Zakres danych: <b>Twój obiekt</b> · rola: <b>Obiekt</b>')}</div></div>
+    <div class="ds-row"><div class="k">Pole i błąd</div><div style="max-width:320px"><div class="f err"><label>Adres www</label><input value="termy rzymskie"><div class="errmsg">${I.warn.replace('<svg','<svg width="13" height="13"')} Adres musi zaczynać się od https://</div></div></div></div>
     <div class="ds-row"><div class="k">Liczby</div><div><span class="num" style="font-size:1.9rem">107</span> <span style="color:var(--stone);font-size:0.8rem">— Fraunces + tabular-nums, kolumny nie skaczą</span></div></div>
-    <div class="ds-row"><div class="k">Motyw</div><div class="cmp"><button class="btn" id="dsTheme">Przełącz jasny / ciemny</button><span style="color:var(--stone);font-size:0.8rem">oba warianty projektowane razem</span></div></div>
-  </div></div>
-
-  <div class="card"><div class="card-h"><h2>Reguły, których pilnujemy</h2></div><div class="card-b">
-    ${[['Zero emoji jako ikon','Wszystkie ikony to SVG o jednolitej grubości 2 px — jak w portalu.'],
-       ['Kontrast AA','Tekst ≥ 4.5:1 w obu motywach; kolor nigdy nie jest jedynym nośnikiem znaczenia.'],
-       ['Klawiatura','Widoczny focus (2 px ember), kolejność tabulacji zgodna z układem, skróty Ctrl K.'],
-       ['Cofanie zamiast potwierdzania','Decyzje moderacyjne wykonują się od razu z 10-sekundowym „Cofnij" — szybciej niż okno potwierdzenia.'],
-       ['Gęstość z umiarem','Wiersz 44 px spełnia minimum dotykowe, mieszcząc 12 rekordów bez przewijania.']
-      ].map(([t,d])=>`<div style="display:flex;gap:11px;padding:9px 0"><span style="color:var(--ok);flex-shrink:0;margin-top:2px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span><div><b style="font-size:0.86rem">${t}</b><div style="font-size:0.83rem;color:var(--ink-dim);margin-top:2px">${d}</div></div></div>`).join('')}
+    <div class="ds-row"><div class="k">Motyw</div><div class="cmp"><button class="btn" id="dsTheme">Przełącz jasny / ciemny</button><span style="color:var(--stone);font-size:0.8rem">oba warianty projektowane razem, kontrast AA sprawdzony w obu</span></div></div>
   </div></div>`;
 
-['wpisy','turnieje','wydarzenia','uzytkownicy','ustawienia'].forEach(id=>{
-  V[id]=()=>`<div class="crumb">Panel</div><div class="page-head"><div><h1>${NAV.find(n=>n.id===id).t}</h1><p>Widok do zaprojektowania w kolejnym kroku — szkielet, nawigacja i komponenty są już gotowe.</p></div></div>
-    <div class="card"><div class="empty">${I.inbox}<h3>Widok w przygotowaniu</h3><p>Ten moduł korzysta z tych samych komponentów co Obiekty i Moderacja: tabela, filtry, statusy i formularz.</p><button class="btn" data-go="system">Zobacz system designu</button></div></div>`;
-});
+V.ustawienia=()=>`<div class="crumb">Panel · Konto</div>
+  <div class="page-head"><div><h1>Ustawienia</h1><p>Dane logowania, powiadomienia i bezpieczeństwo konta.</p></div><div class="acts"><button class="btn pri" data-save>Zapisz</button></div></div>
+  <div class="card"><div class="card-h"><h2>Konto</h2></div><div class="card-b"><div class="fgrid">
+    <div class="f"><label>Nazwa</label><input value="${A().name}"></div>
+    <div class="f"><label>E-mail <span class="req">*</span></label><input value="konto@aufguss.world"></div>
+    <div class="f"><label>Język panelu</label><select><option>Polski</option><option>English</option><option>Deutsch</option></select></div>
+    <div class="f"><label>Strefa czasowa</label><select><option>Europa/Warszawa</option><option>Europa/Berlin</option></select></div>
+  </div><div style="margin-top:16px;display:flex;gap:8px"><button class="btn">Zmień hasło</button><button class="btn">Włącz 2FA</button></div></div></div>`;
 
-/* ══ ROUTER ══ */
+/* ══ RENDER ══ */
 let cur='pulpit';
+function renderNav(){
+  const a=A();
+  document.getElementById('ctxAv').textContent=a.init;
+  document.getElementById('ctxName').textContent=a.name;
+  document.getElementById('ctxRoles').textContent=a.roles.map(r=>ROLE_LABEL[r]).join(' · ');
+  document.getElementById('nav').innerHTML=visible().map(m=>{
+    if(m.g) return `<div class="nav-grp">${m.g}</div>`;
+    const t=typeof m.t==='function'?m.t():m.t, c=m.cnt?m.cnt():null;
+    return `<button class="nav-i${m.id===cur?' on':''}" data-v="${m.id}">${m.ic}<span>${t}</span>${c!=null?`<span class="cnt${m.alert?' alert':''}">${c}</span>`:''}</button>`;
+  }).join('');
+}
 function render(v){
-  cur=v;
-  document.querySelectorAll('.nav-i').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
+  if(!visible().some(m=>m.id===v)) v='pulpit';
+  cur=v; renderNav();
   document.getElementById('view').innerHTML=(V[v]||V.pulpit)();
   document.getElementById('side').classList.remove('open');
   window.scrollTo(0,0);
-  if(v==='obiekty') wireObjects();
+  if(v==='obiekty'&&has('admin')) wireObjects();
 }
 function wireObjects(){
-  const q=document.getElementById('oq'); if(q){ q.oninput=e=>{objState.q=e.target.value;objState.page=1;render('obiekty');document.getElementById('oq').focus();}; }
+  const q=document.getElementById('oq'); if(q) q.oninput=e=>{objState.q=e.target.value;objState.page=1;render('obiekty');const n=document.getElementById('oq');n.focus();n.setSelectionRange(n.value.length,n.value.length);};
   const c=document.getElementById('oc'); if(c) c.onchange=e=>{objState.country=e.target.value;objState.page=1;render('obiekty');};
-  document.querySelectorAll('th.sortable').forEach(th=>th.onclick=()=>{
-    const s=th.dataset.s; objState.dir = objState.sort===s ? -objState.dir : 1; objState.sort=s; render('obiekty');
-  });
-  document.querySelectorAll('[data-pg]').forEach(b=>b.onclick=()=>{const p=+b.dataset.pg; if(p>=1){objState.page=p;render('obiekty');}});
-  document.querySelectorAll('[data-sel]').forEach(cb=>cb.onchange=()=>{
-    const id=+cb.dataset.sel; cb.checked?objState.sel.add(id):objState.sel.delete(id); render('obiekty');
-  });
-  const all=document.getElementById('oall'); if(all) all.onchange=()=>{
-    const rows=objFiltered().slice((objState.page-1)*objState.per,objState.page*objState.per);
-    rows.forEach(o=> all.checked?objState.sel.add(o.id):objState.sel.delete(o.id)); render('obiekty');
-  };
+  document.querySelectorAll('th.sortable').forEach(th=>th.onclick=()=>{const s=th.dataset.s;objState.dir=objState.sort===s?-objState.dir:1;objState.sort=s;render('obiekty');});
+  document.querySelectorAll('[data-pg]').forEach(b=>b.onclick=()=>{const p=+b.dataset.pg;if(p>=1){objState.page=p;render('obiekty');}});
+  document.querySelectorAll('[data-sel]').forEach(cb=>cb.onchange=()=>{const id=+cb.dataset.sel;cb.checked?objState.sel.add(id):objState.sel.delete(id);render('obiekty');});
+  const all=document.getElementById('oall'); if(all) all.onchange=()=>{objFiltered().slice((objState.page-1)*objState.per,objState.page*objState.per).forEach(o=>all.checked?objState.sel.add(o.id):objState.sel.delete(o.id));render('obiekty');};
   const cl=document.getElementById('oclear'); if(cl) cl.onclick=()=>{objState.q='';objState.country='';objState.page=1;render('obiekty');};
 }
+/* przełącznik konta (prototyp) */
+document.getElementById('roleList').innerHTML=Object.entries(ACCOUNTS).map(([k,v])=>
+  `<button class="role-i${k===acc?' on':''}" data-acc="${k}"><span class="rav">${v.init}</span><span><b>${v.name}</b><span>${v.roles.map(r=>ROLE_LABEL[r]).join(' · ')}</span></span></button>`).join('');
+function setAcc(k){acc=k;objState.sel.clear();
+  document.querySelectorAll('[data-acc]').forEach(b=>b.classList.toggle('on',b.dataset.acc===k));
+  document.getElementById('rolebox').classList.remove('on');
+  render('pulpit'); toast(`Panel jako: ${ACCOUNTS[k].name}`);}
+document.getElementById('ctxBtn').onclick=()=>document.getElementById('rolebox').classList.add('on');
+document.getElementById('rolebox').onclick=e=>{if(e.target.id==='rolebox')e.currentTarget.classList.remove('on');};
 document.addEventListener('click',e=>{
+  const a=e.target.closest('[data-acc]'); if(a) return setAcc(a.dataset.acc);
   const nav=e.target.closest('[data-v]'); if(nav) return render(nav.dataset.v);
   const go=e.target.closest('[data-go]'); if(go) return render(go.dataset.go);
+  if(e.target.closest('[data-save]')) return toast('Zmiany zapisane.');
   const act=e.target.closest('[data-act]');
-  if(act){
-    const row=act.closest('.q'), ok=act.dataset.act==='acc';
+  if(act){const row=act.closest('.q'),ok=act.dataset.act==='acc';
     row.outerHTML=`<div class="qdone"><span class="tag ${ok?'ok':'mute'}">${ok?I.check+' Zatwierdzono':I.x+' Odrzucono'}</span> Decyzja zapisana.</div>`;
-    toast(ok?'Wniosek zatwierdzony — użytkownik dostał powiadomienie.':'Wniosek odrzucony.',true);
-  }
+    toast(ok?'Wniosek zatwierdzony — użytkownik dostał powiadomienie.':'Wniosek odrzucony.',true);}
   if(e.target.closest('#dsTheme')) toggleTheme();
 });
-function toggleTheme(){
-  const r=document.documentElement, d=r.dataset.theme==='dark';
-  r.dataset.theme=d?'light':'dark'; localStorage.setItem('adm_theme',r.dataset.theme);
-}
+document.getElementById('toastUndo').onclick=()=>{document.getElementById('toast').classList.remove('on');render(cur);toast('Cofnięto');};
+function toggleTheme(){const r=document.documentElement;r.dataset.theme=r.dataset.theme==='dark'?'light':'dark';localStorage.setItem('adm_theme',r.dataset.theme);}
 document.getElementById('themeBtn').onclick=toggleTheme;
 document.getElementById('menuBtn').onclick=()=>document.getElementById('side').classList.toggle('open');
-document.addEventListener('keydown',e=>{ if((e.ctrlKey||e.metaKey)&&e.key==='k'){e.preventDefault();document.querySelector('.search input').focus();} });
-if(localStorage.getItem('adm_theme')) document.documentElement.dataset.theme=localStorage.getItem('adm_theme');
+document.addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key==='k'){e.preventDefault();document.querySelector('.search input').focus();}
+  if(e.key==='Escape')document.getElementById('rolebox').classList.remove('on');
+});
+if(localStorage.getItem('adm_theme'))document.documentElement.dataset.theme=localStorage.getItem('adm_theme');
 render('pulpit');
 </script>
 </body>
