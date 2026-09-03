@@ -7,6 +7,7 @@ programować — wystarczy założyć projekt i wykonać trzy pliki SQL po kolei
 |---|---|
 | `migrations/0001_schema.sql` | tabele, typy, indeksy, wyzwalacze |
 | `migrations/0002_rls.sql` | polityki dostępu (kto co widzi i może zmieniać) |
+| `migrations/0003_i18n.sql` | wielojęzyczność, słownik krajów, kolejka dla agentów AI, przejmowanie wizytówek |
 | `seed.sql` | dane startowe: 107 obiektów, 9 saunamistrzów, 25 wydarzeń, 9 turniejów, 19 wpisów |
 | `generate-seed.js` | generator `seed.sql` z plików `data/*.js` (`node supabase/generate-seed.js`) |
 
@@ -36,6 +37,8 @@ W panelu Supabase otwórz **SQL Editor** (ikona po lewej) i wykonaj pliki **w te
 1. Wklej całą zawartość `migrations/0001_schema.sql` → **Run**.
 2. Wklej całą zawartość `migrations/0002_rls.sql` → **Run**.
 3. Wklej całą zawartość `seed.sql` → **Run**.
+4. Wklej całą zawartość `migrations/0003_i18n.sql` → **Run**.
+   (po seedzie, bo nakłada klucz obcy na kody krajów już wgranych obiektów)
 
 Po każdym kroku powinno pojawić się `Success`. Gdy coś zgłosi błąd — zatrzymaj się i wyślij mi
 treść komunikatu; poprawimy, zanim pójdziemy dalej.
@@ -95,9 +98,22 @@ Potrzebny na etapie przepisywania panelu — portal działa dziś na GitHub Page
 
 ---
 
-## Do decyzji: 8 obiektów roboczych
+## Obiekty roboczych — to funkcja, nie usterka
 
-Migracja wykryła obiekty obecne w wydarzeniach i turniejach, **których nie ma na Twojej mapie**:
+Portal jest żywym organizmem: obiekty powstają i znikają, a na mapie są **realnie najlepsze**.
+Dlatego obiekt spoza mapy nie jest błędem — jest **zaproszeniem dla właściciela**:
+
+> „Ten obiekt nie ma jeszcze wizytówki w aufguss.world. Jesteś jego administratorem?
+> Skontaktuj się z nami, a otrzymasz uprawnienia do stworzenia i prowadzenia karty."
+
+Obsługuje to migracja 0003:
+- widok **`claimable_venues`** — obiekty, którymi nikt jeszcze nie zarządza (brak wpisu w `venue_members`),
+- rozszerzone **`role_requests`** — zgłoszenie „to mój obiekt" (przez `venue_id`) albo
+  „mojego obiektu u was nie ma" (przez `proposed_name`, `proposed_city`, `proposed_country_code`).
+
+Po akceptacji administrator dopisuje zgłaszającego do `venue_members` i obiekt zyskuje opiekuna.
+
+Obiekty wykryte przy migracji, czekające na właściciela:
 
 | Obiekt | Miasto | Kraj |
 |---|---|---|
@@ -110,8 +126,9 @@ Migracja wykryła obiekty obecne w wydarzeniach i turniejach, **których nie ma 
 | Therme Wien | Wiedeń | Austria |
 | Bernaqua | Berno | Szwajcaria |
 
-Trafiły do bazy jako **robocze** (`status='draft'`): klucze obce działają, ale portal ich nie
-pokazuje. Po weryfikacji uzupełnij współrzędne i opublikuj:
+Są w bazie jako **robocze** (`status='draft'`): powiązania z wydarzeniami działają, ale na mapie
+się nie pokazują (opublikowany obiekt musi mieć współrzędne — pilnuje tego ograniczenie bazy).
+Publikacja po uzupełnieniu lokalizacji:
 
 ```sql
 update public.venues
@@ -119,8 +136,38 @@ set lat = 52.1234, lng = 5.1234, status = 'published'
 where slug = 'thermaalbad';
 ```
 
-Alternatywnie: jeśli któryś obiekt jest niepotrzebny, usuń go — powiązane wydarzenia
-zachowają się (klucz obcy jest `on delete set null`).
+## Wielojęzyczność — jak to działa
+
+Dwie ścieżki, świadomie różne:
+
+| | Treść kuratorowana | Treść użytkowników |
+|---|---|---|
+| **Co** | obiekty, wydarzenia, turnieje, wpisy, szkolenia | komentarze, opinie |
+| **Kiedy tłumaczone** | z góry, przed publikacją | na żądanie, przy kliknięciu |
+| **Gdzie** | tabele `*_translations` | `ugc_translations` (pamięć podręczna) |
+| **Dlaczego tak** | musi być poprawne, indeksowane przez Google | nieograniczona objętość, większości nikt nie przeczyta |
+
+**Nazwy własne nie są tłumaczone** — „Termy Rzymskie" zostają wszędzie. Tłumaczymy opisy,
+tytuły wydarzeń, treść wpisów oraz **miasta i kraje** (Warszawa / Warsaw / Warschau).
+
+Kolejka pracy dla agentów AI:
+
+```sql
+select kind, id, locale, missing, stale from public.translation_queue limit 50;
+```
+
+Widok pokazuje, czego **brakuje** i co **straciło aktualność** — po zmianie oryginału skrót
+`source_hash` przestaje pasować i tłumaczenie samo wraca do kolejki. Agent zapisuje wynik ze
+statusem `machine`; redaktor może podnieść do `reviewed`.
+
+Odczyt z łańcuchem zapasowym (czytelnik nigdy nie zobaczy pustego pola):
+
+```sql
+select * from public.venues_l10n('cs') limit 5;   -- czeski → angielski → oryginał
+```
+
+Języki włączone na start: **pl, en, de, cs, nl, it**. Pozostałe (hu, fr, fi, no, da, lt, lv, et
+oraz sk i ro) są wgrane, ale nieaktywne — włącza się je zmianą `is_active`, gdy tłumaczenia będą gotowe.
 
 ## Znane luki w danych
 
