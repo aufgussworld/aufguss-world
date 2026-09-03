@@ -312,6 +312,8 @@ const I={
   pen:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16z"/></svg>',
   up:'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>',
   inbox:'<svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13h5l1.5 3h5L16 13h5"/><path d="M4.5 6h15l1.5 7v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5z"/></svg>',
+  ticket:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9V7a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v2a2.5 2.5 0 0 0 0 5v2a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-2a2.5 2.5 0 0 0 0-5z"/><path d="M14 6v3M14 14v3"/></svg>',
+  plus:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
 };
 const sm=s=>s.replace(/width="18" height="18"/,'width="14" height="14"');
 const OBJECTS=window.AUFGUSS_OBJECTS||[], POSTS=window.AUFGUSS_POSTS||{}, TOURN=window.AUFGUSS_TOURNAMENTS||[], EVENTS=window.AUFGUSS_EVENTS||[];
@@ -343,8 +345,12 @@ const MODULES=[
   {id:'turnieje', t:()=>has('admin')?'Turnieje':'Moje turnieje', ic:I.trophy, roles:['admin','organizator'], cnt:()=>scopedTournaments().length},
   {id:'oceny',    t:'Karty ocen',        ic:I.gauge,   roles:['sedzia'], cnt:()=>JUDGING.length},
   {id:'wpisy',    t:'Wpisy',             ic:I.post,    roles:['admin','obiekt','organizator'], cnt:()=>scopedPosts().length},
+  {id:'mistrzowie',t:'Saunamistrzowie',  ic:I.users,   roles:['obiekt'], cnt:()=>venueMasters().length},
+  {id:'bilety',   t:'Bilety i ceny',     ic:I.ticket,  roles:['obiekt']},
   {g:'Konto'},
-  {id:'profil',   t:'Profil publiczny',  ic:I.user,    roles:['saunamistrz','sedzia','szkoleniowiec','obiekt','organizator']},
+  /* uwaga: konto obiektu NIE ma osobnego „Profilu publicznego" — jego profilem jest „Mój obiekt" */
+  {id:'profil',   t:'Profil publiczny',  ic:I.user,    roles:['saunamistrz','sedzia','szkoleniowiec','organizator']},
+  {id:'zespol',   t:'Zespół obiektu',    ic:I.users,   roles:['obiekt']},
   {id:'uzytkownicy',t:'Użytkownicy i role', ic:I.users, roles:['admin']},
   {id:'system',   t:'System designu',    ic:I.palette, roles:'*'},
   {id:'ustawienia',t:'Ustawienia',       ic:I.cog,     roles:'*'},
@@ -359,6 +365,16 @@ function scopedEvents(){
   return EVENTS;
 }
 function scopedTournaments(){ const a=A(); return a.orgKey?TOURN.filter(t=>(t.org||'').includes(a.orgKey)):TOURN; }
+/* saunamistrzowie obiektu — wyliczani z realnych wydarzeń tego obiektu */
+function venueMasters(){
+  const map={};
+  scopedEvents().forEach(e=>(e.masters||[]).forEach(m=>{
+    map[m.name]=map[m.name]||{name:m.name,roles:new Set(),count:0};
+    map[m.name].roles.add(m.role); map[m.name].count++;
+  }));
+  return Object.values(map).map(m=>({...m,roles:[...m.roles]}))
+    .sort((a,b)=>b.count-a.count||a.name.localeCompare(b.name,'pl'));
+}
 function scopedPosts(){
   const a=A(), all=Object.entries(POSTS).map(([id,p])=>({id,...p}));
   if(a.objId) return all.filter(p=>p.author==='satama');
@@ -480,6 +496,19 @@ V.obiekty=()=>{
       <div class="f"><label>Długość geogr.</label><input value="${o.lng}"></div>
       <div class="f full"><label>Opis</label><textarea>Kameralny resort saunowy nad jeziorem, słynący z mistrzowskich ceremonii aufguss.</textarea><div class="help">Pierwszy akapit wizytówki. 2–3 zdania działają najlepiej.</div></div>
     </div></div></div>
+    <div class="card"><div class="card-h"><h2>Strefy i sauny</h2><span class="sub">widoczne na wizytówce</span>
+      <div class="acts"><button class="btn sm">${I.plus} Dodaj strefę</button></div></div><div class="card-b">
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        ${['Colosseum Sauna Arena','Sauna fińska 90°C','Banja rosyjska','Sauna nad jeziorem','Łaźnia parowa','Strefa ciszy']
+          .map(z=>`<span class="tag mute" style="padding:6px 12px;font-size:0.78rem">${z}</span>`).join('')}
+      </div></div></div>
+    <div class="card"><div class="card-h"><h2>Galeria</h2><span class="sub">pierwsze zdjęcie trafia na kartę obiektu</span>
+      <div class="acts"><button class="btn sm">${I.plus} Wgraj zdjęcia</button></div></div><div class="card-b">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px">
+        ${['linear-gradient(150deg,#ffd9a8,#ff8a3d)','linear-gradient(150deg,#ff8a3d,#e8552a)','linear-gradient(150deg,#e8552a,#a8320f)','linear-gradient(150deg,#7a3618,#c9651f)']
+          .map((g,i)=>`<div style="aspect-ratio:4/3;border-radius:var(--r-ctl);background:${g};position:relative">${i===0?'<span class="tag ok" style="position:absolute;top:7px;left:7px;background:rgba(255,255,255,0.92);color:#2f6b34">Główne</span>':''}</div>`).join('')}
+        <button style="aspect-ratio:4/3;border-radius:var(--r-ctl);border:1px dashed var(--line-strong);background:var(--surface-2);color:var(--stone);display:flex;align-items:center;justify-content:center;gap:6px;font-size:0.78rem;font-weight:600">${I.plus} Dodaj</button>
+      </div></div></div>
     <div class="card"><div class="card-h"><h2>Widoczność</h2></div><div class="card-b">
       <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
         <span class="tag ok">${I.check} Opublikowany</span>
@@ -562,6 +591,51 @@ V.wpisy=()=>{const p=scopedPosts();return `<div class="crumb">Panel · Zarządza
     <td>${x.cat}</td><td>${x.date}</td><td>${x.score?`<b>${x.score}</b><span style="color:var(--stone)">/10</span>`:'—'}</td>
     <td><span class="tag ok">${I.check} Opublikowany</span></td>
     <td class="right"><div class="rowacts"><button class="icon-btn" style="width:28px;height:28px" title="Edytuj" aria-label="Edytuj wpis">${I.pen}</button></div></td></tr>`).join('')}</tbody></table></div></div>`;};
+
+/* ── moduły wyłącznie dla konta obiektu ── */
+V.mistrzowie=()=>{const m=venueMasters();return `<div class="crumb">Panel · Zarządzanie</div>
+  <div class="page-head"><div><h1>Saunamistrzowie</h1><p>Osoby prowadzące ceremonie w Twoim obiekcie — rezydenci i goście specjalni.</p></div>
+    <div class="acts"><button class="btn pri">${I.plus} Zaproś saunamistrza</button></div></div>
+  ${scopeBar('Lista wynika z <b>wydarzeń Twojego obiektu</b>. Zaproszenie wymaga potwierdzenia przez saunamistrza.')}
+  <div class="card"><div class="twrap"><table><thead><tr><th>Saunamistrz</th><th>Rola w obiekcie</th><th>Wydarzenia</th><th>Status</th><th style="width:70px"></th></tr></thead>
+  <tbody>${m.map(x=>{const res=x.roles.includes('rezydent');return `<tr>
+    <td><div class="nm">${x.name}</div><div class="sub">profil publiczny</div></td>
+    <td><div style="display:flex;gap:5px;flex-wrap:wrap">${x.roles.map(r=>`<span class="tag ${r==='rezydent'?'info':'mute'}">${r.charAt(0).toUpperCase()+r.slice(1)}</span>`).join('')}</div></td>
+    <td><b>${x.count}</b></td>
+    <td>${res?`<span class="tag ok">${I.check} Rezydent</span>`:`<span class="tag mute">Gościnnie</span>`}</td>
+    <td class="right"><div class="rowacts"><a class="icon-btn" style="width:28px;height:28px" href="../saunamaster.html" target="_blank" rel="noopener" title="Podgląd profilu" aria-label="Podgląd profilu ${x.name}">${I.eye}</a></div></td></tr>`;}).join('')}</tbody></table></div>
+  ${m.length?'':`<div class="empty">${I.inbox}<h3>Brak saunamistrzów</h3><p>Zaproś saunamistrza, aby pojawił się na wizytówce obiektu.</p></div>`}</div>`;};
+
+V.bilety=()=>`<div class="crumb">Panel · Zarządzanie</div>
+  <div class="page-head"><div><h1>Bilety i ceny</h1><p>Model prezentacji ceny na wizytówce obiektu.</p></div>
+    <div class="acts"><button class="btn pri" data-save>Zapisz</button></div></div>
+  ${scopeBar('Ustawienia cen <b>Twojego obiektu</b> — widoczne w sekcji „Bilety i ceny" na wizytówce.')}
+  <div class="card"><div class="card-h"><h2>Cennik</h2></div><div class="card-b"><div class="fgrid">
+    <div class="f"><label>Model ceny</label><select><option>Za dzień pobytu</option><option>Za godzinę pobytu</option></select><div class="help">Obiekty w Holandii i Polsce rozliczają się różnie — wybierz sposób zgodny z Twoim cennikiem.</div></div>
+    <div class="f"><label>Cena od <span class="req">*</span></label><input value="od 39 €"></div>
+    <div class="f"><label>Jednostka</label><input value="dzień pobytu"></div>
+    <div class="f full"><label>Uwaga do ceny</label><textarea>Bilet całodniowy, wstęp do wszystkich stref saunowych i ceremonii.</textarea></div>
+  </div></div></div>
+  <div class="card"><div class="card-h"><h2>Co zawiera bilet</h2></div><div class="card-b">
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-bottom:12px;border-bottom:1px solid var(--line)">
+      <span class="tag ok">${I.check} Ceremonie aufguss w cenie</span>
+      <span style="font-size:0.84rem;color:var(--ink-dim)">Wyróżnia obiekt na tle tych, które pobierają za ceremonie osobno.</span>
+      <button class="btn sm" style="margin-left:auto">Zmień</button></div>
+    <div style="padding-top:12px"><div style="font-size:0.8rem;color:var(--stone);margin-bottom:8px">Karty partnerskie (istotne głównie w Polsce)</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <span class="tag mute">Multisport</span><span class="tag mute">Medicover</span><span class="tag mute">PZU Sport</span>
+        <button class="btn sm">${I.plus} Dodaj kartę</button></div></div></div></div>`;
+
+V.zespol=()=>{const T=[['Anna Krüger','anna@satama.de','Administrator obiektu','ok'],['Marek Wolf','marek@satama.de','Redaktor','ok'],['Lena Schmidt','lena@satama.de','Redaktor','warn']];
+  return `<div class="crumb">Panel · Konto</div>
+  <div class="page-head"><div><h1>Zespół obiektu</h1><p>Osoby, które mogą zarządzać tym obiektem w panelu.</p></div>
+    <div class="acts"><button class="btn pri">${I.plus} Dodaj osobę</button></div></div>
+  ${scopeBar('Uprawnienia dotyczą wyłącznie <b>Twojego obiektu</b> — nie dają dostępu do reszty portalu.')}
+  <div class="card"><div class="twrap"><table><thead><tr><th>Osoba</th><th>E-mail</th><th>Uprawnienia</th><th>Status</th><th style="width:70px"></th></tr></thead>
+  <tbody>${T.map(([n,e,r,s])=>`<tr><td><div class="nm">${n}</div></td><td style="color:var(--ink-dim)">${e}</td>
+    <td><span class="tag ${r.includes('Administrator')?'info':'mute'}">${r}</span></td>
+    <td>${s==='ok'?`<span class="tag ok">${I.check} Aktywne</span>`:`<span class="tag warn">${I.clock} Zaproszenie wysłane</span>`}</td>
+    <td class="right"><div class="rowacts"><button class="icon-btn" style="width:28px;height:28px" title="Edytuj uprawnienia" aria-label="Edytuj uprawnienia ${n}">${I.pen}</button></div></td></tr>`).join('')}</tbody></table></div></div>`;};
 
 V.profil=()=>{const a=A();const isVenue=has('obiekt');return `<div class="crumb">Panel · Konto</div>
   <div class="page-head"><div><h1>Profil publiczny</h1><p>Tak widzą Cię użytkownicy portalu.</p></div>
