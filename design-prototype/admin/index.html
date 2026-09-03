@@ -374,6 +374,8 @@ const I={
   ticket:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9V7a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v2a2.5 2.5 0 0 0 0 5v2a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-2a2.5 2.5 0 0 0 0-5z"/><path d="M14 6v3M14 14v3"/></svg>',
   plus:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
   link:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1.5 1.5M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1.5-1.5"/></svg>',
+  flag:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4M5 4h10l-1.5 3.5L15 11H5"/></svg>',
+  globe:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 3.5 6 3.5 9s-1 6.5-3.5 9c-2.5-2.5-3.5-6-3.5-9s1-6.5 3.5-9z"/></svg>',
 };
 const sm=s=>s.replace(/width="18" height="18"/,'width="14" height="14"');
 const OBJECTS=window.AUFGUSS_OBJECTS||[], POSTS=window.AUFGUSS_POSTS||{}, TOURN=window.AUFGUSS_TOURNAMENTS||[], EVENTS=window.AUFGUSS_EVENTS||[];
@@ -405,6 +407,7 @@ const MODULES=[
   {id:'turnieje', t:()=>has('admin')?'Turnieje':'Moje turnieje', ic:I.trophy, roles:['admin','organizator'], cnt:()=>scopedTournaments().length},
   {id:'oceny',    t:'Karty ocen',        ic:I.gauge,   roles:['sedzia'], cnt:()=>JUDGING.length},
   {id:'wpisy',    t:'Wpisy',             ic:I.post,    roles:['admin','obiekt','organizator'], cnt:()=>scopedPosts().length},
+  {id:'zgloszenia',t:'Zgłoszenia treści', ic:I.flag,   roles:['admin','obiekt','organizator','saunamistrz','szkoleniowiec'], cnt:()=>myReports().filter(r=>r.status==='new').length, alert:true},
   {id:'mistrzowie',t:'Saunamistrzowie',  ic:I.users,   roles:['obiekt'], cnt:()=>venueMasters().length},
   {id:'bilety',   t:'Bilety i ceny',     ic:I.ticket,  roles:['obiekt']},
   {g:'Konto'},
@@ -451,6 +454,43 @@ const JUDGING=[
   {t:'Mistrzostwa Polski PTS Classic — półfinał',v:'Suntago',d:'19 kwi 2026',n:9,done:4},
   {t:'Puchar Polski Aufguss — eliminacje',v:'Aquapark Wrocław',d:'23 maj 2026',n:8,done:0},
 ];
+/* ── ZGŁOSZENIA UWAG DO TREŚCI ──────────────────────────────────
+   Agent AI tłumaczy i publikuje od razu (17 języków — nikt tego nie zatwierdzi
+   z góry). Jakości pilnują czytelnicy, a zgłoszenie trafia WPROST do właściciela
+   treści: obiekt → zespół obiektu, wpis → autor, szkolenie → prowadzący.
+   Pole `route` odwzorowuje kolumny route_* wyliczane w bazie wyzwalaczem. */
+const REPORTS=[
+  {id:1,target:'obiekt',   name:'SATAMA SAUNA RESORT & SPA', route:'obiekt', kind:'tlumaczenie',   locale:'de', status:'new',
+   msg:'Niemiecki opis brzmi jak tłumaczenie maszynowe — „Aufgussmeister" zamiast „Saunameister".', who:'Klaus M.', age:'2 godz. temu'},
+  {id:2,target:'wydarzenie',name:'Noc aufguss z gośćmi specjalnymi', route:'obiekt', kind:'nieaktualne', locale:null, status:'new',
+   msg:'Wydarzenie odwołane — na miejscu poinformowano, że przeniesione na kwiecień.', who:'Anna K.', age:'wczoraj'},
+  {id:3,target:'obiekt',   name:'SATAMA SAUNA RESORT & SPA', route:'obiekt', kind:'blad-merytoryczny', locale:'cs', status:'in_progress',
+   msg:'Czeska wersja podaje 12 saun, a w obiekcie jest ich 9.', who:'Petr N.', age:'3 dni temu'},
+  {id:4,target:'turniej',  name:'Mistrzostwa Polski PTS Classic', route:'organizator', kind:'nieaktualne', locale:null, status:'new',
+   msg:'Termin półfinału zmieniony, na stronie PTS jest inna data.', who:'Bartek S.', age:'5 godz. temu'},
+  {id:5,target:'szkolenie',name:'Aufguss od podstaw', route:'osoba', person:'Maciej Piczura', kind:'literowka', locale:'pl', status:'new',
+   msg:'W opisie „temperturą" zamiast „temperaturą".', who:'Ola R.', age:'wczoraj'},
+  {id:6,target:'wpis',     name:'Rzymski przepych, który działa…', route:'osoba', person:'Maciej Piczura', kind:'tlumaczenie', locale:'it', status:'new',
+   msg:'Włoskie tłumaczenie gubi sens ostatniego akapitu.', who:'Marco B.', age:'2 dni temu'},
+  {id:8,target:'wpis',     name:'Berliński minimalizm pod wodą', route:'osoba', person:'Robert Zídek', kind:'blad-merytoryczny', locale:null, status:'new',
+   msg:'Liquidrom nie prowadzi już wieczornych ceremonii w podanych godzinach.', who:'Jonas W.', age:'4 godz. temu'},
+  {id:7,target:'komentarz',name:'Komentarz pod „Noc aufguss"', route:'admin', kind:'niestosowne', locale:null, status:'new',
+   msg:'Komentarz zawiera wulgaryzmy i reklamę innego obiektu.', who:'Tomasz P.', age:'6 godz. temu'},
+];
+const RKIND={tlumaczenie:['Tłumaczenie','info'],nieaktualne:['Nieaktualne','warn'],'blad-merytoryczny':['Błąd merytoryczny','dan'],
+  literowka:['Literówka','mute'],niestosowne:['Niestosowne','dan'],inne:['Inne','mute']};
+/* Odpowiednik polityki RLS `cr_read`: administrator widzi wszystko, właściciel
+   treści swoje. Dla osób kierowanie idzie po KONKRETNYM koncie (route_profile_id),
+   nie po roli — dlatego Robert nie zobaczy zgłoszeń do szkoleń Macieja. */
+function myReports(){
+  const a=A();
+  if(has('admin')) return REPORTS;
+  if(has('obiekt')) return REPORTS.filter(r=>r.route==='obiekt');
+  if(has('organizator')) return REPORTS.filter(r=>r.route==='organizator');
+  if(a.person) return REPORTS.filter(r=>r.route==='osoba' && r.person===a.person);
+  return [];
+}
+
 const QUEUE=[
   {id:1,init:'SB',t:'Sauna Bad — wniosek o zarządzanie profilem obiektu',kind:'Rola: Obiekt',who:'manager@saunabad.de',age:'3 dni temu',flag:true},
   {id:2,init:'JK',t:'Jan Kowalski — wniosek o status blogera',kind:'Rola: Bloger',who:'3 przykładowe recenzje w załączniku',age:'2 dni temu',flag:true},
@@ -813,6 +853,42 @@ function fallbackEditor(host){
   const s=document.getElementById('pmStat'); if(s) s.textContent='Tryb awaryjny: edytor nie wczytał się z sieci. Zapisywane są same akapity.';
 }
 
+V.zgloszenia=()=>{
+  const rs=myReports(), nowe=rs.filter(r=>r.status==='new').length;
+  const scope = has('admin') ? 'Rola <b>Administrator</b>: wszystkie zgłoszenia, w tym dotyczące komentarzy.'
+    : has('obiekt') ? 'Zgłoszenia dotyczące <b>Twojego obiektu i jego wydarzeń</b> — kierowane tu automatycznie.'
+    : has('organizator') ? 'Zgłoszenia dotyczące <b>Twoich turniejów</b>.'
+    : 'Zgłoszenia dotyczące <b>Twoich szkoleń i wpisów</b>.';
+  return `<div class="crumb">Panel · Zarządzanie</div>
+  <div class="page-head"><div><h1>Zgłoszenia treści</h1>
+    <p>Uwagi czytelników do treści, którą się opiekujesz. Tłumaczenia publikują się od razu — to tu wyłapujemy błędy.</p></div></div>
+  ${scopeBar(scope)}
+  <div class="ed-note">${I.info}<div><b>Dlaczego bez zatwierdzania z góry?</b> Treść wychodzi w 17 językach — nikt nie sprawdzi ich przed publikacją. Agent AI tłumaczy i publikuje natychmiast, a każdy widok w portalu ma „Zgłoś uwagę". Uwaga trafia <b>wprost do właściciela treści</b>, nie do wspólnej kolejki.</div></div>
+  <div class="card"><div class="card-h"><h2>${nowe} ${pl(nowe,'nowe zgłoszenie','nowe zgłoszenia','nowych zgłoszeń')}</h2>
+    <span class="sub">${rs.length} łącznie</span>
+    <div class="acts"><select><option>Wszystkie typy</option><option>Tłumaczenie</option><option>Nieaktualne</option><option>Błąd merytoryczny</option></select></div></div>
+    <div class="qlist">${rs.length?rs.map(reportRow).join('')
+      :`<div class="empty">${I.inbox}<h3>Brak zgłoszeń</h3><p>Nikt nie zgłosił uwag do Twoich treści. Gdy to zrobi, pojawią się tutaj.</p></div>`}</div></div>`;
+};
+function reportRow(r){
+  const [kl,kc]=RKIND[r.kind]||['Inne','mute'];
+  const loc = r.locale ? `<span class="tag info">${I.globe} wersja ${r.locale.toUpperCase()}</span>` : '<span class="tag mute">oryginał</span>';
+  const done = r.status!=='new';
+  return `<div class="q" data-rep="${r.id}">
+    <div class="av">${I.flag.replace(/18/g,'19').replace('currentColor','#fff')}</div>
+    <div>
+      <h4>${r.name} <span class="tag ${kc}">${kl}</span> ${loc}
+        ${r.status==='in_progress'?`<span class="tag warn">${I.clock} W toku</span>`:''}</h4>
+      <div class="meta">„${r.msg}" · zgłosił <b>${r.who}</b> · ${r.age} · dotyczy: ${r.target}</div>
+    </div>
+    <div class="qa">
+      ${r.locale?`<button class="btn sm" data-retrans="${r.id}" title="Usuwa tłumaczenie — agent przetłumaczy od nowa">Przetłumacz ponownie</button>`:''}
+      <button class="btn sm" data-rej="${r.id}">Odrzuć</button>
+      <button class="btn sm pri" data-fix="${r.id}">${done?'Zamknij':'Poprawione'}</button>
+    </div>
+  </div>`;
+}
+
 /* ── moduły wyłącznie dla konta obiektu ── */
 V.mistrzowie=()=>{const m=venueMasters();return `<div class="crumb">Panel · Zarządzanie</div>
   <div class="page-head"><div><h1>Saunamistrzowie</h1><p>Osoby prowadzące ceremonie w Twoim obiekcie — rezydenci i goście specjalni.</p></div>
@@ -967,6 +1043,17 @@ document.addEventListener('click',e=>{
     toast('Wpis opublikowany.'); return render('wpisy');
   }
   if(e.target.closest('[data-save]')) return toast('Zmiany zapisane.');
+  const rep=e.target.closest('[data-fix],[data-rej],[data-retrans]');
+  if(rep){
+    const row=rep.closest('.q');
+    if(rep.dataset.retrans!==undefined){
+      row.querySelector('.qa').innerHTML='<span class="tag info">W kolejce do ponownego tłumaczenia</span>';
+      return toast('Tłumaczenie usunięte — agent przetłumaczy je ponownie.',true);
+    }
+    const ok=rep.dataset.fix!==undefined;
+    row.outerHTML=`<div class="qdone"><span class="tag ${ok?'ok':'mute'}">${ok?I.check+' Poprawione':I.x+' Odrzucone'}</span> Zgłaszający dostał powiadomienie.</div>`;
+    return toast(ok?'Zgłoszenie zamknięte jako poprawione.':'Zgłoszenie odrzucone.',true);
+  }
   const act=e.target.closest('[data-act]');
   if(act){const row=act.closest('.q'),ok=act.dataset.act==='acc';
     row.outerHTML=`<div class="qdone"><span class="tag ${ok?'ok':'mute'}">${ok?I.check+' Zatwierdzono':I.x+' Odrzucono'}</span> Decyzja zapisana.</div>`;

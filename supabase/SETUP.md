@@ -8,6 +8,7 @@ programować — wystarczy założyć projekt i wykonać trzy pliki SQL po kolei
 | `migrations/0001_schema.sql` | tabele, typy, indeksy, wyzwalacze |
 | `migrations/0002_rls.sql` | polityki dostępu (kto co widzi i może zmieniać) |
 | `migrations/0003_i18n.sql` | wielojęzyczność, słownik krajów, kolejka dla agentów AI, przejmowanie wizytówek |
+| `migrations/0004_content_reports.sql` | zgłoszenia uwag do treści z automatycznym kierowaniem do właściciela |
 | `seed.sql` | dane startowe: 107 obiektów, 9 saunamistrzów, 25 wydarzeń, 9 turniejów, 19 wpisów |
 | `generate-seed.js` | generator `seed.sql` z plików `data/*.js` (`node supabase/generate-seed.js`) |
 
@@ -39,6 +40,7 @@ W panelu Supabase otwórz **SQL Editor** (ikona po lewej) i wykonaj pliki **w te
 3. Wklej całą zawartość `seed.sql` → **Run**.
 4. Wklej całą zawartość `migrations/0003_i18n.sql` → **Run**.
    (po seedzie, bo nakłada klucz obcy na kody krajów już wgranych obiektów)
+5. Wklej całą zawartość `migrations/0004_content_reports.sql` → **Run**.
 
 Po każdym kroku powinno pojawić się `Success`. Gdy coś zgłosi błąd — zatrzymaj się i wyślij mi
 treść komunikatu; poprawimy, zanim pójdziemy dalej.
@@ -157,8 +159,32 @@ select kind, id, locale, missing, stale from public.translation_queue limit 50;
 ```
 
 Widok pokazuje, czego **brakuje** i co **straciło aktualność** — po zmianie oryginału skrót
-`source_hash` przestaje pasować i tłumaczenie samo wraca do kolejki. Agent zapisuje wynik ze
-statusem `machine`; redaktor może podnieść do `reviewed`.
+`source_hash` przestaje pasować i tłumaczenie samo wraca do kolejki.
+
+### Publikacja bez zatwierdzania — i co w zamian
+
+Przy 17 językach **nikt nie sprawdzi treści przed publikacją**, więc agent AI tłumaczy
+i **publikuje od razu** (status `machine`). Jakości pilnują czytelnicy: każdy widok w portalu
+ma **„Zgłoś uwagę"**, a zgłoszenie trafia **wprost do właściciela treści** — nie do wspólnej
+kolejki administratora:
+
+| Uwaga dotyczy | Trafia do |
+|---|---|
+| obiektu, wydarzenia w obiekcie | zespołu tego obiektu |
+| wpisu | autora (a przy blogu obiektu — też obiektu) |
+| szkolenia | prowadzącego saunamistrza |
+| turnieju | organizatora |
+| komentarza | administratora (moderacja) |
+
+Kierowanie wylicza **wyzwalacz przy zapisie** — zgłaszający nie musi wiedzieć, kto odpowiada.
+Gdy uwaga dotyczy konkretnej wersji językowej, jedno kliknięcie unieważnia tłumaczenie:
+
+```sql
+select public.invalidate_translation(42);   -- id zgłoszenia
+```
+
+Tłumaczenie znika, `translation_queue` natychmiast pokazuje brak, agent tłumaczy od nowa.
+Skrzynka dla panelu: widok **`my_content_reports`** (respektuje RLS, więc każdy widzi swoje).
 
 Odczyt z łańcuchem zapasowym (czytelnik nigdy nie zobaczy pustego pola):
 
