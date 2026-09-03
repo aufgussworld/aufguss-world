@@ -222,27 +222,26 @@ input[type=checkbox]{width:16px;height:16px;accent-color:var(--ember);cursor:poi
 .cov .cl{font-size:0.68rem;color:var(--stone);padding:4px 0 0;font-weight:600;}
 .cov.on{border-color:var(--ember);}
 .cov.on .cl{color:var(--ember-deep);}
-/* bloki treści */
-.blocks{display:flex;flex-direction:column;gap:10px;}
-.blk{border:1px solid var(--line);border-radius:var(--r-ctl);background:var(--surface-2);transition:border-color .15s;}
-.blk:focus-within{border-color:var(--ember);background:var(--surface);}
-.blk-bar{display:flex;align-items:center;gap:6px;padding:6px 8px;border-bottom:1px solid var(--line);}
-.blk-bar select{height:26px;padding:0 24px 0 8px;border:1px solid var(--line-strong);border-radius:6px;background:var(--surface);color:var(--ink);font-family:inherit;font-size:0.74rem;font-weight:600;outline:none;appearance:none;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%237a6a52' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 7px center;}
-.fmt{width:26px;height:26px;border-radius:6px;border:1px solid transparent;background:none;color:var(--ink-dim);display:flex;align-items:center;justify-content:center;font-size:0.78rem;font-weight:700;}
-.fmt:hover{background:var(--surface-3);color:var(--ink);}
-.fmt i{font-family:'Fraunces',serif;font-style:italic;font-weight:600;}
-.blk-bar .sp{flex:1;}
-.blk-bar .mv{width:24px;height:24px;border-radius:5px;border:none;background:none;color:var(--stone);display:flex;align-items:center;justify-content:center;}
-.blk-bar .mv:hover{background:var(--surface-3);color:var(--ink);}
-.blk-bar .mv.del:hover{background:var(--dan-bg);color:var(--dan);}
-.blk-in{padding:10px 12px;min-height:44px;outline:none;font-size:0.9rem;line-height:1.65;color:var(--ink);}
-.blk-in:empty::before{content:attr(data-ph);color:var(--stone);}
-.blk-in b,.blk-in strong{font-weight:700;} .blk-in i,.blk-in em{font-style:italic;}
-.blk-in a{color:var(--ember-deep);text-decoration:underline;}
-.blk[data-t="h"] .blk-in{font-family:'Fraunces',serif;font-size:1.15rem;font-weight:500;}
-.blk[data-t="quote"] .blk-in{border-left:3px solid var(--ember);padding-left:12px;font-style:italic;color:var(--ink-dim);}
-.add-blk{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
+/* edytor TipTap — pasek narzędzi wyłącznie znaczeniowy */
+.pm-wrap{border:1px solid var(--line-strong);border-radius:var(--r-ctl);background:var(--surface-2);overflow:hidden;}
+.pm-wrap:focus-within{border-color:var(--ember);background:var(--surface);}
+.pm-bar{display:flex;align-items:center;gap:4px;flex-wrap:wrap;padding:7px 8px;border-bottom:1px solid var(--line);background:var(--surface);position:sticky;top:56px;z-index:5;}
+.pm-b{height:28px;padding:0 10px;border-radius:6px;border:1px solid transparent;background:none;color:var(--ink-dim);display:inline-flex;align-items:center;gap:6px;font-size:0.76rem;font-weight:600;}
+.pm-b:hover{background:var(--surface-3);color:var(--ink);}
+.pm-b.on{background:var(--ember-soft);color:var(--ember-deep);border-color:rgba(232,85,42,0.3);}
+.pm-b i{font-family:'Fraunces',serif;font-style:italic;font-weight:600;}
+.pm-sep{width:1px;height:20px;background:var(--line-strong);margin:0 4px;}
+.pm-hint{margin-left:auto;font-size:0.7rem;color:var(--stone);}
+.ProseMirror{outline:none;padding:14px 16px;min-height:240px;font-size:0.9rem;line-height:1.7;color:var(--ink);}
+.ProseMirror>*+*{margin-top:11px;}
+.ProseMirror h3{font-family:'Fraunces',serif;font-weight:500;font-size:1.15rem;line-height:1.25;}
+.ProseMirror blockquote{border-left:3px solid var(--ember);padding-left:13px;font-style:italic;color:var(--ink-dim);}
+.ProseMirror ul{padding-left:20px;} .ProseMirror li{margin:3px 0;}
+.ProseMirror a{color:var(--ember-deep);text-decoration:underline;}
+.ProseMirror strong{font-weight:700;} .ProseMirror em{font-style:italic;}
+.ProseMirror p.is-editor-empty:first-child::before{content:attr(data-placeholder);float:left;height:0;pointer-events:none;color:var(--stone);}
+.pm-load{padding:26px;text-align:center;color:var(--stone);font-size:0.85rem;}
+.pm-foot{display:flex;align-items:center;gap:10px;padding:8px 12px;border-top:1px solid var(--line);font-size:0.73rem;color:var(--stone);background:var(--surface);}
 /* podgląd — dokładnie tak, jak zobaczy to czytelnik */
 .prev{position:sticky;top:72px;}
 .prev-h{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--surface-3);border:1px solid var(--line);border-bottom:none;border-radius:var(--r-card) var(--r-card) 0 0;font-size:0.76rem;font-weight:600;color:var(--ink-dim);}
@@ -657,38 +656,14 @@ V.wpisy=()=>{const p=scopedPosts();return `<div class="crumb">Panel · Zarządza
    Zasada: autor decyduje o ZNACZENIU, system o WYGLĄDZIE.
    Brak kontrolek czcionki, rozmiaru, koloru i wyrównania — celowo. */
 const COVERS=[['pc1','Piaskowa'],['pc2','Ognista'],['pc3','Miedziana'],['pc4','Nocna']];
-const BLOCK_TYPES={p:'Akapit',h:'Śródtytuł',quote:'Cytat',list:'Lista',img:'Zdjęcie'};
-let ed={cat:'Recenzja',title:'',lead:'',cover:'pc1',objId:'',score:'',blocks:[{t:'p',v:''}]};
+let ed={cat:'Recenzja',title:'',lead:'',cover:'pc1',objId:'',score:'',html:''};
+let tiptap=null;   // instancja edytora (tworzona przy wejściu w widok, niszczona przy wyjściu)
 
-/* dozwolone są WYŁĄCZNIE znaczniki znaczeniowe — reszta jest usuwana */
-function cleanHTML(html){
-  const d=document.createElement('div'); d.innerHTML=html;
-  const ok={B:1,STRONG:1,I:1,EM:1,A:1,BR:1};
-  (function walk(n){
-    [...n.childNodes].forEach(c=>{
-      if(c.nodeType===1){
-        walk(c);
-        if(!ok[c.tagName]){ c.replaceWith(...c.childNodes); return; }
-        [...c.attributes].forEach(a=>{ if(!(c.tagName==='A'&&a.name==='href')) c.removeAttribute(a.name); });
-        if(c.tagName==='A'){ c.setAttribute('target','_blank'); c.setAttribute('rel','noopener'); }
-      }
-    });
-  })(d);
-  return d.innerHTML.replace(/<br>\s*$/,'');
-}
 const esc=s=>String(s).replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
 
 function previewHTML(){
-  const body=ed.blocks.map(b=>{
-    const v=b.v||'';
-    if(!v.trim()&&b.t!=='img') return '';
-    if(b.t==='h') return `<h3>${v}</h3>`;
-    if(b.t==='quote') return `<blockquote>${v}</blockquote>`;
-    if(b.t==='list') return `<ul>${v.split('\n').filter(Boolean).map(li=>`<li>${li}</li>`).join('')}</ul>`;
-    if(b.t==='img') return `<div class="pimg ${ed.cover}"></div>${v?`<div class="pcap">${v}</div>`:''}`;
-    return `<p>${v}</p>`;
-  }).join('');
-  const hasAny=ed.title||ed.lead||body;
+  const body=(ed.html||'').replace(/<p><\/p>/g,'');
+  const hasAny=ed.title||ed.lead||body.replace(/<[^>]+>/g,'').trim();
   if(!hasAny) return `<div class="prev-empty">Zacznij pisać — podgląd pokaże wpis dokładnie tak, jak zobaczy go czytelnik.</div>`;
   const obj=ed.objId?OBJECTS.find(o=>o.id===+ed.objId):null;
   return `<div class="prev-cover ${ed.cover}"></div><div class="prev-in">
@@ -733,9 +708,22 @@ V.edytor=()=>{
         <div class="help" style="margin-top:9px;font-size:0.74rem;color:var(--stone)">Brak własnych kolorów — cztery warianty pilnują, by karty wpisów tworzyły spójną siatkę.</div>
       </div></div>
 
-      <div class="card"><div class="card-h"><h2>Treść</h2><span class="sub">${ed.blocks.length} ${pl(ed.blocks.length,'blok','bloki','bloków')}</span></div><div class="card-b">
-        <div class="blocks" id="blocks">${ed.blocks.map((b,i)=>blockHTML(b,i)).join('')}</div>
-        <div class="add-blk">${Object.entries(BLOCK_TYPES).map(([k,n])=>`<button class="btn sm" data-add="${k}">${I.plus} ${n}</button>`).join('')}</div>
+      <div class="card"><div class="card-h"><h2>Treść</h2><span class="sub">bloki znaczeniowe</span></div><div class="card-b">
+        <div class="pm-wrap">
+          <div class="pm-bar" id="pmBar">
+            <button class="pm-b" data-cmd="paragraph">Akapit</button>
+            <button class="pm-b" data-cmd="heading">Śródtytuł</button>
+            <button class="pm-b" data-cmd="blockquote">Cytat</button>
+            <button class="pm-b" data-cmd="bulletList">Lista</button>
+            <span class="pm-sep"></span>
+            <button class="pm-b" data-cmd="bold" title="Ctrl+B" aria-label="Pogrubienie"><b>B</b></button>
+            <button class="pm-b" data-cmd="italic" title="Ctrl+I" aria-label="Kursywa"><i>I</i></button>
+            <button class="pm-b" data-cmd="link" aria-label="Odnośnik">${I.link}</button>
+            <span class="pm-hint">bez czcionek, rozmiarów i kolorów — celowo</span>
+          </div>
+          <div id="pmHost"><div class="pm-load">Wczytywanie edytora…</div></div>
+          <div class="pm-foot">${I.shield.replace(/18/g,'14')} <span id="pmStat">Schemat dokumentu dopuszcza wyłącznie: akapit, śródtytuł, cytat, listę oraz pogrubienie, kursywę i odnośnik.</span></div>
+        </div>
       </div></div>
     </div>
 
@@ -745,22 +733,6 @@ V.edytor=()=>{
     </div>
   </div>`;
 };
-function blockHTML(b,i){
-  const ph={p:'Napisz akapit…',h:'Śródtytuł',quote:'Cytat lub wyróżniona myśl',list:'Każda pozycja w nowej linii',img:'Podpis zdjęcia (opcjonalny)'}[b.t];
-  return `<div class="blk" data-t="${b.t}" data-i="${i}">
-    <div class="blk-bar">
-      <select data-type="${i}" aria-label="Typ bloku">${Object.entries(BLOCK_TYPES).map(([k,n])=>`<option value="${k}"${b.t===k?' selected':''}>${n}</option>`).join('')}</select>
-      ${b.t!=='img'?`<button class="fmt" data-fmt="bold" title="Pogrubienie (Ctrl+B)" aria-label="Pogrubienie">B</button>
-      <button class="fmt" data-fmt="italic" title="Kursywa (Ctrl+I)" aria-label="Kursywa"><i>I</i></button>
-      <button class="fmt" data-fmt="link" title="Wstaw odnośnik" aria-label="Wstaw odnośnik">${I.link}</button>`:''}
-      <span class="sp"></span>
-      <button class="mv" data-mv="${i}:-1" title="W górę" aria-label="Przenieś w górę">↑</button>
-      <button class="mv" data-mv="${i}:1" title="W dół" aria-label="Przenieś w dół">↓</button>
-      <button class="mv del" data-del="${i}" title="Usuń blok" aria-label="Usuń blok">${I.x.replace('<svg','<svg width="13" height="13"')}</button>
-    </div>
-    <div class="blk-in" contenteditable="true" data-in="${i}" data-ph="${ph}">${b.v||''}</div>
-  </div>`;
-}
 function wireEditor(){
   const S=(id,ev,fn)=>{const e=document.getElementById(id); if(e) e.addEventListener(ev,fn);};
   S('edCat','change',e=>{ed.cat=e.target.value;render('edytor');});
@@ -771,28 +743,74 @@ function wireEditor(){
     el.addEventListener('input',upd);upd();};
   count('edTitle','cTitle',80,'title'); count('edLead','cLead',180,'lead');
   document.querySelectorAll('[data-cov]').forEach(b=>b.onclick=()=>{ed.cover=b.dataset.cov;render('edytor');});
-  document.querySelectorAll('[data-add]').forEach(b=>b.onclick=()=>{ed.blocks.push({t:b.dataset.add,v:''});render('edytor');});
-  document.querySelectorAll('[data-type]').forEach(s=>s.onchange=()=>{ed.blocks[+s.dataset.type].t=s.value;render('edytor');});
-  document.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{if(ed.blocks.length>1){ed.blocks.splice(+b.dataset.del,1);render('edytor');}else toast('Wpis musi mieć co najmniej jeden blok.');});
-  document.querySelectorAll('[data-mv]').forEach(b=>b.onclick=()=>{const[i,d]=b.dataset.mv.split(':').map(Number),j=i+d;
-    if(j<0||j>=ed.blocks.length)return; [ed.blocks[i],ed.blocks[j]]=[ed.blocks[j],ed.blocks[i]]; render('edytor');});
-  document.querySelectorAll('[data-in]').forEach(el=>{
-    const i=+el.dataset.in;
-    el.addEventListener('input',()=>{ed.blocks[i].v=el.dataset.t==='list'?el.innerText:cleanHTML(el.innerHTML);syncPreview();});
-    /* WKLEJANIE ZAWSZE JAKO CZYSTY TEKST — główna droga, którą obce style trafiają do CMS-a */
-    el.addEventListener('paste',e=>{e.preventDefault();
-      const txt=(e.clipboardData||window.clipboardData).getData('text/plain');
-      document.execCommand('insertText',false,txt);
-      toast('Wklejono jako czysty tekst — formatowanie źródła zostało usunięte.');});
-    el.addEventListener('keydown',e=>{ if((e.ctrlKey||e.metaKey)&&['u'].includes(e.key.toLowerCase())) e.preventDefault(); }); /* bez podkreśleń — mylą się z linkiem */
+  mountTipTap();
+}
+
+/* ══ TIPTAP — ograniczenia wymuszone SCHEMATEM dokumentu ═══════
+   Rejestrujemy wyłącznie potrzebne węzły i znaczniki. Czego nie ma w schemacie,
+   tego nie da się wprowadzić — ani z klawiatury, ani wklejeniem, ani przez API. */
+function destroyTipTap(){ if(tiptap){ try{tiptap.destroy();}catch(e){} tiptap=null; } }
+function mountTipTap(){
+  const host=document.getElementById('pmHost'); if(!host) return;
+  if(!window.TT){                       // biblioteka jeszcze się nie wczytała
+    if(window.TT_FAILED) return fallbackEditor(host);
+    document.addEventListener('tt-ready',()=>{ if(document.getElementById('pmHost')) mountTipTap(); },{once:true});
+    document.addEventListener('tt-failed',()=>{ if(document.getElementById('pmHost')) fallbackEditor(document.getElementById('pmHost')); },{once:true});
+    return;
+  }
+  host.innerHTML='';
+  const {Editor,StarterKit,Link,Placeholder}=window.TT;
+  tiptap=new Editor({
+    element:host,
+    extensions:[
+      StarterKit.configure({
+        heading:{levels:[3]},        // jeden poziom śródtytułu — bez hierarchii do popsucia
+        codeBlock:false, code:false, // bez bloków kodu
+        horizontalRule:false,        // bez linii dekoracyjnych
+        strike:false,                // przekreślenie nie niesie znaczenia redakcyjnego
+        orderedList:false,
+      }),
+      Link.configure({openOnClick:false, autolink:false, HTMLAttributes:{target:'_blank',rel:'noopener'}}),
+      ...(Placeholder?[Placeholder.configure({placeholder:'Napisz pierwszy akapit…'})]:[]),
+    ],
+    content: ed.html || '<p></p>',
+    onUpdate:({editor})=>{ ed.html=editor.getHTML(); syncPreview(); },
+    onSelectionUpdate:({editor})=>refreshBar(editor),
+    onTransaction:({editor})=>refreshBar(editor),
   });
-  document.querySelectorAll('[data-fmt]').forEach(b=>b.onmousedown=e=>{
-    e.preventDefault(); const f=b.dataset.fmt;
-    if(f==='link'){ const u=prompt('Adres odnośnika (https://…)'); if(u) document.execCommand('createLink',false,u); }
-    else document.execCommand(f);
-    const blk=b.closest('.blk'), inp=blk.querySelector('[data-in]');
-    ed.blocks[+inp.dataset.in].v=cleanHTML(inp.innerHTML); syncPreview();
+  /* wklejone treści też przechodzą przez schemat — pokazujemy to użytkownikowi */
+  host.addEventListener('paste',()=>setTimeout(()=>{
+    toast('Wklejono — obce formatowanie zostało odrzucone przez schemat dokumentu.');},0));
+  document.getElementById('pmBar').querySelectorAll('[data-cmd]').forEach(b=>b.onmousedown=e=>{
+    e.preventDefault(); const c=tiptap.chain().focus();
+    ({paragraph:()=>c.setParagraph().run(),
+      heading:()=>c.toggleHeading({level:3}).run(),
+      blockquote:()=>c.toggleBlockquote().run(),
+      bulletList:()=>c.toggleBulletList().run(),
+      bold:()=>c.toggleBold().run(),
+      italic:()=>c.toggleItalic().run(),
+      link:()=>{ if(tiptap.isActive('link')) return c.unsetLink().run();
+        const u=prompt('Adres odnośnika (https://…)'); if(u) c.setLink({href:u}).run(); },
+    })[b.dataset.cmd]();
   });
+  refreshBar(tiptap);
+  const s=document.getElementById('pmStat');
+  if(s) s.textContent=`Schemat dopuszcza węzły: ${Object.keys(tiptap.schema.nodes).join(', ')} · znaczniki: ${Object.keys(tiptap.schema.marks).join(', ')}.`;
+}
+function refreshBar(editor){
+  const bar=document.getElementById('pmBar'); if(!bar) return;
+  const on={paragraph:editor.isActive('paragraph'),heading:editor.isActive('heading',{level:3}),
+    blockquote:editor.isActive('blockquote'),bulletList:editor.isActive('bulletList'),
+    bold:editor.isActive('bold'),italic:editor.isActive('italic'),link:editor.isActive('link')};
+  bar.querySelectorAll('[data-cmd]').forEach(b=>b.classList.toggle('on',!!on[b.dataset.cmd]));
+}
+/* awaryjnie: gdy CDN nie odpowie, autor i tak może pisać (same akapity) */
+function fallbackEditor(host){
+  host.innerHTML=`<textarea id="pmFallback" style="width:100%;min-height:240px;border:none;background:none;padding:14px 16px;font-family:inherit;font-size:0.9rem;line-height:1.7;color:var(--ink);outline:none;resize:vertical" placeholder="Napisz treść — każdy akapit w nowej linii."></textarea>`;
+  const ta=document.getElementById('pmFallback');
+  ta.value=(ed.html||'').replace(/<\/p>/g,'\n').replace(/<[^>]+>/g,'').trim();
+  ta.addEventListener('input',()=>{ed.html=ta.value.split(/\n+/).filter(Boolean).map(p=>`<p>${esc(p)}</p>`).join('');syncPreview();});
+  const s=document.getElementById('pmStat'); if(s) s.textContent='Tryb awaryjny: edytor nie wczytał się z sieci. Zapisywane są same akapity.';
 }
 
 /* ── moduły wyłącznie dla konta obiektu ── */
@@ -912,6 +930,7 @@ function renderNav(){
 function render(v){
   /* 'edytor' to podwidok modułu Wpisy — nie ma własnej pozycji w nawigacji */
   if(v!=='edytor'&&!visible().some(m=>m.id===v)) v='pulpit';
+  destroyTipTap();   /* zawsze sprzątamy instancję przed podmianą DOM */
   cur=v; renderNav();
   if(v==='edytor') document.querySelectorAll('.nav-i').forEach(b=>b.classList.toggle('on',b.dataset.v==='wpisy'));
   document.getElementById('view').innerHTML=(V[v]||V.pulpit)();
@@ -942,7 +961,7 @@ document.addEventListener('click',e=>{
   const a=e.target.closest('[data-acc]'); if(a) return setAcc(a.dataset.acc);
   const nav=e.target.closest('[data-v]'); if(nav) return render(nav.dataset.v);
   const go=e.target.closest('[data-go]'); if(go) return render(go.dataset.go);
-  if(e.target.closest('[data-newpost]')){ ed={cat:'Recenzja',title:'',lead:'',cover:'pc1',objId:'',score:'',blocks:[{t:'p',v:''}]}; return render('edytor'); }
+  if(e.target.closest('[data-newpost]')){ ed={cat:'Recenzja',title:'',lead:'',cover:'pc1',objId:'',score:'',html:''}; return render('edytor'); }
   if(e.target.closest('[data-publish]')){
     if(!ed.title.trim()||!ed.lead.trim()) return toast('Uzupełnij tytuł i lead przed publikacją.');
     toast('Wpis opublikowany.'); return render('wpisy');
@@ -964,6 +983,26 @@ document.addEventListener('keydown',e=>{
 });
 if(localStorage.getItem('adm_theme'))document.documentElement.dataset.theme=localStorage.getItem('adm_theme');
 render('pulpit');
+</script>
+
+<!-- TipTap v2 (ESM z CDN — prototyp bez bundlera; docelowo pakiet npm w Next.js).
+     Wersja 2 celowo: v3 dokłada do schematu podkreślenie, którego nie chcemy. -->
+<script type="module">
+const V='2';
+try{
+  const [core,sk,link,ph]=await Promise.all([
+    import(`https://esm.sh/@tiptap/core@${V}`),
+    import(`https://esm.sh/@tiptap/starter-kit@${V}`),
+    import(`https://esm.sh/@tiptap/extension-link@${V}`),
+    import(`https://esm.sh/@tiptap/extension-placeholder@${V}`).catch(()=>null),
+  ]);
+  window.TT={Editor:core.Editor, StarterKit:sk.default, Link:link.default, Placeholder:ph&&ph.default};
+  document.dispatchEvent(new CustomEvent('tt-ready'));
+}catch(e){
+  console.warn('[edytor] nie udało się wczytać TipTap:',e);
+  window.TT_FAILED=true;
+  document.dispatchEvent(new CustomEvent('tt-failed'));
+}
 </script>
 </body>
 </html>
