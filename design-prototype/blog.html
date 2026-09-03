@@ -44,6 +44,35 @@ header{display:flex;align-items:center;justify-content:space-between;padding:16p
 .sec-head h2{font-size:clamp(1.5rem,2.6vw,2rem);}
 .sec-head .count{font-size:0.82rem;color:var(--stone);}
 
+/* RANKING OBIEKTÓW (wariant .pod-row z tournaments.html + chipy .nl-chip z index.html) */
+.rk-intro{color:var(--ink-dim);line-height:1.65;font-size:0.9rem;max-width:640px;margin:-8px 0 18px;}
+.rk-filter{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:16px;}
+.rk-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:100px;border:1px solid var(--line-strong);background:var(--surface);font:600 0.75rem 'Instrument Sans';color:var(--ink-dim);cursor:pointer;transition:all .18s;}
+.rk-chip:hover{border-color:var(--ember-1);}
+.rk-chip.active{background:var(--ember-2);color:#fff;border-color:var(--ember-2);}
+.rk-chip img{width:16px;border-radius:2px;}
+.rk-chip .n{font-weight:700;opacity:0.65;}
+.rk-list{display:flex;flex-direction:column;gap:8px;}
+.rk-row{display:grid;grid-template-columns:40px 1fr auto auto;gap:14px;align-items:center;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--surface);transition:border-color .18s,background .18s,transform .18s;}
+.rk-row:hover{border-color:var(--ember-1);transform:translateX(3px);}
+.rk-row.p1{background:linear-gradient(120deg,rgba(255,190,80,0.22),var(--surface));border-color:rgba(255,180,80,0.5);}
+.rk-row.p2{background:rgba(170,170,170,0.12);}
+.rk-row.p3{background:rgba(205,127,50,0.12);}
+.rk-medal{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-weight:600;font-size:1rem;color:#2a0e02;background:var(--surface-2);}
+.p1 .rk-medal{background:linear-gradient(135deg,#ffd77a,#e8a53a);}
+.p2 .rk-medal{background:linear-gradient(135deg,#e6e6e6,#b8b8b8);}
+.p3 .rk-medal{background:linear-gradient(135deg,#e0a86a,#c07a3a);}
+.rk-name{font-weight:600;font-size:0.95rem;}
+.rk-name:hover{color:var(--ember-3);}
+.rk-global{font-size:0.72rem;color:var(--stone);white-space:nowrap;}
+.rk-meta{display:block;font-size:0.78rem;color:var(--ink-dim);margin-top:2px;}
+.rk-meta img{width:16px;border-radius:2px;vertical-align:-2px;margin-right:5px;}
+.rk-note{display:block;font-size:0.78rem;color:var(--stone);line-height:1.45;margin-top:4px;}
+.rk-score{font-family:'Fraunces',serif;color:var(--ember-3);font-size:1.15rem;text-align:right;line-height:1.1;}
+.rk-score small{font-size:0.62rem;color:var(--stone);display:block;}
+.rk-review{font-size:0.76rem;font-weight:600;color:var(--ember-2);white-space:nowrap;}
+.rk-review:hover{color:var(--ember-3);}
+
 /* WPISY */
 .posts{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;}
 .post-card{background:var(--surface);border:1px solid var(--line);border-radius:18px;overflow:hidden;display:flex;flex-direction:column;cursor:pointer;transition:transform .3s,box-shadow .3s,border-color .3s;}
@@ -77,7 +106,13 @@ header{display:flex;align-items:center;justify-content:space-between;padding:16p
 .pmodal .pm-body p{color:var(--ink-dim);line-height:1.75;margin-bottom:15px;font-size:1rem;}
 .pmodal .pm-obj{margin-top:6px;font-size:0.86rem;}
 .pmodal .pm-obj a{color:var(--ember-2);font-weight:600;}
-@media(max-width:560px){ .bh-av{width:84px;height:84px;font-size:1.9rem;} .pmodal .pm-inner{padding:22px 22px 0;} }
+@media(max-width:560px){ .bh-av{width:84px;height:84px;font-size:1.9rem;} .pmodal .pm-inner{padding:22px 22px 0;}
+  .rk-row{grid-template-columns:34px 1fr;row-gap:6px;}
+  .rk-medal{width:30px;height:30px;font-size:0.9rem;}
+  .rk-score{grid-column:2;text-align:left;}
+  .rk-score small{display:inline;margin-left:4px;}
+  .rk-review{grid-column:2;}
+}
 </style>
 </head>
 <body>
@@ -89,15 +124,24 @@ header{display:flex;align-items:center;justify-content:space-between;padding:16p
 
 <div class="wrap">
   <div class="blog-hero" id="blogHero"></div>
+
+  <section class="rk" id="rkSec" hidden>
+    <div class="sec-head"><h2>Ranking obiektów</h2><span class="count" id="rkCount"></span></div>
+    <p class="rk-intro">Subiektywne zestawienie wszystkich obiektów, które oceniłem — od najlepszego. Filtruj po kraju, aby zobaczyć ranking krajowy.</p>
+    <div class="rk-filter" id="rkFilter" role="group" aria-label="Filtr kraju"></div>
+    <div class="rk-list" id="rkList"></div>
+  </section>
+
   <div class="sec-head"><h2 id="postsHead">Wpisy</h2><span class="count" id="postsCount"></span></div>
   <div class="posts" id="posts"></div>
 </div>
 
 <script src="../data/posts-data.js"></script>
+<script src="../data/objects-data.js"></script>
 <script>
 // meta właścicieli blogów (autor = wpisy z posts-data.js po polu author)
 const BLOGS = {
-  'wojciech-kadz': { typeCls:'bloger', meta:['Polska','Bloger saunowy','48 recenzji'],
+  'wojciech-kadz': { typeCls:'bloger', meta:['Polska','Bloger saunowy','{recenzje}'],
     bio:'Recenzent i bloger saunowy. Od ośmiu lat objeżdżam europejskie sauny i opisuję je bez filtra — od jakości aufguss, przez architekturę, po obsługę i atmosferę. Współpracuję z aufguss.world jako zweryfikowany bloger.',
     postsLabel:'Recenzje i wpisy' },
   'pts': { typeCls:'partner', meta:['Polska','Organizator turniejów','Partner portalu'],
@@ -114,6 +158,7 @@ const AUTHORS = window.AUFGUSS_POST_AUTHORS||{}, POSTS = window.AUFGUSS_POSTS||{
 const author = AUTHORS[slug] || AUTHORS['wojciech-kadz'];
 // wpisy tego autora (kolejność wg rejestru)
 const posts = Object.entries(POSTS).filter(([,p])=>p.author===slug).map(([id,p])=>({id,...p}));
+const reviewCount = posts.filter(p=>p.score).length;
 
 document.title = `${author.name} — blog | aufguss.world`;
 document.getElementById('blogHero').innerHTML = `
@@ -121,12 +166,75 @@ document.getElementById('blogHero').innerHTML = `
   <div>
     <span class="bh-type ${meta.typeCls}">${author.type}</span>
     <h1>${author.name}</h1>
-    <div class="bh-meta">${meta.meta.map(m=>`<span>${m}</span>`).join('')}</div>
+    <div class="bh-meta">${meta.meta.map(m=>`<span>${m.replace('{recenzje}', `${reviewCount} ${reviewCount===1?'recenzja':(reviewCount%10>=2&&reviewCount%10<=4&&(reviewCount<12||reviewCount>14)?'recenzje':'recenzji')}`)}</span>`).join('')}</div>
     <p class="bh-bio">${meta.bio}</p>
     <button class="bh-follow">＋ Obserwuj bloga</button>
   </div>`;
 document.getElementById('postsHead').textContent = meta.postsLabel;
 document.getElementById('postsCount').textContent = `${posts.length} ${posts.length===1?'wpis':'wpisów'}`;
+
+/* ── RANKING OBIEKTÓW ────────────────────────────────────────
+   Ranking jest globalny (wszystkie ocenione obiekty). Filtr kraju przenumerowuje
+   pozycje od 1 wg rankingu krajowego, zachowując pozycję globalną w nawiasie.
+   Renderuje się tylko, gdy autor ma ocenione wpisy — blogi obiektów i partnerów
+   nie wystawiają ocen, więc sekcja pomija się sama. */
+const OBJECTS = window.AUFGUSS_OBJECTS || [];
+const objById = new Map(OBJECTS.map(o=>[o.id,o]));
+const scoreNum = s => parseFloat(String(s).replace(',','.'));
+const plural = n => n===1?'obiekt':(n%10>=2&&n%10<=4&&(n<12||n>14)?'obiekty':'obiektów');
+
+const ranked = posts
+  .filter(p => p.score)
+  .map(p => {
+    const o = p.objId ? objById.get(p.objId) : null;
+    if(p.objId && !o) console.warn('[ranking] brak obiektu o id', p.objId, '— pomijam');
+    return { postId:p.id, name:(o?o.name:p.obj), country:(o?o.country:p.country),
+             flag:(o?o.flag:p.flag)||'eu', note:p.lead||'', score:p.score, n:scoreNum(p.score) };
+  })
+  .filter(r => r.name && r.country)
+  .sort((a,b)=> b.n - a.n || a.name.localeCompare(b.name,'pl'));
+ranked.forEach((r,i)=> r.global = i+1);   // pozycja globalna — liczona raz, filtr jej nie zmienia
+
+if(ranked.length){
+  const counts={}, flags={};
+  ranked.forEach(r=>{ counts[r.country]=(counts[r.country]||0)+1; flags[r.country]=r.flag; });
+  const countries = Object.keys(counts).sort((a,b)=> counts[b]-counts[a] || a.localeCompare(b,'pl'));
+
+  const rkList=document.getElementById('rkList'), rkCount=document.getElementById('rkCount');
+  document.getElementById('rkSec').hidden = false;
+  document.getElementById('rkFilter').innerHTML =
+    `<button type="button" class="rk-chip active" data-c="">Wszystkie<span class="n">${ranked.length}</span></button>` +
+    countries.map(c=>`<button type="button" class="rk-chip" data-c="${c}"><img src="https://flagcdn.com/20x15/${flags[c]}.png" alt="">${c}<span class="n">${counts[c]}</span></button>`).join('');
+
+  function renderRank(country){
+    const rows = country ? ranked.filter(r=>r.country===country) : ranked;
+    rkList.innerHTML = rows.map((r,i)=>{
+      const pos  = country ? i+1 : r.global;            // po filtrze numeracja krajowa od 1
+      const cls  = pos<=3 ? ' p'+pos : '';
+      const glob = country ? ` <span class="rk-global">(#${r.global} globalnie)</span>` : '';
+      return `<div class="rk-row${cls}">
+        <div class="rk-medal">${pos}</div>
+        <div>
+          <a class="rk-name" href="object.html">${r.name}</a>${glob}
+          <span class="rk-meta"><img src="https://flagcdn.com/20x15/${r.flag}.png" alt="">${r.country}</span>
+          ${r.note?`<span class="rk-note">${r.note}</span>`:''}
+        </div>
+        <div class="rk-score">${r.score}<small>/10</small></div>
+        <a class="rk-review" href="post.html?id=${r.postId}">Czytaj recenzję →</a>
+      </div>`;
+    }).join('');
+    rkCount.textContent = country
+      ? `${rows.length} ${plural(rows.length)} · ${country}`
+      : `${ranked.length} ${plural(ranked.length)} · ${countries.length} krajów`;
+  }
+
+  document.getElementById('rkFilter').addEventListener('click', e=>{
+    const chip = e.target.closest('.rk-chip'); if(!chip) return;
+    document.querySelectorAll('#rkFilter .rk-chip').forEach(c=>c.classList.toggle('active', c===chip));
+    renderRank(chip.dataset.c);
+  });
+  renderRank('');
+}
 
 document.getElementById('posts').innerHTML = posts.map(p=>`
   <a class="post-card" href="post.html?id=${p.id}">
