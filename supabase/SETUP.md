@@ -10,6 +10,7 @@ programować — wystarczy założyć projekt i wykonać trzy pliki SQL po kolei
 | `migrations/0003_i18n.sql` | wielojęzyczność, słownik krajów, kolejka dla agentów AI, przejmowanie wizytówek |
 | `migrations/0004_content_reports.sql` | zgłoszenia uwag do treści z automatycznym kierowaniem do właściciela |
 | `migrations/0005_report_abuse.sql` | ochrona zgłoszeń: limity, blokady, reputacja zgłaszających |
+| `migrations/0006_auth_profiles.sql` | profile z logowania Google / Facebook (nazwa i avatar z metadanych) |
 | `seed.sql` | dane startowe: 107 obiektów, 9 saunamistrzów, 25 wydarzeń, 9 turniejów, 19 wpisów |
 | `generate-seed.js` | generator `seed.sql` z plików `data/*.js` (`node supabase/generate-seed.js`) |
 

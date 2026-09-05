@@ -278,8 +278,8 @@ function render(u){
     root.innerHTML = `<div class="gate">
       <h1>Zaloguj się do aufguss.world</h1>
       <p>Twój profil, obserwacje, kalendarz i powiadomienia w jednym miejscu. Załóż konto, aby komentować, obserwować obiekty i saunamistrzów oraz zbierać rangi.</p>
-      <button class="btn btn-fire" onclick="AufgussAuth.setPersona('user')">Zaloguj / Załóż konto</button>
-      <div class="hint">Prototyp: użyj przełącznika „Podgląd" w prawym dolnym rogu, aby zobaczyć portal oczami różnych typów kont.</div>
+      <button class="btn btn-fire" onclick="AufgussAuth.openLogin('login')">Zaloguj / Załóż konto</button>
+      <div class="hint">Logowanie kontem Google, Facebook albo e-mailem. Podgląd demo: przełącznik „Podgląd" w prawym dolnym rogu.</div>
     </div>`;
     return;
   }
