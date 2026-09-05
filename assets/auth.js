@@ -12,6 +12,7 @@
   const SB_CDN='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.115.0/dist/umd/supabase.min.js';
   let SB=null;        // klient Supabase (null = tryb demo)
   let live=null;      // zalogowane prawdziwe konto (obiekt użytkownika) albo null
+  let providers=null; // {google:bool, facebook:bool} z /auth/v1/settings — null = jeszcze nie sprawdzono
 
   // ── persony demonstracyjne (jedno konto = wiele ról) — podgląd portalu oczami różnych kont ──
   const PERSONAS = {
@@ -115,7 +116,8 @@
   .auth-soc{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:12px;border:1px solid var(--line-strong,rgba(42,27,16,0.18));border-radius:12px;background:var(--surface,#fff);font:600 0.9rem 'Instrument Sans';color:var(--ink,#2a1b10);cursor:pointer;margin-bottom:10px;transition:all .18s;}
   .auth-soc:hover{border-color:var(--ember-1,#ff7a3d);background:var(--surface-2,#f3e8d6);}
   .auth-soc svg{width:19px;height:19px;color:var(--ember-3,#d6491f);}
-  .auth-soc:disabled{opacity:.6;cursor:wait;}
+  .auth-soc:disabled{opacity:.55;cursor:not-allowed;}
+  .auth-soc .soon{font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:2px 7px;border-radius:100px;background:var(--surface-2,#f3e8d6);color:var(--stone,#8a7960);}
   .auth-div{display:flex;align-items:center;gap:12px;color:var(--stone,#8a7960);font-size:0.76rem;margin:18px 0;text-transform:uppercase;letter-spacing:0.06em;}
   .auth-div::before,.auth-div::after{content:'';flex:1;height:1px;background:var(--line,rgba(42,27,16,0.1));}
   .auth-f{margin-bottom:14px;}
@@ -167,6 +169,9 @@
       const c=window.AUFGUSS_SUPABASE; if(!c||!c.url||!c.key) throw new Error('brak konfiguracji');
       SB=window.supabase.createClient(c.url,c.key,{ auth:{ persistSession:true, autoRefreshToken:true, detectSessionInUrl:true } });
     }catch(e){ console.warn('[auth] tryb demo — Supabase niedostępny:', e.message); SB=null; return; }
+    // którzy dostawcy są włączeni w projekcie — wyłączony przycisk zamiast wyskoku na stronę błędu
+    const cfg=window.AUFGUSS_SUPABASE;
+    fetch(cfg.url+'/auth/v1/settings',{headers:{apikey:cfg.key}}).then(r=>r.json()).then(j=>{ providers={google:!!(j.external&&j.external.google), facebook:!!(j.external&&j.external.facebook)}; if(modalEl&&modalEl.classList.contains('open')) openLogin(modalView); }).catch(()=>{});
     SB.auth.onAuthStateChange(async (ev,s)=>{
       if(ev==='PASSWORD_RECOVERY'){ openLogin('recovery'); }
       live = s ? await buildLiveUser(s) : null;
@@ -218,8 +223,8 @@
     return modalEl;
   }
   function viewHTML(v){
-    const soc=`<button class="auth-soc" type="button" data-prov="google">${IC.google} Kontynuuj z kontem Google</button>
-      <button class="auth-soc" type="button" data-prov="facebook">${IC.facebook} Kontynuuj z kontem Facebook</button>
+    const provBtn=(p,label)=>{ const off=providers&&!providers[p]; return `<button class="auth-soc" type="button" data-prov="${p}"${off?' disabled title="Logowanie przez '+label+' zostanie włączone wkrótce"':''}>${IC[p]} Kontynuuj z kontem ${label}${off?' <span class="soon">wkrótce</span>':''}</button>`; };
+    const soc=`${provBtn('google','Google')}${provBtn('facebook','Facebook')}
       <div class="auth-div">lub e-mailem</div>`;
     const err=`<div class="auth-err" data-err>${IC.warn}<span></span></div>`;
     const demo = SB ? '' : `<div class="auth-demo">Baza jest niedostępna — dostępny jest tylko podgląd demo (przełącznik w prawym dolnym rogu).</div>`;
@@ -272,6 +277,7 @@
     m.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{ const em=m.querySelector('#aEmail'); if(em) modalEmail=em.value.trim(); openLogin(b.dataset.view); });
     m.querySelectorAll('[data-prov]').forEach(b=>b.onclick=async()=>{
       if(!SB) return showErr('Baza jest niedostępna — logowanie nie działa w tym trybie.');
+      if(providers&&!providers[b.dataset.prov]) return showErr('Logowanie przez '+(b.dataset.prov==='google'?'Google':'Facebook')+' nie jest jeszcze włączone. Użyj e-maila.');
       busy(true);
       const { error } = await SB.auth.signInWithOAuth({ provider:b.dataset.prov, options:{ redirectTo: location.href.split('#')[0] } });
       if(error){ busy(false); showErr(prettyError(error)); }
