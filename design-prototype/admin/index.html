@@ -196,6 +196,13 @@ input[type=checkbox]{width:16px;height:16px;accent-color:var(--ember);cursor:poi
 .rolecard .rh h3{font-size:1rem;font-weight:600;font-family:'Instrument Sans';}
 .rolecard .rh p{font-size:0.8rem;color:var(--stone);margin-top:3px;}
 .rolecard .rb{padding:10px;max-height:60vh;overflow:auto;}
+[hidden]{display:none!important;}
+.login-form{padding:20px 20px 22px;display:flex;flex-direction:column;gap:16px;}
+.login-acts{display:flex;gap:8px;margin-top:6px;}
+.login-acts .btn{flex:1;}
+.login-hint{font-size:0.74rem;color:var(--stone);line-height:1.45;}
+.login-nocfg{padding:20px;}
+.login-nocfg p{font-size:0.85rem;color:var(--stone);margin-bottom:14px;}
 .role-i{width:100%;display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:var(--r-ctl);border:1px solid transparent;background:none;text-align:left;color:var(--ink);}
 .role-i:hover{background:var(--surface-2);border-color:var(--line);}
 .role-i.on{background:var(--ember-soft);border-color:rgba(232,85,42,0.35);}
@@ -347,14 +354,13 @@ input[type=checkbox]{width:16px;height:16px;accent-color:var(--ember);cursor:poi
 <div class="rolebox" id="loginbox" role="dialog" aria-label="Logowanie">
   <div class="rolecard" style="max-width:400px">
     <div class="rh"><h3>Zaloguj się do panelu</h3><p>Konto z aufguss.world. Dostęp do modułów wynika z ról nadanych przez administratora.</p></div>
-    <form id="loginForm" style="padding:18px 20px;display:flex;flex-direction:column;gap:13px">
+    <form id="loginForm" class="login-form">
       <div class="f"><label>E-mail</label><input type="email" id="lgEmail" required autocomplete="username"></div>
       <div class="f"><label>Hasło</label><input type="password" id="lgPass" required autocomplete="current-password"><div class="errmsg" id="lgErr" style="display:none"></div></div>
-      <button class="btn pri" type="submit" id="lgBtn">Zaloguj</button>
-      <button class="btn" type="button" id="lgDemo">Przeglądaj wersję demo</button>
-      <div style="font-size:0.74rem;color:var(--stone)">Wersja demo pokazuje panel na danych statycznych, bez zapisu.</div>
+      <div class="login-acts"><button class="btn pri" type="submit" id="lgBtn">Zaloguj</button><button class="btn" type="button" id="lgDemo">Przeglądaj wersję demo</button></div>
+      <div class="login-hint">Wersja demo pokazuje panel na danych statycznych, bez zapisu.</div>
     </form>
-    <div id="lgNoCfg" style="display:none;padding:18px 20px"><p style="font-size:0.85rem;color:var(--stone);margin-bottom:12px">Brak konfiguracji bazy — dostępna jest tylko wersja demo.</p><button class="btn pri" type="button" onclick="enterDemo()">Otwórz demo</button></div>
+    <div id="lgNoCfg" class="login-nocfg" hidden><p>Brak konfiguracji bazy — dostępna jest tylko wersja demo.</p><button class="btn pri" type="button" onclick="enterDemo()">Otwórz demo</button></div>
   </div>
 </div>
 
@@ -493,8 +499,8 @@ async function savePost(publish){
 const loginBox=()=>document.getElementById('loginbox');
 function showLogin(canLogin){
   const b=loginBox(); b.classList.add('on');
-  document.getElementById('loginForm').style.display=canLogin?'':'none';
-  document.getElementById('lgNoCfg').style.display=canLogin?'none':'';
+  document.getElementById('loginForm').hidden=!canLogin;
+  document.getElementById('lgNoCfg').hidden=canLogin;
 }
 async function enterLive(a){
   ACCOUNTS.live=a; acc='live'; await loadPosts();
