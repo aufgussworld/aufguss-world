@@ -34,6 +34,13 @@ programować — wystarczy założyć projekt i wykonać trzy pliki SQL po kolei
 
 ## Krok 2. Wgranie schematu
 
+**Najprościej:** otwórz plik `WSZYSTKO.sql` (RESET + wszystkie migracje + seed w dobrej kolejności),
+skopiuj całość (Ctrl+A, Ctrl+C), wklej do **SQL Editor** i kliknij **Run**. Plik zaczyna się od
+bloku RESET, więc można go uruchamiać wielokrotnie — każde uruchomienie buduje bazę od zera.
+Przy ostrzeżeniu „Potential issue detected" wybierz **Run and enable RLS**.
+
+**Alternatywnie, plik po pliku** (przy powtórce najpierw `RESET.sql`):
+
 W panelu Supabase otwórz **SQL Editor** (ikona po lewej) i wykonaj pliki **w tej kolejności**:
 
 1. Wklej całą zawartość `migrations/0001_schema.sql` → **Run**.

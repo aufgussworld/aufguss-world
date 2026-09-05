@@ -341,9 +341,26 @@ input[type=checkbox]{width:16px;height:16px;accent-color:var(--ember);cursor:poi
   <div class="rolecard">
     <div class="rh"><h3>Zobacz panel jako</h3><p>Prototyp: konta są wielorolowe, a nawigacja to suma modułów aktywnych ról.</p></div>
     <div class="rb" id="roleList"></div>
+    <div style="padding:10px 16px;border-top:1px solid var(--line);display:flex;justify-content:flex-end"><button class="btn sm" id="logoutBtn" type="button">Wyloguj</button></div>
+  </div>
+</div>
+<div class="rolebox" id="loginbox" role="dialog" aria-label="Logowanie">
+  <div class="rolecard" style="max-width:400px">
+    <div class="rh"><h3>Zaloguj się do panelu</h3><p>Konto z aufguss.world. Dostęp do modułów wynika z ról nadanych przez administratora.</p></div>
+    <form id="loginForm" style="padding:18px 20px;display:flex;flex-direction:column;gap:13px">
+      <div class="f"><label>E-mail</label><input type="email" id="lgEmail" required autocomplete="username"></div>
+      <div class="f"><label>Hasło</label><input type="password" id="lgPass" required autocomplete="current-password"><div class="errmsg" id="lgErr" style="display:none"></div></div>
+      <button class="btn pri" type="submit" id="lgBtn">Zaloguj</button>
+      <button class="btn" type="button" id="lgDemo">Przeglądaj wersję demo</button>
+      <div style="font-size:0.74rem;color:var(--stone)">Wersja demo pokazuje panel na danych statycznych, bez zapisu.</div>
+    </form>
+    <div id="lgNoCfg" style="display:none;padding:18px 20px"><p style="font-size:0.85rem;color:var(--stone);margin-bottom:12px">Brak konfiguracji bazy — dostępna jest tylko wersja demo.</p><button class="btn pri" type="button" onclick="enterDemo()">Otwórz demo</button></div>
   </div>
 </div>
 
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.115.0/dist/umd/supabase.min.js"></script>
+<script src="../../supabase/config.js"></script>
 <script src="../../data/objects-data.js"></script>
 <script src="../../data/posts-data.js"></script>
 <script src="../../data/tournaments-data.js"></script>
@@ -394,6 +411,117 @@ let acc='kamil';
 const A=()=>ACCOUNTS[acc];
 const has=r=>A().roles.includes(r);
 
+/* ══ SUPABASE — prawdziwe konto i dane ════════════════════════
+   Panel ma dwa tryby: „live" (zalogowane konto, dane z bazy, zakres wyznacza RLS)
+   oraz „demo" (konta podglądowe z danymi statycznymi prototypu). */
+const SB=(window.supabase&&window.AUFGUSS_SUPABASE)?window.supabase.createClient(window.AUFGUSS_SUPABASE.url,window.AUFGUSS_SUPABASE.key):null;
+const DB={posts:[]};                       // pamięć podręczna danych z bazy
+const isLive=()=>acc==='live';
+const initials=n=>String(n||'?').split(/\s+/).filter(Boolean).slice(0,3).map(w=>w[0].toUpperCase()).join('');
+const fmtDate=s=>s?new Date(s).toLocaleDateString('pl-PL',{day:'numeric',month:'short',year:'numeric'}):'—';
+const slugify=s=>String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')
+  .replace(/ł/g,'l').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,70)||'wpis';
+
+/* Buduje konto panelu z tabel profiles / user_roles / venue_members / saunamasters. */
+async function loadAccount(session){
+  const uid=session.user.id;
+  const [prof,roles,vm,sm]=await Promise.all([
+    SB.from('profiles').select('display_name').eq('id',uid).maybeSingle(),
+    SB.from('user_roles').select('role').eq('profile_id',uid).eq('status','active'),
+    SB.from('venue_members').select('venue_id,venues(name)').eq('profile_id',uid),
+    SB.from('saunamasters').select('id,name').eq('profile_id',uid),
+  ]);
+  const rs=(roles.data||[]).map(r=>r.role).filter(r=>ROLE_LABEL[r]);   // 'user' i 'bloger' nie mają modułów w panelu
+  if(!rs.length) return null;
+  const name=(prof.data&&prof.data.display_name)||session.user.email;
+  const a={name,init:initials(name),roles:rs,scope:'Dane z bazy',live:true,uid,email:session.user.email};
+  if(vm.data&&vm.data.length){a.objId=vm.data[0].venue_id;a.objName=vm.data[0].venues&&vm.data[0].venues.name;}
+  if(sm.data&&sm.data.length){a.person=sm.data[0].name;a.smId=sm.data[0].id;}
+  return a;
+}
+async function loadPosts(){
+  if(!SB) return;
+  const {data,error}=await SB.from('posts')
+    .select('id,slug,category,cover,title,lead,score,status,published_at,updated_at,author_id,venue_id,venues(name),profiles(display_name)')
+    .order('updated_at',{ascending:false});
+  if(error){toast('Nie udało się pobrać wpisów: '+error.message);return;}
+  DB.posts=(data||[]).map(p=>({id:p.id,slug:p.slug,cat:p.category,cover:p.cover,title:p.title,lead:p.lead,
+    score:p.score==null?'':String(p.score).replace('.',','),status:p.status,venueId:p.venue_id,
+    obj:(p.venues&&p.venues.name)||'',author:(p.profiles&&p.profiles.display_name)||'Redakcja',
+    publishedAt:p.published_at,date:fmtDate(p.published_at||p.updated_at)}));
+}
+/* Otwiera wpis do edycji: lista nie niesie treści, więc body dociągamy osobno. */
+async function openPost(id){
+  const p=DB.posts.find(x=>x.id===+id); if(!p) return;
+  const {data,error}=await SB.from('posts').select('body').eq('id',id).single();
+  if(error) return toast('Nie udało się wczytać treści: '+error.message);
+  ed={id:p.id,slug:p.slug,status:p.status,publishedAt:p.publishedAt,cat:p.cat,title:p.title,lead:p.lead||'',cover:p.cover,
+      objId:p.venueId?String(p.venueId):'',score:p.score?p.score.replace(',','.'):'',html:'',doc:data.body};
+  render('edytor');
+}
+/* Awaryjnie (bez TipTap) treść to same akapity — budujemy z nich dokument ProseMirror. */
+const docFromHtml=h=>({type:'doc',content:String(h||'').split(/<\/p>/).map(s=>s.replace(/<[^>]+>/g,'').trim()).filter(Boolean)
+  .map(t=>({type:'paragraph',content:[{type:'text',text:t}]}))});
+async function savePost(publish){
+  if(!ed.title.trim()||!ed.lead.trim()) return toast('Uzupełnij tytuł i lead.');
+  if(ed.cat==='Recenzja'&&(!ed.objId||!ed.score)) return toast('Recenzja wymaga wskazania obiektu i oceny.');
+  if(!isLive()){ toast(publish?'Wpis opublikowany (tryb demo — bez zapisu).':'Zmiany zapisane (tryb demo — bez zapisu).'); return render('wpisy'); }
+  const row={category:ed.cat,cover:ed.cover,title:ed.title.trim(),lead:ed.lead.trim(),
+    body:ed.doc||docFromHtml(ed.html),
+    score:ed.cat==='Recenzja'?+String(ed.score).replace(',','.'):null,
+    venue_id:ed.objId?+ed.objId:null,
+    status:publish?'published':'draft',
+    published_at:publish?(ed.publishedAt||new Date().toISOString()):(ed.publishedAt||null)};
+  const btns=document.querySelectorAll('[data-save],[data-publish]'); btns.forEach(b=>b.disabled=true);
+  let res;
+  if(ed.id){ res=await SB.from('posts').update(row).eq('id',ed.id).select('id,slug').single(); }
+  else{
+    row.author_id=A().uid; const base=slugify(ed.title);
+    for(let i=1;i<=9;i++){                              // slug musi być unikalny — przy kolizji dokładamy -2, -3…
+      row.slug=i===1?base:`${base}-${i}`;
+      res=await SB.from('posts').insert(row).select('id,slug').single();
+      if(!res.error||res.error.code!=='23505') break;
+    }
+  }
+  btns.forEach(b=>b.disabled=false);
+  if(res.error) return toast('Błąd zapisu: '+res.error.message);
+  ed.id=res.data.id; ed.slug=res.data.slug;
+  await loadPosts(); toast(publish?'Wpis opublikowany.':'Szkic zapisany.'); render('wpisy');
+}
+
+/* ── logowanie ── */
+const loginBox=()=>document.getElementById('loginbox');
+function showLogin(canLogin){
+  const b=loginBox(); b.classList.add('on');
+  document.getElementById('loginForm').style.display=canLogin?'':'none';
+  document.getElementById('lgNoCfg').style.display=canLogin?'none':'';
+}
+async function enterLive(a){
+  ACCOUNTS.live=a; acc='live'; await loadPosts();
+  loginBox().classList.remove('on'); buildRoleList(); render('pulpit'); toast(`Zalogowano: ${a.name}`);
+}
+function enterDemo(){ acc='kamil'; loginBox().classList.remove('on'); buildRoleList(); render('pulpit'); }
+async function boot(){
+  buildRoleList();
+  if(!SB){ showLogin(false); return; }
+  const {data:{session}}=await SB.auth.getSession();
+  if(session){ const a=await loadAccount(session); if(a) return enterLive(a); }
+  showLogin(true);
+}
+document.getElementById('loginForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const err=document.getElementById('lgErr'), btn=document.getElementById('lgBtn');
+  err.style.display='none'; btn.disabled=true; btn.textContent='Logowanie…';
+  const {data,error}=await SB.auth.signInWithPassword({email:document.getElementById('lgEmail').value.trim(),password:document.getElementById('lgPass').value});
+  btn.disabled=false; btn.textContent='Zaloguj';
+  if(error){ err.textContent='Nieprawidłowy e-mail lub hasło.'; err.style.display='flex'; return; }
+  const a=await loadAccount(data.session);
+  if(!a){ await SB.auth.signOut(); err.textContent='To konto nie ma jeszcze roli panelu. Role nadaje administrator.'; err.style.display='flex'; return; }
+  enterLive(a);
+});
+document.getElementById('lgDemo').onclick=enterDemo;
+document.getElementById('logoutBtn').onclick=async()=>{ if(SB) await SB.auth.signOut(); location.reload(); };
+
 /* moduły: każdy deklaruje, które role go widzą */
 const MODULES=[
   {g:'Przegląd'},
@@ -439,6 +567,7 @@ function venueMasters(){
     .sort((a,b)=>b.count-a.count||a.name.localeCompare(b.name,'pl'));
 }
 function scopedPosts(){
+  if(isLive()) return DB.posts;              // zakres wyznacza RLS w bazie
   const a=A(), all=Object.entries(POSTS).map(([id,p])=>({id,...p}));
   if(a.objId) return all.filter(p=>p.author==='satama');
   if(a.orgKey) return all.filter(p=>p.author==='pts');
@@ -692,21 +821,25 @@ V.oceny=()=>`<div class="crumb">Panel · Zarządzanie</div>
   ${scopeBar('Moduł roli <b>Sędzia</b> — karty przypisane wyłącznie do Ciebie, niewidoczne dla innych sędziów do czasu zamknięcia panelu.')}
   <div class="card"><div class="card-h"><h2>Do wypełnienia</h2></div><div class="qlist">${JUDGING.map(judgeRow).join('')}</div></div>`;
 
-V.wpisy=()=>{const p=scopedPosts();return `<div class="crumb">Panel · Zarządzanie</div>
+const POST_STATUS={published:['ok',I.check,'Opublikowany'],draft:['warn',I.clock,'Szkic'],review:['info',I.clock,'Do przeglądu'],hidden:['mute',I.x,'Ukryty']};
+V.wpisy=()=>{const p=scopedPosts(), live=isLive();return `<div class="crumb">Panel · Zarządzanie</div>
   <div class="page-head"><div><h1>Wpisy</h1><p>Aktualności i wpisy blogowe publikowane na portalu.</p></div>
     <div class="acts"><button class="btn pri" data-newpost>${I.plus} Nowy wpis</button></div></div>
-  ${scopeBar(has('admin')?'Rola <b>Administrator</b>: wpisy wszystkich autorów.':`Widzisz wyłącznie wpisy autorstwa <b>${A().name}</b>.`)}
-  <div class="card"><div class="twrap"><table><thead><tr><th>Tytuł</th><th>Kategoria</th><th>Data</th><th>Ocena</th><th>Status</th><th style="width:70px"></th></tr></thead>
-  <tbody>${p.map(x=>`<tr><td><div class="nm">${x.title}</div>${x.obj?`<div class="sub">${x.obj}</div>`:''}</td>
-    <td>${x.cat}</td><td>${x.date}</td><td>${x.score?`<b>${x.score}</b><span style="color:var(--stone)">/10</span>`:'—'}</td>
-    <td><span class="tag ok">${I.check} Opublikowany</span></td>
-    <td class="right"><div class="rowacts"><button class="icon-btn" style="width:28px;height:28px" title="Edytuj" aria-label="Edytuj wpis">${I.pen}</button></div></td></tr>`).join('')}</tbody></table></div></div>`;};
+  ${scopeBar(live?(has('admin')?'Rola <b>Administrator</b>: wpisy wszystkich autorów, także szkice. Zakres wyznacza baza.':'Widzisz wpisy, do których masz uprawnienia w bazie: własne oraz Twojego obiektu.')
+    :(has('admin')?'Rola <b>Administrator</b>: wpisy wszystkich autorów.':`Widzisz wyłącznie wpisy autorstwa <b>${A().name}</b>.`))}
+  <div class="card"><div class="twrap"><table><thead><tr><th>Tytuł</th><th>Kategoria</th>${live?'<th>Autor</th>':''}<th>Data</th><th>Ocena</th><th>Status</th><th style="width:70px"></th></tr></thead>
+  <tbody>${p.length?p.map(x=>{const st=POST_STATUS[x.status||'published']||POST_STATUS.published;return `<tr><td><div class="nm">${esc(x.title)}</div>${x.obj?`<div class="sub">${esc(x.obj)}</div>`:''}</td>
+    <td>${x.cat}</td>${live?`<td>${esc(x.author||'—')}</td>`:''}<td>${x.date}</td><td>${x.score?`<b>${x.score}</b><span style="color:var(--stone)">/10</span>`:'—'}</td>
+    <td><span class="tag ${st[0]}">${st[1]} ${st[2]}</span></td>
+    <td class="right"><div class="rowacts"><button class="icon-btn" style="width:28px;height:28px" title="Edytuj" aria-label="Edytuj wpis" data-edit="${x.id}">${I.pen}</button></div></td></tr>`;}).join('')
+    :`<tr><td colspan="7"><div class="empty">${I.inbox}<h3>Brak wpisów</h3><p>Kliknij „Nowy wpis", aby dodać pierwszy.</p></div></td></tr>`}</tbody></table></div></div>`;};
 
 /* ══ EDYTOR TREŚCI ═════════════════════════════════════════════
    Zasada: autor decyduje o ZNACZENIU, system o WYGLĄDZIE.
    Brak kontrolek czcionki, rozmiaru, koloru i wyrównania — celowo. */
 const COVERS=[['pc1','Piaskowa'],['pc2','Ognista'],['pc3','Miedziana'],['pc4','Nocna']];
-let ed={cat:'Recenzja',title:'',lead:'',cover:'pc1',objId:'',score:'',html:''};
+const newPost=()=>({id:null,slug:'',status:'draft',publishedAt:null,cat:'Recenzja',title:'',lead:'',cover:'pc1',objId:'',score:'',html:'',doc:null});
+let ed=newPost();
 let tiptap=null;   // instancja edytora (tworzona przy wejściu w widok, niszczona przy wyjściu)
 
 const esc=s=>String(s).replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
@@ -729,9 +862,10 @@ function syncPreview(){ const p=document.getElementById('prevBody'); if(p) p.inn
 
 V.edytor=()=>{
   const isRev=ed.cat==='Recenzja';
-  return `<div class="crumb"><a href="#" data-go="wpisy">Wpisy</a> · Nowy wpis</div>
-  <div class="page-head"><div><h1>Nowy wpis</h1><p>Treść składasz z bloków znaczeniowych. Wygląd nadaje portal — dzięki temu każdy wpis wygląda spójnie.</p></div>
-    <div class="acts"><button class="btn" data-go="wpisy">Anuluj</button><button class="btn" data-save>Zapisz szkic</button><button class="btn pri" data-publish>Opublikuj</button></div></div>
+  const isNew=!ed.id;
+  return `<div class="crumb"><a href="#" data-go="wpisy">Wpisy</a> · ${isNew?'Nowy wpis':'Edycja wpisu'}</div>
+  <div class="page-head"><div><h1>${isNew?'Nowy wpis':esc(ed.title||'Edycja wpisu')}</h1><p>Treść składasz z bloków znaczeniowych. Wygląd nadaje portal — dzięki temu każdy wpis wygląda spójnie.</p></div>
+    <div class="acts"><button class="btn" data-go="wpisy">Anuluj</button><button class="btn" data-save>${ed.status==='published'?'Cofnij do szkicu':'Zapisz szkic'}</button><button class="btn pri" data-publish>${ed.status==='published'?'Zapisz i opublikuj':'Opublikuj'}</button></div></div>
   <div class="ed-note">${I.info}<div><b>Dlaczego nie ma czcionek, rozmiarów i kolorów?</b> Bo wygląd wpisu jest wspólny dla całego portalu i wynika z systemu designu. Ty decydujesz, <b>czym jest</b> dany fragment — akapitem, śródtytułem czy cytatem — a portal nada mu właściwą formę. Wklejany tekst jest zawsze czyszczony z obcego formatowania.</div></div>
   <div class="ed-grid">
     <div>
@@ -823,8 +957,8 @@ function mountTipTap(){
       Link.configure({openOnClick:false, autolink:false, HTMLAttributes:{target:'_blank',rel:'noopener'}}),
       ...(Placeholder?[Placeholder.configure({placeholder:'Napisz pierwszy akapit…'})]:[]),
     ],
-    content: ed.html || '<p></p>',
-    onUpdate:({editor})=>{ ed.html=editor.getHTML(); syncPreview(); },
+    content: ed.doc || ed.html || '<p></p>',
+    onUpdate:({editor})=>{ ed.html=editor.getHTML(); ed.doc=editor.getJSON(); syncPreview(); },
     onSelectionUpdate:({editor})=>refreshBar(editor),
     onTransaction:({editor})=>refreshBar(editor),
   });
@@ -844,6 +978,7 @@ function mountTipTap(){
     })[b.dataset.cmd]();
   });
   refreshBar(tiptap);
+  ed.html=tiptap.getHTML(); ed.doc=tiptap.getJSON(); syncPreview();   // wpis otwarty do edycji: podgląd od razu
   const s=document.getElementById('pmStat');
   if(s) s.textContent=`Schemat dopuszcza węzły: ${Object.keys(tiptap.schema.nodes).join(', ')} · znaczniki: ${Object.keys(tiptap.schema.marks).join(', ')}.`;
 }
@@ -859,7 +994,7 @@ function fallbackEditor(host){
   host.innerHTML=`<textarea id="pmFallback" style="width:100%;min-height:240px;border:none;background:none;padding:14px 16px;font-family:inherit;font-size:0.9rem;line-height:1.7;color:var(--ink);outline:none;resize:vertical" placeholder="Napisz treść — każdy akapit w nowej linii."></textarea>`;
   const ta=document.getElementById('pmFallback');
   ta.value=(ed.html||'').replace(/<\/p>/g,'\n').replace(/<[^>]+>/g,'').trim();
-  ta.addEventListener('input',()=>{ed.html=ta.value.split(/\n+/).filter(Boolean).map(p=>`<p>${esc(p)}</p>`).join('');syncPreview();});
+  ta.addEventListener('input',()=>{ed.html=ta.value.split(/\n+/).filter(Boolean).map(p=>`<p>${esc(p)}</p>`).join('');ed.doc=docFromHtml(ed.html);syncPreview();});
   const s=document.getElementById('pmStat'); if(s) s.textContent='Tryb awaryjny: edytor nie wczytał się z sieci. Zapisywane są same akapity.';
 }
 
@@ -1030,7 +1165,7 @@ V.ustawienia=()=>`<div class="crumb">Panel · Konto</div>
   <div class="page-head"><div><h1>Ustawienia</h1><p>Dane logowania, powiadomienia i bezpieczeństwo konta.</p></div><div class="acts"><button class="btn pri" data-save>Zapisz</button></div></div>
   <div class="card"><div class="card-h"><h2>Konto</h2></div><div class="card-b"><div class="fgrid">
     <div class="f"><label>Nazwa</label><input value="${A().name}"></div>
-    <div class="f"><label>E-mail <span class="req">*</span></label><input value="konto@aufguss.world"></div>
+    <div class="f"><label>E-mail <span class="req">*</span></label><input value="${A().email||'konto@aufguss.world'}"></div>
     <div class="f"><label>Język panelu</label><select><option>Polski</option><option>English</option><option>Deutsch</option></select></div>
     <div class="f"><label>Strefa czasowa</label><select><option>Europa/Warszawa</option><option>Europa/Berlin</option></select></div>
   </div><div style="margin-top:16px;display:flex;gap:8px"><button class="btn">Zmień hasło</button><button class="btn">Włącz 2FA</button></div></div></div>`;
@@ -1070,23 +1205,26 @@ function wireObjects(){
   const cl=document.getElementById('oclear'); if(cl) cl.onclick=()=>{objState.q='';objState.country='';objState.page=1;render('obiekty');};
 }
 /* przełącznik konta (prototyp) */
-document.getElementById('roleList').innerHTML=Object.entries(ACCOUNTS).map(([k,v])=>
-  `<button class="role-i${k===acc?' on':''}" data-acc="${k}"><span class="rav">${v.init}</span><span><b>${v.name}</b><span>${v.roles.map(r=>ROLE_LABEL[r]).join(' · ')}</span></span></button>`).join('');
+function buildRoleList(){
+  document.getElementById('roleList').innerHTML=Object.entries(ACCOUNTS).map(([k,v])=>
+    `<button class="role-i${k===acc?' on':''}" data-acc="${k}"><span class="rav">${v.init}</span><span><b>${v.name}</b><span>${v.roles.map(r=>ROLE_LABEL[r]).join(' · ')}${v.live?' · <b style="color:var(--ok)">Twoje konto</b>':' · podgląd (dane demo)'}</span></span></button>`).join('');
+  document.getElementById('logoutBtn').style.display=ACCOUNTS.live?'':'none';
+}
 function setAcc(k){acc=k;objState.sel.clear();
   document.querySelectorAll('[data-acc]').forEach(b=>b.classList.toggle('on',b.dataset.acc===k));
   document.getElementById('rolebox').classList.remove('on');
-  render('pulpit'); toast(`Panel jako: ${ACCOUNTS[k].name}`);}
+  render('pulpit'); toast(ACCOUNTS[k].live?`Panel jako: ${ACCOUNTS[k].name}`:`Podgląd jako: ${ACCOUNTS[k].name} (dane demo)`);}
 document.getElementById('ctxBtn').onclick=()=>document.getElementById('rolebox').classList.add('on');
 document.getElementById('rolebox').onclick=e=>{if(e.target.id==='rolebox')e.currentTarget.classList.remove('on');};
 document.addEventListener('click',e=>{
   const a=e.target.closest('[data-acc]'); if(a) return setAcc(a.dataset.acc);
   const nav=e.target.closest('[data-v]'); if(nav) return render(nav.dataset.v);
   const go=e.target.closest('[data-go]'); if(go) return render(go.dataset.go);
-  if(e.target.closest('[data-newpost]')){ ed={cat:'Recenzja',title:'',lead:'',cover:'pc1',objId:'',score:'',html:''}; return render('edytor'); }
-  if(e.target.closest('[data-publish]')){
-    if(!ed.title.trim()||!ed.lead.trim()) return toast('Uzupełnij tytuł i lead przed publikacją.');
-    toast('Wpis opublikowany.'); return render('wpisy');
-  }
+  if(e.target.closest('[data-newpost]')){ ed=newPost(); return render('edytor'); }
+  const edit=e.target.closest('[data-edit]');
+  if(edit){ if(!isLive()) return toast('Edycja wpisów działa po zalogowaniu.'); return openPost(edit.dataset.edit); }
+  if(cur==='edytor'&&e.target.closest('[data-publish]')) return savePost(true);
+  if(cur==='edytor'&&e.target.closest('[data-save]')) return savePost(false);
   if(e.target.closest('[data-save]')) return toast('Zmiany zapisane.');
   const rep=e.target.closest('[data-fix],[data-rej],[data-retrans]');
   if(rep){
@@ -1114,7 +1252,7 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Escape')document.getElementById('rolebox').classList.remove('on');
 });
 if(localStorage.getItem('adm_theme'))document.documentElement.dataset.theme=localStorage.getItem('adm_theme');
-render('pulpit');
+boot();
 </script>
 
 <!-- TipTap v2 (ESM z CDN — prototyp bez bundlera; docelowo pakiet npm w Next.js).
