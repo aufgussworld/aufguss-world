@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.css">
 <style>
 .brand{height:40px;width:auto;display:block;}
 :root{
@@ -157,8 +158,6 @@ header{
   .country-picker,.card-list{overflow:visible;max-height:none;}
   .sidebar-head,.obj-head{position:sticky;top:0;background:var(--surface);z-index:5;}
 }
-/* podkład OSM przygaszony pod paletę portalu */
-.leaflet-tile-pane{filter:saturate(.62) sepia(.10) contrast(.96);}
 .leaflet-control-attribution{font-size:10px;color:#8a7960;background:rgba(251,245,234,.85);}
 </style>
 </head>
@@ -193,6 +192,8 @@ header{
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@maplibre/maplibre-gl-leaflet@0.0.22/leaflet-maplibre-gl.js"></script>
 <script src="../data/objects-data.js"></script>
 <script>
 const objects = window.AUFGUSS_OBJECTS || [];
@@ -201,7 +202,8 @@ let selected = new Set(countries); // all selected by default
 
 const map = L.map('map', { zoomControl:true, attributionControl:true }).setView([50.5, 12], 5);
 map.attributionControl.setPrefix(false);
-L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19, attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>' }).addTo(map);
+/* podkład wektorowy OpenFreeMap w stylu przebarwionym pod paletę portalu (assets/map-style.json) */
+L.maplibreGL({ style:'../assets/map-style.json', attribution:'&copy; <a href="https://openfreemap.org" target="_blank" rel="noopener">OpenFreeMap</a> &copy; <a href="https://www.openmaptiles.org/" target="_blank" rel="noopener">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>' }).addTo(map);
 
 const markerLayer = L.layerGroup().addTo(map);
 const markers = {};
