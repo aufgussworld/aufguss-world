@@ -224,6 +224,9 @@ section.block{margin:46px 0;}
   .show{grid-template-columns:52px 1fr;}
   .show .scope-tag{grid-column:2;justify-self:start;margin-top:4px;}
 }
+/* podkład OSM przygaszony pod paletę portalu */
+.leaflet-tile-pane{filter:saturate(.62) sepia(.10) contrast(.96);}
+.leaflet-control-attribution{font-size:10px;color:#8a7960;background:rgba(251,245,234,.85);}
 </style>
 </head>
 <body>
@@ -486,8 +489,9 @@ AufgussComments.render(document.getElementById('commentsMount'), { type:'object'
 
 // ── MAPA LOKALIZACJI (Leaflet) ─────────────────────────────────
 const VENUE_COORDS = [52.21502, 14.01027];
-const vmap = L.map('venueMap', { zoomControl:true, scrollWheelZoom:false, attributionControl:false }).setView(VENUE_COORDS, 12);
-L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{maxZoom:18}).addTo(vmap);
+const vmap = L.map('venueMap', { zoomControl:true, scrollWheelZoom:false, attributionControl:true }).setView(VENUE_COORDS, 12);
+vmap.attributionControl.setPrefix(false);
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19, attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>' }).addTo(vmap);
 L.marker(VENUE_COORDS, { icon: L.divIcon({ className:'', html:'<div class="pin-marker"></div>', iconSize:[28,28], iconAnchor:[14,26] }) })
   .addTo(vmap).bindPopup('<b>Satama Sauna Resort</b><br>Wendisch-Rietz').openPopup();
 
