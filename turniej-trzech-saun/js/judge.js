@@ -1,0 +1,543 @@
+// Widok sędziego: karta oceny z walidacją, porównanie zawodników, własny ranking.
+// Sędzia widzi wyłącznie własne oceny — nigdy kart innych sędziów ani wyników łącznych.
+
+import { html, useEffect, useRef, useState } from './lib.js';
+import {
+  DISCIPLINES, FINAL_ORDER, fmt, fmtInput, fmtDate, fullName, parseScore, entryStats, getEntry,
+  orderedContestants, startOf, startNumber, cardMax, categoryMax, disciplinesOf, assignRanks,
+} from './model.js';
+import { setScore, logChange, setNote } from './store.js';
+import { Icon, Avatar, DiscBadge, StatusIcon, Segmented, Empty } from './ui.js';
+
+// ---------- pola punktów ----------
+
+function moveFocus(from, dir) {
+  const all = [...document.querySelectorAll('[data-score]')];
+  const i = all.indexOf(from);
+  const next = all[i + dir];
+  if (next) {
+    next.focus();
+    next.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }
+}
+
+function ScoreInput({ id, item, value, mode, onLive, onDone, onError, errId }) {
+  const [text, setText] = useState(fmtInput(value));
+  const [err, setErr] = useState(null);
+  const focused = useRef(false);
+  const start = useRef(value);
+  const latest = useRef(value);
+  const keepText = useRef(false); // po odrzuceniu wpisu zostawiamy w polu tekst do poprawy
+  if (!focused.current) latest.current = value;
+
+  useEffect(() => {
+    if (keepText.current) { keepText.current = false; return; }
+    if (!focused.current) setText(fmtInput(value));
+  }, [value]);
+
+  const show = (m) => {
+    setErr(m);
+    onError(item.id, m);
+  };
+
+  const onInput = (e) => {
+    const s = e.currentTarget.value;
+    setText(s);
+    const r = parseScore(s, item, mode);
+    if (r.ok) {
+      if (err) show(null);
+      if (r.value !== latest.current) {
+        latest.current = r.value;
+        onLive(r.value);
+      }
+    } else if (r.immediate || err) {
+      show(r.error);
+    }
+  };
+  const onFocus = (e) => {
+    focused.current = true;
+    start.current = latest.current;
+    e.currentTarget.select();
+  };
+  const onBlur = () => {
+    focused.current = false;
+    const r = parseScore(text, item, mode);
+    if (!r.ok) {
+      // błędny wpis nie zostaje w karcie — wracamy do oceny sprzed edycji
+      if (latest.current !== start.current) {
+        latest.current = start.current;
+        keepText.current = true;
+        onLive(start.current);
+      }
+      show(r.error);
+    } else {
+      setText(fmtInput(r.value));
+      if (err) show(null);
+    }
+    if (latest.current !== start.current) onDone(start.current, latest.current);
+    start.current = latest.current;
+  };
+  const onKey = (e) => {
+    if (e.key === 'Enter' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      moveFocus(e.currentTarget, e.shiftKey && e.key === 'Enter' ? -1 : 1);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      moveFocus(e.currentTarget, -1);
+    } else if (e.key === 'Escape') {
+      latest.current = start.current;
+      onLive(start.current);
+      setText(fmtInput(start.current));
+      show(null);
+    }
+  };
+
+  return html`<div class=${`score-field k-${item.kind} ${err ? 'invalid' : ''} ${value != null ? 'filled' : ''}`}>
+    ${item.kind === 'minus' ? html`<span class="prefix" aria-hidden="true">−</span>` : null}
+    <input id=${id} data-score type="text" inputmode="decimal" autocomplete="off" spellcheck="false"
+      value=${text} placeholder=${item.kind === 'minus' ? '0' : ''}
+      aria-invalid=${err ? 'true' : 'false'} aria-describedby=${err ? errId : undefined}
+      onInput=${onInput} onFocus=${onFocus} onBlur=${onBlur} onKeyDown=${onKey} />
+  </div>`;
+}
+
+// Pozycja 0/1 — dwa przyciski; klawiatura: 0, 1, spacja, Enter (dalej), Delete (wyczyść).
+function BinInput({ id, item, value, onSet }) {
+  const max = Math.round(item.max * 10);
+  const set = (v) => onSet(v === value ? null : v);
+  const onKey = (e) => {
+    if (e.key === '0') set(0);
+    else if (e.key === '1') set(max);
+    else if (e.key === ' ') { e.preventDefault(); onSet(value === max ? 0 : max); }
+    else if (e.key === 'Delete' || e.key === 'Backspace') onSet(null);
+    else if (e.key === 'Enter' || e.key === 'ArrowDown') { e.preventDefault(); moveFocus(e.currentTarget, 1); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); moveFocus(e.currentTarget, -1); }
+  };
+  return html`<div id=${id} class="bin" data-score tabindex="0" role="radiogroup" aria-label=${item.label} onKeyDown=${onKey}>
+    <button type="button" tabindex="-1" role="radio" aria-checked=${value === 0} class=${value === 0 ? 'on' : ''} onClick=${() => set(0)}>Nie · 0</button>
+    <button type="button" tabindex="-1" role="radio" aria-checked=${value === max} class=${value === max ? 'on' : ''} onClick=${() => set(max)}>Tak · ${fmt(max)}</button>
+  </div>`;
+}
+
+function ReadValue({ item, value }) {
+  if (value == null) return html`<span class="score-ro empty">—</span>`;
+  if (item.kind === 'minus') return html`<span class=${'score-ro k-minus ' + (value ? 'neg' : '')}>${value ? '−' + fmt(value) : '0'}</span>`;
+  return html`<span class="score-ro">${fmt(value)}</span>`;
+}
+
+function rangeText(it) {
+  if (it.kind === 'minus') return `0 do −${fmt(Math.round(it.max * 10))}`;
+  if (it.kind === 'bin') return `0 / ${fmt(Math.round(it.max * 10))}`;
+  return `0–${fmt(Math.round(it.max * 10))}`;
+}
+
+function CatNotes({ value, locked, onSave }) {
+  const [open, setOpen] = useState(!!value);
+  const [txt, setTxt] = useState(value || '');
+  const timer = useRef();
+  const focused = useRef(false);
+  useEffect(() => {
+    if (!focused.current) setTxt(value || '');
+    if (value) setOpen(true);
+  }, [value]);
+  if (locked) return value ? html`<p class="note-ro"><b>Uwagi:</b> ${value}</p>` : null;
+  if (!open) {
+    return html`<button type="button" class="link-btn note-add" onClick=${() => setOpen(true)}>
+      <${Icon} name="plus" size=${14} />Dodaj uwagi</button>`;
+  }
+  return html`<label class="notes"><span>Uwagi</span>
+    <textarea rows="2" value=${txt} placeholder="Notatka widoczna tylko dla Ciebie i supervisora"
+      onFocus=${() => (focused.current = true)}
+      onBlur=${() => { focused.current = false; clearTimeout(timer.current); onSave(txt.trim()); }}
+      onInput=${(e) => {
+        const v = e.currentTarget.value;
+        setTxt(v);
+        clearTimeout(timer.current);
+        timer.current = setTimeout(() => onSave(v.trim()), 600);
+      }}></textarea></label>`;
+}
+
+// ---------- karta oceny ----------
+
+function fieldsToFix(n) {
+  if (n === 1) return 'Jedno pole wymaga poprawy';
+  const few = n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14);
+  return few ? `${n} pola wymagają poprawy` : `${n} pól wymaga poprawy`;
+}
+
+export function ScoreCard({ t, disc, cid, jid, readOnly = false, judgeName, onPrev, onNext }) {
+  const card = t.cards[disc];
+  const c = t.contestants.find((x) => x.id === cid);
+  const entry = getEntry(t, disc, cid, jid);
+  const stats = entryStats(card, entry);
+  const [errors, setErrors] = useState({});
+  useEffect(() => setErrors({}), [cid, disc]);
+  if (!c) return html`<${Empty} title="Wybierz zawodnika z listy" />`;
+
+  const locked = readOnly || t.status !== 'live';
+  const st = startOf(c, disc);
+  const nr = startNumber(t, disc, cid);
+  const max = cardMax(card);
+  const v = (entry && entry.v) || {};
+  const errCount = Object.values(errors).filter(Boolean).length;
+  const onError = (itemId, msg) => setErrors((e) => (e[itemId] === msg ? e : { ...e, [itemId]: msg }));
+  const live = (itemId, value) => setScore(t.id, disc, cid, jid, itemId, value);
+  const done = (itemId, from, to) => {
+    if ((from ?? null) !== (to ?? null)) logChange(t.id, { j: jid, c: cid, d: disc, i: itemId, f: from ?? null, t: to ?? null });
+  };
+  const pct = stats.required ? Math.round((stats.filled / stats.required) * 100) : 0;
+  const saved = entry?.u ? new Date(entry.u).toLocaleTimeString('pl-PL') : null;
+  const meta = [nr ? `Nr startowy ${nr}` : null, st.date ? `${fmtDate(st.date)}${st.time ? ', godz. ' + st.time : ''}` : null, card.duration ? `czas ceremonii ${card.duration}` : null].filter(Boolean);
+
+  return html`<article class=${'scorecard d-' + disc} aria-label=${'Karta oceny: ' + fullName(c)}>
+    <header class="sc-head">
+      <${Avatar} c=${c} size=${76} />
+      <div class="sc-who">
+        <p class="eyebrow">${meta.join(' · ')}</p>
+        <h2>${fullName(c)}</h2>
+        <div class="sc-tags"><${DiscBadge} disc=${disc} />
+          ${judgeName ? html`<span class="muted">Karta sędziego: <b>${judgeName}</b></span>` : null}
+          ${t.dq?.[`${disc}|${cid}`] && readOnly ? html`<span class="badge neg"><${Icon} name="ban" size=${13} />Dyskwalifikacja</span>` : null}
+        </div>
+      </div>
+      <div class="sc-total" aria-live="polite">
+        <span class="label">${readOnly ? 'Ocena sędziego' : 'Twoja ocena'}</span>
+        <span class="big">${stats.started ? fmt(stats.total, true) : '—'}</span>
+        <span class="of">z ${fmt(max)} pkt możliwych</span>
+        <div class="bar" role="progressbar" aria-valuenow=${pct} aria-valuemin="0" aria-valuemax="100" aria-label="Wypełnienie karty"><i style=${{ width: pct + '%' }}></i></div>
+        <span class="small">${stats.filled} z ${stats.required} ocen${saved && !readOnly ? html` · <${Icon} name="check" size=${12} /> zapisano ${saved}` : ''}</span>
+      </div>
+    </header>
+
+    ${errCount ? html`<div class="alert err" role="alert"><${Icon} name="alert" />
+      ${fieldsToFix(errCount)} — błędnej wartości nie zapisano, w karcie pozostaje poprzednia ocena.</div>` : null}
+    ${locked && !readOnly ? html`<div class="alert info"><${Icon} name="lock" />Turniej jest zakończony — karta jest tylko do odczytu.</div>` : null}
+    ${!locked ? html`<p class="hint-line"><${Icon} name="info" size=${14} /> Wpisuj liczby z dokładnością do 0,1 — przecinek lub kropka. Punkty karne wpisuj bez minusa. <kbd>Enter</kbd> przenosi do następnego pola, <kbd>Esc</kbd> cofa zmianę.</p>` : null}
+
+    <div class="sc-grid">
+      ${card.categories.map((cat, ci) => {
+        const cs = stats.cats[ci];
+        return html`<section class="sc-cat" key=${cat.id}>
+          <header class="cat-head">
+            <h3>${cat.name}</h3>
+            <span class="cat-sum"><b>${fmt(cs.sum, true)}</b> <small>/ ${fmt(categoryMax(cat))}</small></span>
+          </header>
+          <ol class="items">
+            ${cat.items.map((it, ii) => {
+              const id = `f-${disc}-${cat.id}-${it.id}`;
+              const err = errors[it.id];
+              return html`<li class=${`item k-${it.kind} ${err ? 'has-err' : ''}`} key=${it.id}>
+                <span class="num">${ii + 1}</span>
+                <label class="lbl" for=${id}>
+                  <span>${it.label}</span>
+                  ${it.kind === 'minus' ? html`<span class="tag-neg">kara</span>` : null}
+                  ${it.hint ? html`<small>${it.hint}</small>` : null}
+                </label>
+                <span class="range">${rangeText(it)}</span>
+                <span class="val">
+                  ${locked
+                    ? html`<${ReadValue} item=${it} value=${v[it.id]} />`
+                    : it.kind === 'bin'
+                      ? html`<${BinInput} id=${id} item=${it} value=${v[it.id]} onSet=${(x) => { const f = v[it.id]; live(it.id, x); done(it.id, f, x); }} />`
+                      : html`<${ScoreInput} id=${id} item=${it} value=${v[it.id]} mode=${t.decimalMode} errId=${id + '-err'}
+                          onLive=${(x) => live(it.id, x)} onDone=${(f, to) => done(it.id, f, to)} onError=${onError} />`}
+                </span>
+                ${err ? html`<p class="err" id=${id + '-err'}><${Icon} name="alert" size=${14} />${err}</p>` : null}
+              </li>`;
+            })}
+          </ol>
+          <${CatNotes} value=${entry?.n?.[cat.id]} locked=${locked}
+            onSave=${(txt) => (txt || entry?.n?.[cat.id]) && txt !== (entry?.n?.[cat.id] || '') && setNote(t.id, disc, cid, jid, cat.id, txt)} />
+        </section>`;
+      })}
+    </div>
+
+    ${onPrev || onNext ? html`<footer class="sc-foot">
+      <button class="btn ghost" disabled=${!onPrev} onClick=${onPrev}><${Icon} name="chevron-left" />Poprzedni zawodnik</button>
+      <button class="btn" disabled=${!onNext} onClick=${onNext}>Następny zawodnik<${Icon} name="chevron-right" /></button>
+    </footer>` : null}
+  </article>`;
+}
+
+// ---------- lista zawodników ----------
+
+function groupByDay(list, disc) {
+  const groups = [];
+  for (const row of list) {
+    const d = startOf(row.c, disc).date || '';
+    let g = groups.find((x) => x.date === d);
+    if (!g) groups.push((g = { date: d, rows: [] }));
+    g.rows.push(row);
+  }
+  return groups;
+}
+
+function Rail({ t, disc, jid, selected, onSelect }) {
+  const card = t.cards[disc];
+  const rows = orderedContestants(t, disc).map((c) => ({ c, st: entryStats(card, getEntry(t, disc, c.id, jid)) }));
+  const done = rows.filter((r) => r.st.complete).length;
+  return html`<aside class="rail" aria-label="Lista zawodników">
+    <header class="rail-head">
+      <h2>Zawodnicy</h2>
+      <span class="muted">${done} z ${rows.length} kart kompletnych</span>
+      <div class="bar"><i style=${{ width: (rows.length ? (done / rows.length) * 100 : 0) + '%' }}></i></div>
+    </header>
+    <div class="rail-list">
+      ${groupByDay(rows, disc).map((g) => html`<div class="rail-group" key=${g.date}>
+        <h3 class="rail-day">${g.date ? fmtDate(g.date, true) : 'Bez terminu'}</h3>
+        <ul>
+          ${g.rows.map(({ c, st }) => html`<li key=${c.id}>
+            <button class=${'rail-item ' + (selected === c.id ? 'on' : '')} aria-current=${selected === c.id ? 'true' : undefined} onClick=${() => onSelect(c.id)}>
+              <span class="ri-time">${startOf(c, disc).time || '—'}</span>
+              <${Avatar} c=${c} size=${34} />
+              <span class="ri-name">${fullName(c)}</span>
+              <span class="ri-score">${st.started ? fmt(st.total, true) : ''}</span>
+              <${StatusIcon} status=${st.status} size=${17} />
+            </button>
+          </li>`)}
+        </ul>
+      </div>`)}
+    </div>
+  </aside>`;
+}
+
+// ---------- porównanie ----------
+
+// Wartości do porównania: karta konkretnego sędziego albo suma liczonych kart (tylko supervisor).
+export function compareValues(t, disc, cid, jid) {
+  if (jid !== '__sum') return (getEntry(t, disc, cid, jid) || {}).v || {};
+  const v = {};
+  for (const j of t.judges) {
+    if (t.excluded?.[`${disc}|${cid}|${j.id}`]) continue;
+    const e = getEntry(t, disc, cid, j.id);
+    if (!e) continue;
+    for (const [k, x] of Object.entries(e.v || {})) if (x != null) v[k] = (v[k] || 0) + x;
+  }
+  return v;
+}
+
+export function ContestantPicker({ t, disc, selected, onChange, max = 6 }) {
+  const list = orderedContestants(t, disc);
+  const toggle = (id) => {
+    if (selected.includes(id)) onChange(selected.filter((x) => x !== id));
+    else if (selected.length < max) onChange([...selected, id]);
+  };
+  return html`<div class="picker" role="group" aria-label="Wybierz zawodników do porównania">
+    ${list.map((c) => {
+      const on = selected.includes(c.id);
+      return html`<button type="button" key=${c.id} class=${'pick ' + (on ? 'on' : '')} aria-pressed=${on}
+        disabled=${!on && selected.length >= max} onClick=${() => toggle(c.id)}>
+        <${Avatar} c=${c} size=${26} /><span>${fullName(c)}</span>${on ? html`<${Icon} name="check" size=${14} />` : null}
+      </button>`;
+    })}
+  </div>`;
+}
+
+function bestIndex(vals, higherIsBetter = true) {
+  const present = vals.map((x, i) => [x, i]).filter(([x]) => x != null);
+  if (present.length < 2) return new Set();
+  const target = higherIsBetter ? Math.max(...present.map(([x]) => x)) : Math.min(...present.map(([x]) => x));
+  if (present.every(([x]) => x === target)) return new Set();
+  return new Set(present.filter(([x]) => x === target).map(([, i]) => i));
+}
+
+export function Comparison({ t, disc, jid, cids, onRemove }) {
+  const card = t.cards[disc];
+  const cols = cids.map((cid) => {
+    const c = t.contestants.find((x) => x.id === cid);
+    const v = compareValues(t, disc, cid, jid);
+    return { c, v, st: entryStats(card, { v }) };
+  }).filter((x) => x.c);
+  if (cols.length < 2) {
+    return html`<${Empty} icon="columns" title="Wybierz co najmniej dwóch zawodników">Zaznacz zawodników powyżej — pojawią się obok siebie, pozycja po pozycji.</${Empty}>`;
+  }
+  const two = cols.length === 2;
+  const diff = (a, b) => (a == null || b == null ? null : a - b);
+  const diffCell = (d, neg = false) => html`<td class=${'diff ' + (d > 0 ? 'pos' : d < 0 ? 'negd' : '')}>${d == null ? '' : d === 0 ? '=' : (d > 0 ? '+' : '−') + fmt(Math.abs(d))}</td>`;
+  return html`<div class="table-wrap">
+    <table class=${'compare d-' + disc}>
+      <thead><tr>
+        <th class="c-label" scope="col">Kryterium</th>
+        ${cols.map(({ c }) => html`<th scope="col" key=${c.id} class="c-col">
+          <div class="cc-head"><${Avatar} c=${c} size=${40} /><span>${fullName(c)}</span>
+            <small>${startOf(c, disc).time ? fmtDate(startOf(c, disc).date) + ', ' + startOf(c, disc).time : ''}</small>
+            ${onRemove ? html`<button class="btn icon ghost xs" aria-label=${'Usuń z porównania: ' + fullName(c)} onClick=${() => onRemove(c.id)}><${Icon} name="x" size=${14} /></button>` : null}
+          </div></th>`)}
+        ${two ? html`<th scope="col" class="c-diff">Różnica<small>1. − 2.</small></th>` : null}
+      </tr></thead>
+      ${card.categories.map((cat, ci) => {
+        const sums = cols.map((x) => (x.st.started ? x.st.cats[ci].sum : null));
+        const best = bestIndex(sums);
+        return html`<tbody key=${cat.id}>
+          <tr class="cat-row"><th scope="row">${cat.name}<small>maks. ${fmt(categoryMax(cat))}</small></th>
+            ${sums.map((s, i) => html`<td class=${best.has(i) ? 'best' : ''}>${fmt(s, true)}</td>`)}
+            ${two ? diffCell(diff(sums[0], sums[1])) : null}</tr>
+          ${cat.items.map((it) => {
+            const vals = cols.map((x) => x.v[it.id] ?? null);
+            const b = it.kind === 'minus' ? new Set() : bestIndex(vals);
+            const shown = (x) => (x == null ? '—' : it.kind === 'minus' ? (x ? '−' + fmt(x) : '0') : fmt(x));
+            const dv = it.kind === 'minus' ? diff(vals[1], vals[0]) : diff(vals[0], vals[1]);
+            return html`<tr class=${'k-' + it.kind} key=${it.id}>
+              <th scope="row"><span>${it.label}</span>${it.kind === 'minus' ? html`<span class="tag-neg">kara</span>` : null}<small>${rangeText(it)}</small></th>
+              ${vals.map((x, i) => html`<td class=${`${b.has(i) ? 'best' : ''} ${it.kind === 'minus' && x ? 'neg' : ''}`}>${shown(x)}</td>`)}
+              ${two ? diffCell(dv) : null}
+            </tr>`;
+          })}
+        </tbody>`;
+      })}
+      <tfoot>
+        <tr class="total-row"><th scope="row">Wynik całkowity<small>maks. ${fmt(cardMax(card))}</small></th>
+          ${(() => {
+            const tot = cols.map((x) => (x.st.started ? x.st.total : null));
+            const b = bestIndex(tot);
+            return tot.map((s, i) => html`<td class=${b.has(i) ? 'best' : ''}>${fmt(s, true)}</td>`);
+          })()}
+          ${two ? diffCell(diff(cols[0].st.started ? cols[0].st.total : null, cols[1].st.started ? cols[1].st.total : null)) : null}
+        </tr>
+      </tfoot>
+    </table>
+  </div>`;
+}
+
+// Finał: zestawienie sum z trzech dni.
+export function ComparisonFinal({ t, jid, cids }) {
+  const cols = cids.map((cid) => t.contestants.find((x) => x.id === cid)).filter(Boolean);
+  if (cols.length < 2) return html`<${Empty} icon="columns" title="Wybierz co najmniej dwóch zawodników" />`;
+  const per = cols.map((c) => FINAL_ORDER.map((d) => {
+    const st = entryStats(t.cards[d], { v: compareValues(t, d, c.id, jid) });
+    return st.started ? st.total : null;
+  }));
+  const totals = per.map((p) => (p.every((x) => x == null) ? null : p.reduce((a, x) => a + (x || 0), 0)));
+  return html`<div class="table-wrap"><table class="compare">
+    <thead><tr><th class="c-label">Konkurencja</th>${cols.map((c) => html`<th class="c-col" key=${c.id}><div class="cc-head"><${Avatar} c=${c} size=${40} /><span>${fullName(c)}</span></div></th>`)}</tr></thead>
+    <tbody>
+      ${FINAL_ORDER.map((d, di) => {
+        const vals = per.map((p) => p[di]);
+        const b = bestIndex(vals);
+        return html`<tr class="cat-row" key=${d}><th scope="row"><${DiscBadge} disc=${d} small /><small>maks. ${fmt(cardMax(t.cards[d]))}</small></th>
+          ${vals.map((x, i) => html`<td class=${b.has(i) ? 'best' : ''}>${fmt(x, true)}</td>`)}</tr>`;
+      })}
+    </tbody>
+    <tfoot><tr class="total-row"><th scope="row">Suma trzech dni</th>
+      ${(() => { const b = bestIndex(totals); return totals.map((x, i) => html`<td class=${b.has(i) ? 'best' : ''}>${fmt(x, true)}</td>`); })()}
+    </tr></tfoot>
+  </table></div>`;
+}
+
+function defaultPicks(t, disc, jid) {
+  const list = orderedContestants(t, disc).filter((c) => {
+    const d = disc === 'all' ? FINAL_ORDER : [disc];
+    return d.some((x) => Object.keys(compareValues(t, x, c.id, jid)).length);
+  });
+  return list.slice(-3).map((c) => c.id);
+}
+
+export function CompareView({ t, jid, disc, onDisc, isFinal }) {
+  const pd = disc === 'all' ? 'relax' : disc;
+  const [sel, setSel] = useState(() => defaultPicks(t, disc, jid));
+  const keyRef = useRef(jid);
+  useEffect(() => {
+    if (keyRef.current !== jid) { keyRef.current = jid; setSel(defaultPicks(t, disc, jid)); }
+  }, [jid]);
+  return html`<div class="compare-view">
+    <div class="toolbar">
+      ${isFinal ? html`<${Segmented} label="Konkurencja" value=${disc} onChange=${onDisc}
+        options=${[...FINAL_ORDER.map((d) => ({ value: d, label: DISCIPLINES[d].label, icon: DISCIPLINES[d].icon, disc: d })), { value: 'all', label: 'Suma 3 dni', icon: 'trophy' }]} />` : null}
+      <span class="muted">${sel.length} z maks. 6 zaznaczonych</span>
+      ${sel.length ? html`<button class="link-btn" onClick=${() => setSel([])}>Wyczyść wybór</button>` : null}
+    </div>
+    <${ContestantPicker} t=${t} disc=${pd} selected=${sel} onChange=${setSel} />
+    ${disc === 'all'
+      ? html`<${ComparisonFinal} t=${t} jid=${jid} cids=${sel} />`
+      : html`<${Comparison} t=${t} disc=${disc} jid=${jid} cids=${sel} onRemove=${(id) => setSel(sel.filter((x) => x !== id))} />`}
+  </div>`;
+}
+
+// ---------- mój ranking ----------
+
+export function MyRanking({ t, jid, disc, onDisc, isFinal, onOpen }) {
+  const discs = disc === 'all' ? FINAL_ORDER : [disc];
+  const rows = assignRanks(t.contestants.map((c) => {
+    const per = discs.map((d) => entryStats(t.cards[d], getEntry(t, d, c.id, jid)));
+    return {
+      c, name: fullName(c), per,
+      total: per.reduce((a, s) => a + (s.started ? s.total : 0), 0),
+      scored: per.some((s) => s.started),
+      complete: per.every((s) => s.complete),
+    };
+  })).filter((r) => r.scored);
+  const top = Math.max(1, ...rows.map((r) => r.total));
+  return html`<div class="ranking-view">
+    <div class="toolbar">
+      ${isFinal ? html`<${Segmented} label="Konkurencja" value=${disc} onChange=${onDisc}
+        options=${[...FINAL_ORDER.map((d) => ({ value: d, label: DISCIPLINES[d].label, icon: DISCIPLINES[d].icon, disc: d })), { value: 'all', label: 'Suma 3 dni', icon: 'trophy' }]} />` : null}
+      <span class="muted"><${Icon} name="eye" size=${14} /> Ranking według Twoich ocen — inni sędziowie go nie widzą.</span>
+    </div>
+    ${!rows.length ? html`<${Empty} icon="ranking" title="Brak ocen">Ranking pojawi się po wypełnieniu pierwszej karty.</${Empty}>` : html`
+    <ol class="myrank">
+      ${rows.map((r) => html`<li key=${r.c.id}>
+        <button class="mr-row" onClick=${() => onOpen && disc !== 'all' && onOpen(r.c.id)} disabled=${!onOpen || disc === 'all'}>
+          <span class="mr-pos">${r.rank}${r.tie ? html`<small>ex aequo</small>` : null}</span>
+          <${Avatar} c=${r.c} size=${38} />
+          <span class="mr-name">${r.name}${!r.complete ? html`<small class="warn-text">karta niekompletna</small>` : null}</span>
+          <span class="mr-bars" aria-hidden="true">
+            ${disc === 'all'
+              ? r.per.map((s, i) => html`<span class=${'mr-bar d-' + FINAL_ORDER[i]} title=${DISCIPLINES[FINAL_ORDER[i]].label}><i style=${{ width: (s.started ? (s.total / cardMax(t.cards[FINAL_ORDER[i]])) * 100 : 0) + '%' }}></i></span>`)
+              : r.per[0].cats.map((cs) => html`<span class="mr-bar" title=${cs.name}><i style=${{ width: Math.max(0, (cs.sum / cs.max) * 100) + '%' }}></i><em>${cs.name.split(' ')[0]}</em></span>`)}
+          </span>
+          <span class="mr-total">${fmt(r.total, true)}</span>
+          <span class="mr-line"><i style=${{ width: (r.total / top) * 100 + '%' }}></i></span>
+        </button>
+      </li>`)}
+    </ol>`}
+  </div>`;
+}
+
+// ---------- aplikacja sędziego ----------
+
+export function JudgeApp({ t, judge, route, go }) {
+  const discs = disciplinesOf(t);
+  const isFinal = t.type === 'final';
+  const view = route[1] || 'ocena';
+  const disc = discs.includes(route[2]) || route[2] === 'all' ? route[2] : discs[0];
+  const scoringDisc = disc === 'all' ? discs[0] : disc;
+  const ordered = orderedContestants(t, scoringDisc);
+  let cid = route[3];
+  if (view === 'ocena' && !ordered.find((c) => c.id === cid)) {
+    const firstOpen = ordered.find((c) => !entryStats(t.cards[scoringDisc], getEntry(t, scoringDisc, c.id, judge.id)).complete);
+    cid = (firstOpen || ordered[0])?.id;
+  }
+  const idx = ordered.findIndex((c) => c.id === cid);
+  const goCard = (id, d = scoringDisc) => go(`#/j/ocena/${d}/${id}`);
+
+  useEffect(() => {
+    if (view === 'ocena') document.querySelector('.card-pane')?.scrollTo({ top: 0 });
+  }, [cid, view]);
+
+  return html`<div class=${'judge-shell d-' + scoringDisc}>
+    ${isFinal && view === 'ocena' ? html`<div class="discbar">
+      <span class="muted">Konkurencja:</span>
+      <${Segmented} label="Konkurencja" value=${scoringDisc} onChange=${(d) => go(`#/j/${view}/${d}`)}
+        options=${discs.map((d) => {
+          const anyDate = orderedContestants(t, d)[0];
+          const date = anyDate && startOf(anyDate, d).date;
+          return { value: d, label: DISCIPLINES[d].label, icon: DISCIPLINES[d].icon, disc: d, sub: date ? fmtDate(date) : '' };
+        })} />
+      <span class="muted small">W finale każdego zawodnika oceniasz na trzech osobnych kartach.</span>
+    </div>` : null}
+    ${view === 'ocena' ? html`<div class="split">
+      <${Rail} t=${t} disc=${scoringDisc} jid=${judge.id} selected=${cid} onSelect=${(id) => goCard(id)} />
+      <div class="card-pane">
+        <${ScoreCard} key=${scoringDisc + cid} t=${t} disc=${scoringDisc} cid=${cid} jid=${judge.id}
+          onPrev=${idx > 0 ? () => goCard(ordered[idx - 1].id) : null}
+          onNext=${idx >= 0 && idx < ordered.length - 1 ? () => goCard(ordered[idx + 1].id) : null} />
+      </div>
+    </div>` : null}
+    ${view === 'porownanie' ? html`<div class="page"><div class="page-head"><h1>Porównanie zawodników</h1>
+        <p class="muted">Twoje oceny obok siebie, pozycja po pozycji. Pogrubienie oznacza najwyższą notę w wierszu.</p></div>
+      <${CompareView} t=${t} jid=${judge.id} disc=${disc} isFinal=${isFinal} onDisc=${(d) => go(`#/j/porownanie/${d}`)} /></div>` : null}
+    ${view === 'ranking' ? html`<div class="page"><div class="page-head"><h1>Mój ranking</h1></div>
+      <${MyRanking} t=${t} jid=${judge.id} disc=${disc} isFinal=${isFinal} onDisc=${(d) => go(`#/j/ranking/${d}`)}
+        onOpen=${(id) => goCard(id, scoringDisc)} /></div>` : null}
+  </div>`;
+}
