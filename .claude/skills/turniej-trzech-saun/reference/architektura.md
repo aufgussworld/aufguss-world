@@ -19,6 +19,7 @@
 | `config.js` | `window.TTS_CONFIG = { mode: 'live', supabaseUrl, supabaseAnonKey }` (klucz publishable); opcjonalnie `feedbackEndpoint` |
 | `demo/index.html` | wersja demo: `TTS_CONFIG = { mode: 'demo' }`, te same `../css` i `../js` |
 | `assets/login-hero.jpg` | grafika ekranu logowania (od organizatora) |
+| `assets/favicon-16.png`, `assets/favicon-32.png`, `assets/apple-touch-icon.png` | favicon i ikona na ekran telefonu: biały sygnet Sommer Residence (wieniec z monogramem SR, wycięty z `logo-sommer-residence.png`, wiersze 0–130, kolumny 45–205) na bordowym tle `#8D2732`; podpięte w `index.html` i `demo/index.html` |
 | `js/app.js` | start aplikacji, ekran logowania, wymuszona zmiana kodu supervisora, routing po `#hash`, pasek górny, znacznik synchronizacji, automatyczna kopia co godzinę o :30 (supervisor) |
 | `js/store.js` | magazyn stanu (demo: localStorage `tts-demo-v1`; live: pamięć + `remote.js`), akcje: `updateT`, `createTournament`, `deleteTournament`, `setScore`, `logChange`, `setNote`, `setItemNote`, `setFeedback`, sesja w sessionStorage |
 | `js/remote.js` | tryb produkcyjny: logowanie anonimowe + RPC ról, pobieranie danych, zapisy z kolejką offline, czas rzeczywisty, odświeżanie co 60 s, kopie w bazie, przekazanie dostępu |

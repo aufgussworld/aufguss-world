@@ -142,6 +142,9 @@ Najpierw zawsze: co dokładnie widzi użytkownik (treść komunikatu) i na ilu u
 
 Najnowsze na górze. Każdy wpis: data — co — dlaczego.
 
+- **2026-10-15** — Favicon: sygnet z logo Sommer Residence (biały na bordowym, 16/32 px + ikona 180 px na telefon)
+  zamiast trzech kolorowych słupków. Powód: spójność z marką organizatora.
+
 - **2026-10-15** — Wyniki na żywo: przełącznik „Kolejność startowa” (domyślnie, z kolumną „Nr”) / „Ranking”;
   w klasyfikacji łącznej finału kolejność z pierwszego dnia (Relax). Kopie: podgląd stanu z wybranej godziny
   obok obecnych wyników (strzałki między kopiami, zaznaczone różnice), kolumna „Zmiana” liczby kart na liście kopii,
