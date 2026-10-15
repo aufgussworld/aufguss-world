@@ -10,6 +10,7 @@ import {
 import { store, updateT } from './store.js';
 import { Icon, Avatar, DiscBadge, StatusIcon, Segmented, Modal, Empty, LiveDot, toast } from './ui.js';
 import { ScoreCard, CompareView } from './judge.js';
+import { resultsPDF } from './pdf.js';
 import { ContestantsEditor, JudgesEditor, CardEditor, QualifierImport } from './editors.js';
 
 const discOptions = (t, withAll) => [
@@ -183,7 +184,8 @@ function ResultsTab({ t }) {
         <p class="muted">${t.status === 'live' ? 'Tabela aktualizuje się sama, gdy sędziowie wpisują oceny — bez przeładowania strony.' : STATUS[t.status].hint}</p></div>
       <div class="actions">
         <button class="btn" onClick=${() => resultsCSV(t, disc)}><${Icon} name="download" />Eksport CSV</button>
-        <button class="btn" onClick=${() => window.print()}><${Icon} name="printer" />Drukuj</button>
+        <button class="btn" onClick=${() => resultsPDF(t, disc).catch(() => toast('Nie udało się przygotować pliku PDF — sprawdź połączenie z internetem', 'err'))}>
+          <${Icon} name="file-text" />Wyniki PDF</button>
       </div>
     </div>
     ${isFinal ? html`<div class="toolbar"><${Segmented} label="Konkurencja" value=${disc} onChange=${setDisc} options=${discOptions(t, true)} /></div>` : null}
@@ -354,13 +356,15 @@ function MatrixTab({ t }) {
             return html`<tr key=${c.id}>
               <th scope="row"><div class="who"><${Avatar} c=${c} size=${30} /><span><b>${fullName(c)}</b><small>${st.date ? `${fmtDate(st.date)}, ${st.time || ''}` : ''}</small></span></div></th>
               ${t.judges.map((j) => {
-                const s = entryStats(card, getEntry(t, disc, c.id, j.id));
+                const e = getEntry(t, disc, c.id, j.id);
+                const s = entryStats(card, e);
                 const ex = !!t.excluded?.[excludedKey(disc, c.id, j.id)];
                 return html`<td key=${j.id} class="mx-cell">
                   ${s.started
                     ? html`<button class=${`mx-btn s-${s.status} ${ex ? 'ex' : ''}`} onClick=${() => setOpen({ cid: c.id, jid: j.id })}
-                        aria-label=${`${fullName(j)} — ${fullName(c)}: ${fmt(s.total, true)} pkt${ex ? ', nie liczy się' : ''}`}>
-                        <${StatusIcon} status=${s.status} size=${15} /><span>${fmt(s.total, true)}</span></button>`
+                        aria-label=${`${fullName(j)} — ${fullName(c)}: ${fmt(s.total, true)} pkt${ex ? ', nie liczy się' : ''}${e?.fb ? ', feedback gotowy' : ''}`}>
+                        <${StatusIcon} status=${s.status} size=${15} /><span>${fmt(s.total, true)}</span>
+                        ${e?.fb ? html`<${Icon} name="file-text" size=${14} cls="mx-fb" />` : null}</button>`
                     : html`<span class="mx-empty" aria-label="brak karty">·</span>`}
                 </td>`;
               })}
@@ -374,6 +378,7 @@ function MatrixTab({ t }) {
     <p class="legend muted small">
       <${StatusIcon} status="complete" size=${14} withLabel /> <${StatusIcon} status="partial" size=${14} withLabel />
       <span class="lg-ex">12,5</span> nie liczy się do wyniku
+      <span class="lg-fb"><${Icon} name="file-text" size=${14} /> sędzia przygotował feedback</span>
     </p>
     ${open ? html`<${CardModal} t=${t} disc=${disc} cid=${open.cid} jid=${open.jid} onClose=${() => setOpen(null)} />` : null}
   </div>`;

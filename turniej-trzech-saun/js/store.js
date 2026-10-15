@@ -4,7 +4,7 @@
 // Docelowo ten moduł zostanie podmieniony na Supabase (te same funkcje, inne źródło danych).
 
 import { useEffect, useReducer } from './lib.js';
-import { seedState } from './seed.js';
+import { seedState, SEED_VERSION, SEED_IDS, LEGACY_SEED_IDS } from './seed.js';
 
 const KEY = 'tts-demo-v1';
 const SESSION_KEY = 'tts-session';
@@ -16,11 +16,22 @@ let state = load();
 function load() {
   try {
     const raw = localStorage.getItem(KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) return migrate(JSON.parse(raw));
   } catch (e) {
     console.warn('Nie udało się odczytać danych demo', e);
   }
   const s = seedState();
+  persist(s);
+  return s;
+}
+
+// Nowa wersja danych przykładowych podmienia tylko turnieje demo — turnieje założone przez użytkownika zostają.
+function migrate(s) {
+  if (s.seedVersion === SEED_VERSION) return s;
+  const fresh = seedState();
+  const drop = new Set([...LEGACY_SEED_IDS, ...SEED_IDS]);
+  s.tournaments = [...fresh.tournaments, ...s.tournaments.filter((t) => !drop.has(t.id))];
+  s.seedVersion = SEED_VERSION;
   persist(s);
   return s;
 }
@@ -114,6 +125,32 @@ export function setNote(tid, disc, cid, jid, catId, text) {
     e.n ||= {};
     if (text) e.n[catId] = text;
     else delete e.n[catId];
+  });
+}
+
+function entryFor(t, disc, cid, jid) {
+  t.scores ||= {};
+  t.scores[disc] ||= {};
+  t.scores[disc][cid] ||= {};
+  return (t.scores[disc][cid][jid] ||= { v: {}, n: {} });
+}
+
+// Uwaga sędziego do jednej pozycji karty (ikonka notatnika przy ocenie).
+export function setItemNote(tid, disc, cid, jid, itemId, text) {
+  updateT(tid, (t) => {
+    const e = entryFor(t, disc, cid, jid);
+    e.ni ||= {};
+    if (text) e.ni[itemId] = text;
+    else delete e.ni[itemId];
+  });
+}
+
+// Feedback dla zawodnika: { sections: [{ id, title, text }], updatedAt, source }
+export function setFeedback(tid, disc, cid, jid, fb) {
+  updateT(tid, (t) => {
+    const e = entryFor(t, disc, cid, jid);
+    if (fb) e.fb = { ...fb, updatedAt: Date.now() };
+    else delete e.fb;
   });
 }
 

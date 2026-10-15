@@ -9,6 +9,7 @@ import {
 import { defaultCard } from './templates.js';
 import { store } from './store.js';
 import { Icon, Avatar, Segmented, DiscBadge, readPhoto, toast } from './ui.js';
+import { logoDataURL } from './pdf.js';
 
 const shuffle = (a) => {
   const x = [...a];
@@ -263,17 +264,23 @@ export function allCodes(except) {
   return s;
 }
 
-export function printCodes(t) {
+export async function printCodes(t) {
   const w = window.open('', '_blank');
   if (!w) return toast('Przeglądarka zablokowała okno wydruku', 'err');
+  let logo = '';
+  try { logo = await logoDataURL(); } catch (_) { /* wydruk bez logo */ }
   const url = location.href.split('#')[0];
-  const rows = t.judges.map((j) => `<div class="c"><p class="n">${fullName(j)}</p><p class="k">${prettyCode(j.code)}</p><p class="u">${t.name}<br>Zaloguj się: ${url}</p></div>`).join('');
+  const rows = t.judges.map((j) => `<div class="c">${logo ? `<img src="${logo}" alt="Sommer Residence">` : ''}<p class="n">${fullName(j)}</p><p class="k">${prettyCode(j.code)}</p><p class="u">${t.name}<br>Zaloguj się: ${url}</p></div>`).join('');
   w.document.write(`<!doctype html><html lang="pl"><head><meta charset="utf-8"><title>Kody sędziów — ${t.name}</title>
-    <style>body{font-family:system-ui,sans-serif;margin:24px}.g{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-    .c{border:1.5px dashed #999;border-radius:10px;padding:18px 20px;break-inside:avoid}.n{font-size:18px;font-weight:600;margin:0 0 8px}
-    .k{font:600 34px/1.1 ui-monospace,monospace;letter-spacing:.12em;margin:0 0 10px}.u{font-size:12px;color:#555;margin:0}</style></head>
-    <body><h1 style="font-size:20px">Kody logowania sędziów — ${t.name}</h1><div class="g">${rows}</div>
-    <script>window.onload=()=>window.print()<\/script></body></html>`);
+    <style>body{font-family:system-ui,sans-serif;margin:24px;color:#1b1a17}.g{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    header{display:flex;align-items:center;gap:16px;border-bottom:1.5px solid #8D2732;padding-bottom:12px;margin-bottom:18px}
+    header img{height:56px}header h1{font-size:19px;margin:0}header p{margin:2px 0 0;color:#6b655c;font-size:13px}
+    .c{position:relative;border:1.5px dashed #b9afa2;border-radius:10px;padding:18px 20px;break-inside:avoid}
+    .c img{position:absolute;right:16px;top:14px;height:34px;opacity:.9}.n{font-size:18px;font-weight:600;margin:0 0 8px}
+    .k{font:600 34px/1.1 ui-monospace,monospace;letter-spacing:.12em;margin:0 0 10px;color:#8D2732}.u{font-size:12px;color:#555;margin:0}</style></head>
+    <body><header>${logo ? `<img src="${logo}" alt="Sommer Residence">` : ''}<div><h1>Kody logowania sędziów</h1><p>Turniej Trzech Saun · ${t.name}</p></div></header>
+    <div class="g">${rows}</div>
+    <script>window.onload=()=>setTimeout(()=>window.print(),150)<\/script></body></html>`);
   w.document.close();
 }
 
@@ -370,6 +377,15 @@ export function CardEditor({ t, update }) {
     if (j < 0 || j >= arr.length) return;
     [arr[i], arr[j]] = [arr[j], arr[i]];
   };
+  // Nowy element domyślnie daje punkty dodatnie — rodzaj zmienia się w kolumnie „Rodzaj punktów”.
+  const addItem = (ci, catId) => {
+    upd((c) => c.categories[ci].items.push({ id: uid('i'), label: 'Nowy element', kind: 'plus', max: 2 }));
+    setTimeout(() => {
+      const input = document.querySelector(`[data-cat="${catId}"] tbody tr:last-child input[type="text"]`);
+      input?.focus();
+      input?.select();
+    }, 30);
+  };
   const resetCard = () => {
     if (!confirm(`Przywrócić kartę wzorcową ${DISCIPLINES[disc].label}? Twoje zmiany w tej karcie zostaną utracone.`)) return;
     update((x) => { x.cards[disc] = defaultCard(disc); });
@@ -385,7 +401,7 @@ export function CardEditor({ t, update }) {
       <button class="btn ghost" onClick=${resetCard}><${Icon} name="undo" />Karta wzorcowa</button>
     </div>
     ${scored ? html`<div class="alert warn"><${Icon} name="alert" />Sędziowie wystawili już oceny na tej karcie. Zmiana zakresu lub usunięcie pozycji wpłynie na wyniki — zmieniaj ostrożnie.</div>` : null}
-    ${card.categories.map((cat, ci) => html`<section class="ce-cat" key=${cat.id}>
+    ${card.categories.map((cat, ci) => html`<section class="ce-cat" key=${cat.id} data-cat=${cat.id}>
       <header class="ce-cat-head">
         <span class="num">${ci + 1}</span>
         <input type="text" class="ce-cat-name" value=${cat.name} aria-label="Nazwa kategorii" onInput=${(e) => upd((c) => (c.categories[ci].name = e.currentTarget.value))} />
@@ -416,8 +432,8 @@ export function CardEditor({ t, update }) {
         </tbody>
       </table></div>
       <div class="ce-add">
-        <button class="btn ghost sm" onClick=${() => upd((c) => c.categories[ci].items.push({ id: uid('i'), label: 'Nowa pozycja', kind: 'plus', max: 2 }))}><${Icon} name="plus" size=${15} />Punkty dodatnie</button>
-        <button class="btn ghost sm neg" onClick=${() => upd((c) => c.categories[ci].items.push({ id: uid('i'), label: 'Nowa kara', kind: 'minus', max: 1 }))}><${Icon} name="minus" size=${15} />Punkty karne</button>
+        <button class="btn sm" onClick=${() => addItem(ci, cat.id)}><${Icon} name="plus" size=${15} />Dodaj element</button>
+        <span class="muted small">Rodzaj punktów (dodatnie, karne albo Tak / Nie) wybierasz w kolumnie „Rodzaj punktów”.</span>
       </div>
     </section>`)}
     <button class="btn add-row" onClick=${() => upd((c) => c.categories.push({ id: uid('k'), name: 'Nowa kategoria', items: [{ id: uid('i'), label: 'Nowa pozycja', kind: 'plus', max: 2 }] }))}>

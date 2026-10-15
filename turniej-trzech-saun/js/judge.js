@@ -6,8 +6,9 @@ import {
   DISCIPLINES, FINAL_ORDER, fmt, fmtInput, fmtDate, fullName, parseScore, entryStats, getEntry,
   orderedContestants, startOf, startNumber, cardMax, categoryMax, disciplinesOf, assignRanks,
 } from './model.js';
-import { setScore, logChange, setNote } from './store.js';
-import { Icon, Avatar, DiscBadge, StatusIcon, Segmented, Empty } from './ui.js';
+import { setScore, logChange, setNote, setItemNote } from './store.js';
+import { Icon, Avatar, DiscBadge, StatusIcon, Segmented, Empty, Modal, NoteTip, tipProps } from './ui.js';
+import { FeedbackModal } from './feedback.js';
 
 // ---------- pola punktów ----------
 
@@ -131,6 +132,34 @@ function rangeText(it) {
   return `0–${fmt(Math.round(it.max * 10))}`;
 }
 
+// Uwaga do jednej pozycji: ikonka notatnika otwiera okienko, a zapisana uwaga pokazuje się po najechaniu.
+function NoteEditor({ item, note, onClose, onSave }) {
+  const [txt, setTxt] = useState(note || '');
+  return html`<${Modal} title="Uwaga do pozycji" onClose=${onClose} footer=${html`
+      ${note ? html`<button class="btn ghost danger" onClick=${() => onSave('')}><${Icon} name="trash" size=${16} />Usuń uwagę</button>` : null}
+      <span class="grow"></span>
+      <button class="btn ghost" onClick=${onClose}>Anuluj</button>
+      <button class="btn primary" onClick=${() => onSave(txt.trim())}><${Icon} name="check" size=${16} />Zapisz uwagę</button>`}>
+    <p class="note-for"><${Icon} name="note-text" size=${16} /><b>${item.label}</b>${item.kind === 'minus' ? html`<span class="tag-neg">kara</span>` : null}</p>
+    <textarea data-autofocus rows="5" value=${txt}
+      placeholder="Co zwróciło Twoją uwagę w tym elemencie? Notatka przyda się przy porównywaniu zawodników i przy pisaniu feedbacku."
+      onInput=${(e) => setTxt(e.currentTarget.value)}
+      onKeyDown=${(e) => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); onSave(txt.trim()); } }}></textarea>
+    <p class="muted small note-help">Uwagę widzisz Ty i supervisor. <kbd>Ctrl</kbd> + <kbd>Enter</kbd> zapisuje.</p>
+  </${Modal}>`;
+}
+
+function ItemNote({ item, note, locked, onSave }) {
+  const [open, setOpen] = useState(false);
+  if (locked) return html`<span class="note-cell">${note ? html`<${NoteTip} text=${note} />` : null}</span>`;
+  return html`<span class="note-cell">
+    <button type="button" class=${'note-btn ' + (note ? 'has' : '')} aria-label=${(note ? 'Edytuj uwagę: ' : 'Dodaj uwagę: ') + item.label}
+      ...${tipProps(note)} onClick=${() => setOpen(true)}>
+      <${Icon} name=${note ? 'note-text' : 'note'} size=${16} /></button>
+    ${open ? html`<${NoteEditor} item=${item} note=${note} onClose=${() => setOpen(false)} onSave=${(txt) => { onSave(txt); setOpen(false); }} />` : null}
+  </span>`;
+}
+
 function CatNotes({ value, locked, onSave }) {
   const [open, setOpen] = useState(!!value);
   const [txt, setTxt] = useState(value || '');
@@ -140,13 +169,13 @@ function CatNotes({ value, locked, onSave }) {
     if (!focused.current) setTxt(value || '');
     if (value) setOpen(true);
   }, [value]);
-  if (locked) return value ? html`<p class="note-ro"><b>Uwagi:</b> ${value}</p>` : null;
+  if (locked) return value ? html`<p class="note-ro"><b>Dodatkowe uwagi:</b> ${value}</p>` : null;
   if (!open) {
     return html`<button type="button" class="link-btn note-add" onClick=${() => setOpen(true)}>
-      <${Icon} name="plus" size=${14} />Dodaj uwagi</button>`;
+      <${Icon} name="plus" size=${14} />Dodatkowe uwagi</button>`;
   }
-  return html`<label class="notes"><span>Uwagi</span>
-    <textarea rows="2" value=${txt} placeholder="Notatka widoczna tylko dla Ciebie i supervisora"
+  return html`<label class="notes"><span>Dodatkowe uwagi</span>
+    <textarea rows="2" value=${txt} placeholder="Ogólne uwagi do całej kategorii — widzisz je Ty i supervisor"
       onFocus=${() => (focused.current = true)}
       onBlur=${() => { focused.current = false; clearTimeout(timer.current); onSave(txt.trim()); }}
       onInput=${(e) => {
@@ -171,8 +200,10 @@ export function ScoreCard({ t, disc, cid, jid, readOnly = false, judgeName, onPr
   const entry = getEntry(t, disc, cid, jid);
   const stats = entryStats(card, entry);
   const [errors, setErrors] = useState({});
+  const [fbOpen, setFbOpen] = useState(false);
   useEffect(() => setErrors({}), [cid, disc]);
   if (!c) return html`<${Empty} title="Wybierz zawodnika z listy" />`;
+  const fb = entry?.fb;
 
   const locked = readOnly || t.status !== 'live';
   const st = startOf(c, disc);
@@ -211,8 +242,14 @@ export function ScoreCard({ t, disc, cid, jid, readOnly = false, judgeName, onPr
 
     ${errCount ? html`<div class="alert err" role="alert"><${Icon} name="alert" />
       ${fieldsToFix(errCount)} — błędnej wartości nie zapisano, w karcie pozostaje poprzednia ocena.</div>` : null}
-    ${locked && !readOnly ? html`<div class="alert info"><${Icon} name="lock" />Turniej jest zakończony — karta jest tylko do odczytu.</div>` : null}
-    ${!locked ? html`<p class="hint-line"><${Icon} name="info" size=${14} /> Wpisuj liczby z dokładnością do 0,1 — przecinek lub kropka. Punkty karne wpisuj bez minusa. <kbd>Enter</kbd> przenosi do następnego pola, <kbd>Esc</kbd> cofa zmianę.</p>` : null}
+    ${locked && !readOnly ? html`<div class="alert info"><${Icon} name="lock" />Turniej jest zakończony — karta jest tylko do odczytu. Feedback dla zawodnika możesz nadal przygotować.</div>` : null}
+    <div class="sc-toolbar">
+      ${!locked ? html`<p class="hint-line"><${Icon} name="info" size=${14} /> Wpisuj liczby z dokładnością do 0,1 — przecinek lub kropka. Punkty karne wpisuj bez minusa. <kbd>Enter</kbd> przenosi dalej, <kbd>Esc</kbd> cofa zmianę, <${Icon} name="note" size=${14} /> dodaje uwagę do pozycji.</p>` : html`<span></span>`}
+      ${!readOnly || fb ? html`<button class=${'btn ' + (fb ? '' : 'fb-cta')} onClick=${() => setFbOpen(true)} disabled=${!stats.started && !fb}
+          title=${!stats.started && !fb ? 'Najpierw wypełnij kartę' : ''}>
+          <${Icon} name=${fb ? 'file-text' : 'sparkles'} size=${16} />${fb ? (readOnly ? 'Feedback sędziego' : 'Feedback — edytuj') : 'Feedback dla zawodnika'}</button>` : null}
+    </div>
+    ${fbOpen ? html`<${FeedbackModal} t=${t} disc=${disc} cid=${cid} jid=${jid} readOnly=${readOnly} onClose=${() => setFbOpen(false)} />` : null}
 
     <div class="sc-grid">
       ${card.categories.map((cat, ci) => {
@@ -233,6 +270,8 @@ export function ScoreCard({ t, disc, cid, jid, readOnly = false, judgeName, onPr
                   ${it.kind === 'minus' ? html`<span class="tag-neg">kara</span>` : null}
                   ${it.hint ? html`<small>${it.hint}</small>` : null}
                 </label>
+                <${ItemNote} item=${it} note=${entry?.ni?.[it.id]} locked=${locked}
+                  onSave=${(txt) => txt !== (entry?.ni?.[it.id] || '') && setItemNote(t.id, disc, cid, jid, it.id, txt)} />
                 <span class="range">${rangeText(it)}</span>
                 <span class="val">
                   ${locked
@@ -316,6 +355,27 @@ export function compareValues(t, disc, cid, jid) {
   return v;
 }
 
+// Uwagi do porównania: { items: {pozycja: tekst}, cats: {kategoria: tekst} }.
+// W trybie sumy łączymy uwagi wszystkich liczonych sędziów, z nazwiskiem przed każdą.
+export function compareNotes(t, disc, cid, jid) {
+  const items = {}, cats = {};
+  const sum = jid === '__sum';
+  const judges = sum ? t.judges.filter((j) => !t.excluded?.[`${disc}|${cid}|${j.id}`]) : t.judges.filter((j) => j.id === jid);
+  const add = (bag, k, txt, who) => {
+    if (!txt) return;
+    const line = who ? `${who}: ${txt}` : txt;
+    bag[k] = bag[k] ? `${bag[k]}\n${line}` : line;
+  };
+  for (const j of judges) {
+    const e = getEntry(t, disc, cid, j.id);
+    if (!e) continue;
+    const who = sum ? fullName(j) : null;
+    for (const [k, x] of Object.entries(e.ni || {})) add(items, k, x, who);
+    for (const [k, x] of Object.entries(e.n || {})) add(cats, k, x, who);
+  }
+  return { items, cats };
+}
+
 export function ContestantPicker({ t, disc, selected, onChange, max = 6 }) {
   const list = orderedContestants(t, disc);
   const toggle = (id) => {
@@ -346,7 +406,7 @@ export function Comparison({ t, disc, jid, cids, onRemove }) {
   const cols = cids.map((cid) => {
     const c = t.contestants.find((x) => x.id === cid);
     const v = compareValues(t, disc, cid, jid);
-    return { c, v, st: entryStats(card, { v }) };
+    return { c, v, st: entryStats(card, { v }), notes: compareNotes(t, disc, cid, jid) };
   }).filter((x) => x.c);
   if (cols.length < 2) {
     return html`<${Empty} icon="columns" title="Wybierz co najmniej dwóch zawodników">Zaznacz zawodników powyżej — pojawią się obok siebie, pozycja po pozycji.</${Empty}>`;
@@ -370,7 +430,7 @@ export function Comparison({ t, disc, jid, cids, onRemove }) {
         const best = bestIndex(sums);
         return html`<tbody key=${cat.id}>
           <tr class="cat-row"><th scope="row">${cat.name}<small>maks. ${fmt(categoryMax(cat))}</small></th>
-            ${sums.map((s, i) => html`<td class=${best.has(i) ? 'best' : ''}>${fmt(s, true)}</td>`)}
+            ${sums.map((s, i) => html`<td class=${best.has(i) ? 'best' : ''}><span class="cv">${fmt(s, true)}<${NoteTip} text=${cols[i].notes.cats[cat.id]} label="Dodatkowe uwagi" size=${14} /></span></td>`)}
             ${two ? diffCell(diff(sums[0], sums[1])) : null}</tr>
           ${cat.items.map((it) => {
             const vals = cols.map((x) => x.v[it.id] ?? null);
@@ -379,7 +439,8 @@ export function Comparison({ t, disc, jid, cids, onRemove }) {
             const dv = it.kind === 'minus' ? diff(vals[1], vals[0]) : diff(vals[0], vals[1]);
             return html`<tr class=${'k-' + it.kind} key=${it.id}>
               <th scope="row"><span>${it.label}</span>${it.kind === 'minus' ? html`<span class="tag-neg">kara</span>` : null}<small>${rangeText(it)}</small></th>
-              ${vals.map((x, i) => html`<td class=${`${b.has(i) ? 'best' : ''} ${it.kind === 'minus' && x ? 'neg' : ''}`}>${shown(x)}</td>`)}
+              ${vals.map((x, i) => html`<td class=${`${b.has(i) ? 'best' : ''} ${it.kind === 'minus' && x ? 'neg' : ''}`}>
+                <span class="cv">${shown(x)}<${NoteTip} text=${cols[i].notes.items[it.id]} size=${14} /></span></td>`)}
               ${two ? diffCell(dv) : null}
             </tr>`;
           })}

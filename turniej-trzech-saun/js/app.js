@@ -3,7 +3,7 @@
 import { html, render, useEffect, useState } from './lib.js';
 import { fullName, normCode, prettyCode, fmtRange, STATUS } from './model.js';
 import { store, useStore, getSession, setSession } from './store.js';
-import { Icon, Mark, DiscBadge, ToastHost, toast } from './ui.js';
+import { Icon, SRLogo, DiscBadge, ToastHost, TipHost, toast } from './ui.js';
 import { JudgeApp } from './judge.js';
 import { SupervisorHome, TournamentView } from './supervisor.js';
 import { Wizard } from './wizard.js';
@@ -52,20 +52,12 @@ function Login({ onLogin }) {
 
   return html`<div class="login">
     <section class="login-brand">
-      <div class="lb-inner">
-        <${Mark} size=${56} />
-        <h1>Turniej Trzech Saun</h1>
-        <p class="lb-sub">Sommer Residence · system sędziowski</p>
-        <ul class="lb-discs">
-          <li class="d-hot"><${Icon} name="flame" size=${20} /><span><b>Sommer Hot Cup</b><small>ciepło ponad wszystko · maks. 50 pkt</small></span></li>
-          <li class="d-relax"><${Icon} name="waves" size=${20} /><span><b>Sommer Relax Cup</b><small>spokój, komfort, klasyczne machanie</small></span></li>
-          <li class="d-banya"><${Icon} name="leaf" size=${20} /><span><b>Sommer Banya Cup</b><small>naturalne aromaty i tradycja bani</small></span></li>
-        </ul>
-        <p class="lb-foot">Elektroniczne karty sędziów, wyniki na żywo i historia zmian w jednym miejscu.</p>
-      </div>
+      <img src="assets/login-hero.jpg" width="1046" height="896"
+        alt="Sommer Residence — Turniej Trzech Saun. Trzy żywioły, jedna pasja. Sommer HOT 29–31 maja 2026, Relax Cup 8–9 sierpnia 2026, Banya Cup 17–18 października 2026, Finał Turnieju Trzech Saun 11–13 grudnia 2026." />
     </section>
 
     <section class="login-forms">
+      <h1 class="login-title"><span>System sędziowski</span>Turniej Trzech Saun</h1>
       <form class="panel login-card" onSubmit=${(e) => { e.preventDefault(); loginJudge(code); }}>
         <h2><${Icon} name="gavel" />Sędzia</h2>
         <label for="code">Kod logowania</label>
@@ -111,8 +103,8 @@ function TopBar({ session, t, judge, hash, onLogout }) {
   const jv = parts[1] || 'ocena';
   const jd = parts[2] && parts[2] !== 'all' ? parts[2] : '';
   return html`<header class="topbar">
-    <a class="brand" href=${session.role === 'sup' ? '#/s' : '#/j/ocena'}>
-      <${Mark} size=${28} /><span><b>Turniej Trzech Saun</b><small>Sommer Residence</small></span>
+    <a class="brand" href=${session.role === 'sup' ? '#/s' : '#/j/ocena'} aria-label="Turniej Trzech Saun — strona główna">
+      <${SRLogo} height=${40} /><span><b>Turniej Trzech Saun</b><small>system sędziowski</small></span>
     </a>
     ${session.role === 'judge' && t ? html`
       <div class="tb-ctx"><span class="tb-t">${t.name}</span><${DiscBadge} disc=${t.type} small /></div>
@@ -175,6 +167,7 @@ function App() {
     ${store.saveError() ? html`<div class="alert err banner"><${Icon} name="alert" />Nie udało się zapisać danych w przeglądarce (brak miejsca). Usuń część zdjęć lub zrób kopię zapasową.</div>` : null}
     <div class="app-body" id=${session && session.role === 'judge' ? 'main' : undefined}>${body}</div>
     <${ToastHost} />
+    <${TipHost} />
   </div>`;
 }
 

@@ -35,6 +35,10 @@ const JUDGE_POOL = [
   ['Dorota', 'Fijałkowska'], ['Leszek', 'Urban'],
 ];
 
+export const SEED_VERSION = 2;
+export const SEED_IDS = ['fin25', 'hot26', 'rlx26', 'bny26'];
+export const LEGACY_SEED_IDS = ['fin26'];
+
 const ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 const PLACE = 'Sommer Residence Spa & Wellness, Kuniów';
 
@@ -93,10 +97,49 @@ function schedule(t, disc, days, r) {
 
 const ts = (date, time) => new Date(`${date}T${time}:00`).getTime();
 
+// Przykładowe notatki sędziów do pojedynczych pozycji (pochwała przy wysokiej ocenie, uwaga przy niskiej).
+const ITEM_NOTES = [
+  ['relaksu', 'Bardzo spokojny, kojący seans.', 'Za dużo bodźców jak na ceremonię relaksacyjną.'],
+  ['przygotow', 'Sauna i akcesoria przygotowane bez zarzutu.', 'Na starcie brakowało części akcesoriów.'],
+  ['otwarci', 'Mocne wejście i klimatyczne zakończenie.', 'Zakończenie zbyt szybkie, bez puenty.'],
+  ['wykonanie', 'Płynne przejścia między rundami.', 'Zawahania w drugiej rundzie.'],
+  ['czystoś', 'Wzorowy porządek przy piecu.', 'Rozlana woda przy piecu po drugiej rundzie.'],
+  ['muzyk', 'Muzyka i strój idealnie w klimacie historii.', 'Muzyka nie pasowała do tematu seansu.'],
+  ['atrakcj', 'Poczęstunek po seansie — świetny pomysł.', 'Atrakcje słabo związane z tematem.'],
+  ['emocj', 'Publiczność wyraźnie poruszona, cisza w kulminacji.', 'Zabrakło wyraźnej kulminacji.'],
+  ['machani', 'Czyste, równe machanie, świetna praca ręcznikiem.', 'Ręcznik często się zwijał.'],
+  ['kreatyw', 'Oryginalny motyw przewodni.', 'Pomysł dość przewidywalny.'],
+  ['wzrost temperatury', 'Temperatura rosła równo, mocna ostatnia runda.', 'Za mały przyrost ciepła w trzeciej rundzie.'],
+  ['dystrybuc', 'Ciepło dobrze rozprowadzone, także na dolnych ławkach.', 'Górne ławki przegrzane, dół chłodny.'],
+  ['komfort', 'Intensywnie, ale komfortowo.', 'Momentami za ostro dla publiczności.'],
+  ['minimum', 'Trzy wyraźne, rozpoznawalne zapachy.', 'Trzeci zapach ledwo wyczuwalny.'],
+  ['sposób podania', 'Zapach podany na lodzie — świetny efekt.', 'Podanie zapachów bez pomysłu.'],
+  ['dopasowanie zapachów', 'Zapachy spójne z historią.', 'Zapachy nie pasowały do tematu.'],
+];
+const PENALTY_NOTES = {
+  p5: 'Ceremonia dłuższa o około minutę.',
+  p6: 'Sauna oddana po wyznaczonym czasie.',
+  p7: 'Wykaz zapachów dostarczony po terminie.',
+  p8: 'Szklana butelka w saunie.',
+  z5: 'Pierwszy zapach przedawkowany.',
+  t4: 'Kilka osób wyszło przed końcem rundy.',
+};
+function itemNote(it, val, r) {
+  const max = Math.round(it.max * 10);
+  if (it.kind === 'minus') return val > 0 && r() < 0.7 ? PENALTY_NOTES[it.id] || null : null;
+  if (it.kind !== 'plus' || !max) return null;
+  const ratio = val / max;
+  if ((ratio < 0.8 && ratio > 0.5) || r() > 0.16) return null;
+  const label = it.label.toLowerCase();
+  const hit = ITEM_NOTES.find(([k]) => label.includes(k));
+  return hit ? (ratio >= 0.8 ? hit[1] : hit[2]) : null;
+}
+
 // Wypełnia kartę jednego sędziego. fraction < 1 = karta w trakcie wypełniania.
 function fillCard(t, disc, c, j, r, { bias = 0, start, fraction = 1 }) {
   const card = t.cards[disc];
   const v = {};
+  const ni = {};
   const items = card.categories.flatMap((cat) => cat.items);
   const take = Math.round(items.length * fraction);
   let clock = start;
@@ -116,12 +159,14 @@ function fillCard(t, disc, c, j, r, { bias = 0, start, fraction = 1 }) {
       else return; // pusta kara = 0
     }
     v[it.id] = val;
+    const note = itemNote(it, val, r);
+    if (note) ni[it.id] = note;
     clock += 8000 + Math.floor(r() * 25000);
     t.history.push({ ts: clock, j: j.id, c: c.id, d: disc, i: it.id, f: null, t: val });
   });
   t.scores[disc] ||= {};
   t.scores[disc][c.id] ||= {};
-  t.scores[disc][c.id][j.id] = { v, n: {}, u: clock };
+  t.scores[disc][c.id][j.id] = { v, n: {}, ni, u: clock };
   return clock;
 }
 
@@ -200,14 +245,14 @@ export function seedState() {
   const taken = new Set();
   const tournaments = [];
 
-  // Finał 2026 (sezon 2025) — zakończony, trzy dni.
+  // Finał 2025 — zakończony, trzy dni (pt Relax, sb HOT, nd Banya).
   {
-    const t = baseTournament({ id: 'fin26', name: 'Finał Turnieju Trzech Saun 2026', type: 'final', status: 'closed', dateFrom: '2026-02-20', dateTo: '2026-02-22' });
+    const t = baseTournament({ id: 'fin25', name: 'Finał Turnieju Trzech Saun 2025', type: 'final', status: 'closed', dateFrom: '2025-12-12', dateTo: '2025-12-14' });
     addPeople(t, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14], r);
     addJudges(t, [0, 1, 2, 3, 4], r, taken);
-    schedule(t, 'relax', [{ date: '2026-02-20', first: '10:00', step: 45, count: 15 }], r);
-    schedule(t, 'hot', [{ date: '2026-02-21', first: '10:00', step: 45, count: 15 }], r);
-    schedule(t, 'banya', [{ date: '2026-02-22', first: '10:00', step: 45, count: 15 }], r);
+    schedule(t, 'relax', [{ date: '2025-12-12', first: '10:00', step: 45, count: 15 }], r);
+    schedule(t, 'hot', [{ date: '2025-12-13', first: '10:00', step: 45, count: 15 }], r);
+    schedule(t, 'banya', [{ date: '2025-12-14', first: '10:00', step: 45, count: 15 }], r);
     FINAL_ORDER.forEach((d) => {
       judgeDiscipline(t, d, r);
       audience(t, d, r, t.order[d]);
@@ -217,10 +262,10 @@ export function seedState() {
 
   // Sommer Hot Cup 2026 — zakończony.
   {
-    const t = baseTournament({ id: 'hot26', name: 'Sommer Hot Cup 2026', type: 'hot', status: 'closed', dateFrom: '2026-04-17', dateTo: '2026-04-18' });
+    const t = baseTournament({ id: 'hot26', name: 'Sommer Hot Cup 2026', type: 'hot', status: 'closed', dateFrom: '2026-05-29', dateTo: '2026-05-31' });
     addPeople(t, [0, 1, 2, 15, 16, 17, 18, 19, 20, 3, 21, 22], r);
     addJudges(t, [0, 1, 2, 5, 6], r, taken);
-    schedule(t, 'hot', [{ date: '2026-04-17', first: '15:00', step: 60, count: 6 }, { date: '2026-04-18', first: '11:00', step: 60, count: 6 }], r);
+    schedule(t, 'hot', [{ date: '2026-05-29', first: '15:00', step: 60, count: 6 }, { date: '2026-05-30', first: '11:00', step: 60, count: 6 }], r);
     judgeDiscipline(t, 'hot', r, { allFive: 4, resolveFive: 4 });
     audience(t, 'hot', r, t.order.hot);
     t.dq[`hot|${t.order.hot[8]}`] = 'Przekroczenie czasu ceremonii o ponad 2 min';
@@ -229,10 +274,10 @@ export function seedState() {
 
   // Sommer Relax Cup 2026 — zakończony.
   {
-    const t = baseTournament({ id: 'rlx26', name: 'Sommer Relax Cup 2026', type: 'relax', status: 'closed', dateFrom: '2026-06-12', dateTo: '2026-06-13' });
+    const t = baseTournament({ id: 'rlx26', name: 'Sommer Relax Cup 2026', type: 'relax', status: 'closed', dateFrom: '2026-08-08', dateTo: '2026-08-09' });
     addPeople(t, [4, 5, 23, 24, 25, 26, 27, 1, 28, 29, 6, 30], r);
     addJudges(t, [1, 3, 4, 7, 8], r, taken);
-    schedule(t, 'relax', [{ date: '2026-06-12', first: '15:00', step: 60, count: 6 }, { date: '2026-06-13', first: '11:00', step: 60, count: 6 }], r);
+    schedule(t, 'relax', [{ date: '2026-08-08', first: '15:00', step: 60, count: 6 }, { date: '2026-08-09', first: '11:00', step: 60, count: 6 }], r);
     judgeDiscipline(t, 'relax', r);
     audience(t, 'relax', r, t.order.relax);
     tournaments.push(t);
@@ -240,14 +285,14 @@ export function seedState() {
 
   // Sommer Banya Cup 2026 — w trakcie (symulacja wieczoru pierwszego dnia).
   {
-    const t = baseTournament({ id: 'bny26', name: 'Sommer Banya Cup 2026', type: 'banya', status: 'live', dateFrom: '2026-10-16', dateTo: '2026-10-17' });
+    const t = baseTournament({ id: 'bny26', name: 'Sommer Banya Cup 2026', type: 'banya', status: 'live', dateFrom: '2026-10-17', dateTo: '2026-10-18' });
     addPeople(t, [7, 8, 31, 32, 33, 34, 35, 2, 9, 36, 37, 38], r);
     addJudges(t, [0, 2, 5, 8, 9], r, taken);
-    schedule(t, 'banya', [{ date: '2026-10-16', first: '15:00', step: 60, count: 6 }, { date: '2026-10-17', first: '11:00', step: 60, count: 6 }], r);
+    schedule(t, 'banya', [{ date: '2026-10-17', first: '15:00', step: 60, count: 6 }, { date: '2026-10-18', first: '11:00', step: 60, count: 6 }], r);
     judgeDiscipline(t, 'banya', r, { until: 5, allFive: 2 });
     // szósty występ (20:00) — sędziowie właśnie wypełniają karty
     const c6 = t.contestants.find((x) => x.id === t.order.banya[5]);
-    const start6 = ts('2026-10-16', '20:22');
+    const start6 = ts('2026-10-17', '20:22');
     fillCard(t, 'banya', c6, t.judges[1], r, { start: start6 });
     fillCard(t, 'banya', c6, t.judges[2], r, { start: start6, fraction: 0.55 });
     fillCard(t, 'banya', c6, t.judges[3], r, { start: start6, fraction: 0.25 });
@@ -256,5 +301,5 @@ export function seedState() {
   }
 
   tournaments.forEach((t) => t.history.sort((a, b) => a.ts - b.ts));
-  return { version: 1, supervisorPin: '2026', rev: 0, tournaments };
+  return { version: 1, seedVersion: SEED_VERSION, supervisorPin: '2026', rev: 0, tournaments };
 }

@@ -55,12 +55,29 @@ const P = {
   search: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
   'file-json': '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4M10 12a1 1 0 0 0-1 1v1a1 1 0 0 1-1 1 1 1 0 0 1 1 1v1a1 1 0 0 0 1 1M14 18a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1 1 1 0 0 1-1-1v-1a1 1 0 0 0-1-1"/>',
   monitor: '<rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>',
+  note: '<path d="M15.5 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.5z"/><path d="M15 3v6h6"/>',
+  'note-text': '<path d="M15.5 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.5z"/><path d="M15 3v6h6M7 12h6M7 16h9"/>',
+  sparkles: '<path d="M9.94 15.5A2 2 0 0 0 8.5 14.06l-6.14-1.58a.5.5 0 0 1 0-.96L8.5 9.94A2 2 0 0 0 9.94 8.5l1.58-6.14a.5.5 0 0 1 .96 0l1.58 6.14a2 2 0 0 0 1.44 1.44l6.14 1.58a.5.5 0 0 1 0 .96l-6.14 1.58a2 2 0 0 0-1.44 1.44l-1.58 6.14a.5.5 0 0 1-.96 0z"/><path d="M20 3v4M22 5h-4"/>',
+  message: '<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/><path d="M8 12h.01M12 12h.01M16 12h.01"/>',
+  'file-text': '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4M10 9H8M16 13H8M16 17H8"/>',
 };
 
 export function Icon({ name, size = 18, label, cls = '' }) {
   return html`<svg class=${'ic ' + cls} width=${size} height=${size} viewBox="0 0 24 24" fill="none" stroke="currentColor"
     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" role=${label ? 'img' : undefined}
     aria-label=${label} aria-hidden=${label ? undefined : 'true'} dangerouslySetInnerHTML=${{ __html: P[name] || '' }} />`;
+}
+
+// Logo Sommer Residence (plik jest biały — na jasnym tle barwimy go maską CSS na bordo).
+const LOGO_URL = new URL('../assets/logo-sommer-residence.png', import.meta.url).href;
+export function SRLogo({ height = 38, onLight = false }) {
+  const width = Math.round((height * 250) / 199);
+  if (onLight) {
+    const mask = `url("${LOGO_URL}")`;
+    return html`<span class="sr-logo-mask" role="img" aria-label="Sommer Residence"
+      style=${{ width: width + 'px', height: height + 'px', WebkitMaskImage: mask, maskImage: mask }}></span>`;
+  }
+  return html`<img class="sr-logo" src=${LOGO_URL} alt="Sommer Residence" width=${width} height=${height} />`;
 }
 
 // Znak turnieju: trzy „płomienie/kolumny” w kolorach konkurencji.
@@ -118,19 +135,22 @@ export function Segmented({ value, options, onChange, label, cls = '' }) {
 
 export function Modal({ title, onClose, children, wide = false, footer }) {
   const ref = useRef();
+  const closeRef = useRef(onClose);
+  closeRef.current = onClose; // Escape woła aktualną wersję (np. z pytaniem o niezapisane zmiany)
   useEffect(() => {
     const prev = document.activeElement;
-    ref.current?.querySelector('[data-autofocus], button, input, select, textarea')?.focus();
+    const el = ref.current;
+    (el?.querySelector('[data-autofocus]') || el?.querySelector('.modal-body input, .modal-body textarea, .modal-body select, .modal-body button') || el?.querySelector('button'))?.focus();
     const onKey = (e) => {
       if (e.key !== 'Escape') return;
       const all = document.querySelectorAll('.modal');
-      if (all[all.length - 1] === ref.current) onClose();
+      if (all[all.length - 1] === ref.current) closeRef.current();
     };
     document.addEventListener('keydown', onKey);
     document.body.classList.add('no-scroll');
     return () => {
       document.removeEventListener('keydown', onKey);
-      document.body.classList.remove('no-scroll');
+      if (document.querySelectorAll('.modal').length <= 1) document.body.classList.remove('no-scroll');
       prev?.focus?.();
     };
   }, []);
@@ -144,6 +164,41 @@ export function Modal({ title, onClose, children, wide = false, footer }) {
       ${footer ? html`<footer class="modal-foot">${footer}</footer>` : null}
     </div>
   </div>`;
+}
+
+// ---------- dymki z uwagami (pokazują się po najechaniu, bez klikania) ----------
+let tipFn = null;
+export function tipProps(text, label = 'Uwaga sędziego') {
+  if (!text) return {};
+  const show = (e) => tipFn && tipFn({ text, label, rect: e.currentTarget.getBoundingClientRect() });
+  const hide = () => tipFn && tipFn(null);
+  return { onMouseEnter: show, onMouseLeave: hide, onFocus: show, onBlur: hide };
+}
+export function NoteTip({ text, label = 'Uwaga sędziego', size = 15 }) {
+  if (!text) return null;
+  return html`<span class="note-tip" tabindex="0" role="note" aria-label=${label + ': ' + text} ...${tipProps(text, label)}>
+    <${Icon} name="note-text" size=${size} /></span>`;
+}
+export function TipHost() {
+  const [tip, setTip] = useState(null);
+  useEffect(() => {
+    tipFn = setTip;
+    const hide = () => setTip(null);
+    window.addEventListener('scroll', hide, true);
+    window.addEventListener('resize', hide);
+    return () => {
+      tipFn = null;
+      window.removeEventListener('scroll', hide, true);
+      window.removeEventListener('resize', hide);
+    };
+  }, []);
+  if (!tip) return null;
+  const r = tip.rect;
+  const below = r.bottom + 190 < window.innerHeight;
+  const half = Math.min(170, window.innerWidth / 2 - 8);
+  const x = Math.min(Math.max(r.left + r.width / 2, half + 8), window.innerWidth - half - 8);
+  return html`<div class=${'tip-bubble ' + (below ? 'below' : 'above')} role="tooltip"
+    style=${{ left: x + 'px', top: (below ? r.bottom + 8 : r.top - 8) + 'px' }}><b>${tip.label}</b><span>${tip.text}</span></div>`;
 }
 
 // ---------- komunikaty (toast) ----------
