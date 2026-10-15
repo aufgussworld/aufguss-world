@@ -1,7 +1,7 @@
 // Pliki PDF (feedback dla zawodnika, wyniki) z logo Sommer Residence.
 // pdfmake ładujemy dopiero przy pierwszym eksporcie — wbudowana czcionka Roboto obsługuje polskie znaki.
 
-import { DISCIPLINES, TYPES, fmt, fmtDate, fmtRange, fullName, startOf, disciplineResults, finalResults, FINAL_ORDER, entryStats, cardMax } from './model.js';
+import { DISCIPLINES, TYPES, fmt, fmtDate, fmtRange, fullName, startOf, disciplineResults, finalResults, FINAL_ORDER, entryStats, cardMax, audienceRanking } from './model.js';
 
 const PDFMAKE_URL = 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.12/pdfmake.min.js';
 const FONTS_URL = 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.12/vfs_fonts.min.js';
@@ -266,6 +266,45 @@ export async function cardPDF(t, disc, cid, jid) {
     { text: `Wygenerowano z systemu sędziowskiego: ${new Date().toLocaleString('pl-PL')} · ${st.filled} z ${st.required} ocen`, style: 'muted', fontSize: 8, margin: [0, 16, 0, 0] },
   ];
   pdfMake.createPdf(doc).download(`karta-${slug(d.label)}-${slug(fullName(c))}-${slug(fullName(j))}.pdf`);
+}
+
+// Ranking Nagrody Publiczności — z wszystkimi głosami; odrzucone (skrajne) w nawiasach.
+export async function audiencePDF(t, disc) {
+  const [pdfMake, logo] = await Promise.all([loadPdfMake(), logoDataURL()]);
+  const d = DISCIPLINES[disc];
+  const { byRank, voted, size } = audienceRanking(t, disc);
+  const doc = base(t, logo, { title: `Nagroda Publiczności — ${t.name}`, right: d.label.toUpperCase(), rightColor: DISC_COLOR[disc] });
+  const votesText = (r) => r.votes.map((v, i) => (v == null ? null : r.dropped.includes(i) ? `(${fmt(v)})` : fmt(v))).filter(Boolean).join('  ');
+  const leader = byRank.filter((r) => r.rank === 1);
+  const body = [
+    ['MIEJSCE', 'ZAWODNIK', 'GŁOSY (odrzucone w nawiasach)', 'ŚREDNIA', 'SUMA'].map((h, i) => ({ text: h, style: 'th', alignment: i > 2 ? 'right' : 'left' })),
+    ...byRank.map((r) => [
+      { text: r.rank ? `${r.rank}${r.tie ? ' ex aequo' : ''}` : '—', bold: true },
+      { stack: [{ text: r.name, bold: true }, { text: startOf(r.c, disc).time ? `${fmtDate(startOf(r.c, disc).date)}, ${startOf(r.c, disc).time}` : '', fontSize: 8.5, color: '#6B655C' }] },
+      { text: r.s.count ? `${votesText(r)}${r.s.count < size ? `  · ${r.s.count} z ${size} głosów` : ''}` : 'brak głosów', fontSize: 9, color: r.s.count ? '#1B1A17' : '#8A8378' },
+      { text: r.s.avg != null ? fmt(r.s.avg, true) : '—', alignment: 'right' },
+      { text: r.s.sum != null ? fmt(r.s.sum) : '—', alignment: 'right', bold: true },
+    ]),
+  ];
+  doc.content = [
+    { text: `NAGRODA PUBLICZNOŚCI · ${d.label.toUpperCase()}`, style: 'eyebrow', color: BRAND },
+    { text: 'Ranking głosów publiczności', style: 'h1' },
+    { text: `Głosuje ${size} osób, skala 0–10; odrzucamy jedną najwyższą i jedną najniższą ocenę. Ocenionych zawodników: ${voted} z ${byRank.length}. Punkty publiczności nie liczą się do wyniku turnieju. Stan na ${new Date().toLocaleString('pl-PL', { dateStyle: 'long', timeStyle: 'short' })}.`, style: 'sub' },
+    leader.length ? {
+      margin: [0, 0, 0, 10],
+      table: { widths: ['*'], body: [[{
+        text: [
+          { text: `${leader.length > 1 ? 'PROWADZĄ EX AEQUO' : 'PROWADZI'}   `, style: 'metaL' },
+          { text: leader.map((r) => r.name).join(', '), fontSize: 13, bold: true },
+          { text: `   ${fmt(leader[0].s.sum)} pkt · średnia ${fmt(leader[0].s.avg, true)}`, style: 'muted' },
+        ],
+        fillColor: '#F8EDEE', margin: [10, 6, 10, 6],
+      }]] },
+      layout: 'noBorders',
+    } : null,
+    { table: { headerRows: 1, widths: ['auto', 130, '*', 'auto', 'auto'], body }, layout: listLayout, fontSize: 9.8 },
+  ].filter(Boolean);
+  pdfMake.createPdf(doc).download(`nagroda-publicznosci-${slug(t.name)}-${slug(d.label)}.pdf`);
 }
 
 export async function resultsPDF(t, disc) {

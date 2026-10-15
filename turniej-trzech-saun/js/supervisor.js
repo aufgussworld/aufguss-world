@@ -4,13 +4,13 @@
 import { html, useEffect, useRef, useState } from './lib.js';
 import {
   DISCIPLINES, TYPES, STATUS, FINAL_ORDER, disciplinesOf, fullName, fmt, fmtDate, fmtRange, fmtStamp,
-  entryStats, getEntry, contestantDisc, disciplineResults, finalResults, audienceStats, orderedContestants,
+  entryStats, getEntry, contestantDisc, disciplineResults, finalResults, audienceStats, audienceRanking, orderedContestants,
   startOf, findItem, parseScore, cardMax, excludedKey, dqKey, toCSV, download, prettyCode,
 } from './model.js';
 import { store, updateT, deleteTournament, LIVE } from './store.js';
 import { Icon, Avatar, DiscBadge, StatusIcon, Segmented, Modal, Empty, LiveDot, toast } from './ui.js';
 import { ScoreCard, CompareView } from './judge.js';
-import { resultsPDF } from './pdf.js';
+import { resultsPDF, audiencePDF } from './pdf.js';
 import { ContestantsEditor, JudgesEditor, CardEditor, QualifierImport } from './editors.js';
 import {
   toSnapshot, fromSnapshot, downloadJSON, backupWorkbook, stamp, autoBackupEnabled, setAutoBackup, lastAutoBackup,
@@ -498,13 +498,13 @@ function HistoryTab({ t }) {
 
 const VOTE_ITEM = { kind: 'plus', max: 10 };
 
-function VoteCell({ value, onSet, label, mode }) {
+function VoteCell({ value, onSet, label, mode, dropped }) {
   const [txt, setTxt] = useState(value == null ? '' : fmt(value));
   const [err, setErr] = useState(null);
   const focused = useRef(false);
   useEffect(() => { if (!focused.current) setTxt(value == null ? '' : fmt(value)); }, [value]);
-  return html`<input type="text" inputmode="decimal" class=${'vote ' + (err ? 'invalid' : '')} value=${txt} aria-label=${label}
-    title=${err || ''} aria-invalid=${err ? 'true' : 'false'}
+  return html`<input type="text" inputmode="decimal" class=${`vote ${err ? 'invalid' : ''} ${dropped ? 'dropped' : ''}`} value=${txt}
+    aria-label=${label + (dropped ? ' (odrzucony)' : '')} title=${err || (dropped ? 'Głos odrzucony jako skrajny' : '')} aria-invalid=${err ? 'true' : 'false'}
     onFocus=${(e) => { focused.current = true; e.currentTarget.select(); }}
     onBlur=${() => { focused.current = false; const r = parseScore(txt, VOTE_ITEM, mode); if (!r.ok) setErr(r.error); else setTxt(r.value == null ? '' : fmt(r.value)); }}
     onKeyDown=${(e) => { if (e.key === 'Enter') { e.preventDefault(); const all = [...document.querySelectorAll('input.vote')]; all[all.indexOf(e.currentTarget) + 1]?.focus(); } }}
@@ -517,49 +517,100 @@ function VoteCell({ value, onSet, label, mode }) {
     }} />`;
 }
 
+function audienceCSV(t, disc) {
+  const { byRank, size } = audienceRanking(t, disc);
+  const head = ['Miejsce', 'Zawodnik', 'Nr startowy', 'Dzień startu', 'Godzina', ...Array.from({ length: size }, (_, i) => `Głos ${i + 1}`),
+    'Odrzucona najniższa', 'Odrzucona najwyższa', 'Liczba głosów', 'Średnia', 'Suma'];
+  const rows = byRank.map((r) => {
+    const st = startOf(r.c, disc);
+    return [
+      r.rank ? `${r.rank}${r.tie ? ' ex aequo' : ''}` : '', r.name, r.order, st.date || '', st.time || '',
+      ...Array.from({ length: size }, (_, i) => (r.votes[i] == null ? '' : fmt(r.votes[i]))),
+      r.s.low != null ? fmt(r.s.low) : '', r.s.high != null ? fmt(r.s.high) : '', r.s.count,
+      r.s.avg != null ? fmt(r.s.avg, true) : '', r.s.sum != null ? fmt(r.s.sum) : '',
+    ];
+  });
+  download(`nagroda-publicznosci-${t.id}-${disc}.csv`, toCSV([head, ...rows]));
+}
+
 function AudienceTab({ t }) {
   const discs = disciplinesOf(t);
   const [disc, setDisc] = useState(discs[0]);
+  const [view, setView] = useState('order');
+  const [busy, setBusy] = useState(false);
   const n = t.audienceSize || 12;
-  const list = orderedContestants(t, disc);
-  const votes = (cid) => t.audience?.[disc]?.[cid] || [];
+  const { byOrder, byRank, voted } = audienceRanking(t, disc);
+  const rows = view === 'rank' ? byRank : byOrder;
+  const podium = byRank.filter((r) => r.rank && r.rank <= 3);
   const setVote = (cid, i, v) => updateT(t.id, (x) => {
     x.audience ||= {};
     x.audience[disc] ||= {};
     const arr = (x.audience[disc][cid] ||= Array(n).fill(null));
     arr[i] = v;
   });
-  const ranked = list.map((c) => ({ c, s: audienceStats(votes(c.id)) })).filter((x) => x.s.sum != null)
-    .sort((a, b) => b.s.sum - a.s.sum);
-  return html`<div class="page">
-    <div class="page-head"><h1>Głosy publiczności</h1>
-      <p class="muted">Głosuje ${n} wylosowanych osób, skala 0–10. Odrzucamy jedną najwyższą i jedną najniższą ocenę. Punkty publiczności nie liczą się do wyniku turnieju — wyłaniają laureata Nagrody Publiczności.</p></div>
-    ${discs.length > 1 ? html`<div class="toolbar"><${Segmented} label="Konkurencja" value=${disc} onChange=${setDisc} options=${discOptions(t)} /></div>` : null}
-    <div class="aud-layout">
-      <aside class="panel aud-side">
-        <h3><${Icon} name="trophy" size=${16} />Nagroda Publiczności</h3>
-        ${!ranked.length ? html`<p class="muted small">Brak głosów.</p>` : html`<ol class="aud-rank">
-          ${ranked.slice(0, 5).map((x, i) => html`<li key=${x.c.id} class=${i === 0 ? 'lead' : ''}><span class="pos">${i + 1}.</span><${Avatar} c=${x.c} size=${30} /><span class="nm">${fullName(x.c)}</span><b>${fmt(x.s.sum)}</b></li>`)}
-        </ol>`}
-      </aside>
-      <div class="table-wrap"><table class="audience">
-        <thead><tr><th>Zawodnik</th>${Array.from({ length: n }, (_, i) => html`<th class="num" key=${i}>${i + 1}</th>`)}<th class="num">Odrzucone</th><th class="num total-col">Suma</th></tr></thead>
-        <tbody>
-          ${list.map((c) => {
-            const v = votes(c.id);
-            const s = audienceStats(v);
-            return html`<tr key=${c.id}>
-              <th scope="row"><div class="who"><${Avatar} c=${c} size=${28} /><b>${fullName(c)}</b></div></th>
-              ${Array.from({ length: n }, (_, i) => html`<td key=${i}><${VoteCell} value=${v[i] ?? null} mode=${t.decimalMode}
-                label=${`${fullName(c)}, głos ${i + 1}`} onSet=${(x) => setVote(c.id, i, x)} /></td>`)}
-              <td class="num muted small">${s.sum != null ? `${fmt(s.low)} / ${fmt(s.high)}` : ''}</td>
-              <td class="num total-col"><b>${s.sum != null ? fmt(s.sum) : '—'}</b>${s.count && s.count < n ? html`<small class="warn-text">${s.count}/${n}</small>` : null}</td>
-            </tr>`;
-          })}
-        </tbody>
-      </table></div>
+  const pdf = async () => {
+    setBusy(true);
+    try { await audiencePDF(t, disc); } catch (e) { console.error(e); toast('Nie udało się przygotować pliku PDF — sprawdź połączenie z internetem', 'err'); } finally { setBusy(false); }
+  };
 
+  return html`<div class="page">
+    <div class="page-head row">
+      <div><h1>Głosy publiczności</h1>
+        <p class="muted">Głosuje ${n} wylosowanych osób, skala 0–10. Odrzucamy jedną najwyższą i jedną najniższą ocenę. Punkty publiczności nie liczą się do wyniku turnieju — wyłaniają laureata Nagrody Publiczności.</p></div>
+      <div class="actions">
+        <button class="btn" onClick=${() => audienceCSV(t, disc)}><${Icon} name="download" />Ranking CSV</button>
+        <button class="btn" onClick=${pdf} disabled=${busy}><${Icon} name="file-text" />${busy ? 'Przygotowuję…' : 'Ranking PDF'}</button>
+      </div>
     </div>
+    <div class="toolbar">
+      ${discs.length > 1 ? html`<${Segmented} label="Konkurencja" value=${disc} onChange=${setDisc} options=${discOptions(t)} />` : null}
+      <${Segmented} label="Kolejność wierszy" value=${view} onChange=${setView}
+        options=${[{ value: 'order', label: 'Kolejność występów', icon: 'clock' }, { value: 'rank', label: 'Ranking głosów', icon: 'ranking' }]} />
+      <span class="muted small">Ocenieni: <b>${voted}</b> z ${byOrder.length}</span>
+    </div>
+
+    <section class="panel aud-podium" aria-label="Nagroda Publiczności — czołówka">
+      <h3><${Icon} name="trophy" size=${16} />Nagroda Publiczności</h3>
+      ${!podium.length ? html`<p class="muted small">Brak głosów — czołówka pojawi się po wpisaniu głosów pierwszego zawodnika.</p>` : html`
+      <ol class="podium">
+        ${podium.map((r) => html`<li key=${r.c.id} class=${'pod p' + r.rank}>
+          <span class="pod-rank">${r.rank}</span>
+          <${Avatar} c=${r.c} size=${r.rank === 1 ? 52 : 42} />
+          <span class="pod-name">${r.name}${r.tie ? html`<small>ex aequo</small>` : null}</span>
+          <span class="pod-score"><b>${fmt(r.s.sum)}</b><small>średnia ${fmt(r.s.avg, true)}</small></span>
+        </li>`)}
+      </ol>`}
+    </section>
+
+    ${view === 'rank' ? html`<p class="hint-line"><${Icon} name="info" size=${14} />W widoku rankingu głosy są tylko do odczytu, żeby wiersze nie zmieniały miejsca w trakcie wpisywania. Głosy wpisuj w widoku „Kolejność występów”.</p>` : null}
+    <div class="table-wrap"><table class="audience">
+      <thead><tr>
+        <th class="num w-pos">${view === 'rank' ? 'Miejsce' : 'Nr'}</th>
+        <th>Zawodnik</th>
+        ${Array.from({ length: n }, (_, i) => html`<th class="num" key=${i}>${i + 1}</th>`)}
+        <th class="num">Odrzucone</th><th class="num">Średnia</th><th class="num total-col">Suma</th>
+        ${view === 'order' ? html`<th class="num w-pos">Miejsce</th>` : null}
+      </tr></thead>
+      <tbody>
+        ${rows.map((r) => {
+          const st = startOf(r.c, disc);
+          const rankCell = r.rank ? html`<span class=${'aud-rank-n ' + (r.rank <= 3 ? 'top p' + r.rank : '')}>${r.rank}</span>${r.tie ? html`<small>ex aequo</small>` : null}` : html`<span class="muted">—</span>`;
+          return html`<tr key=${r.c.id} class=${r.rank === 1 ? 'leader' : ''}>
+            <td class="num w-pos">${view === 'rank' ? rankCell : html`<span class="muted">${r.order}</span>`}</td>
+            <th scope="row"><div class="who"><${Avatar} c=${r.c} size=${28} /><span><b>${r.name}</b><small>${st.date ? `${fmtDate(st.date)}, ${st.time || ''}` : ''}</small></span></div></th>
+            ${Array.from({ length: n }, (_, i) => html`<td key=${i}>${view === 'rank'
+              ? html`<span class=${'vote-ro ' + (r.dropped.includes(i) ? 'dropped' : '')}>${r.votes[i] == null ? '' : fmt(r.votes[i])}</span>`
+              : html`<${VoteCell} value=${r.votes[i] ?? null} mode=${t.decimalMode} dropped=${r.dropped.includes(i)}
+                  label=${`${r.name}, głos ${i + 1}`} onSet=${(x) => setVote(r.c.id, i, x)} />`}</td>`)}
+            <td class="num muted small">${r.s.sum != null ? `${fmt(r.s.low)} / ${fmt(r.s.high)}` : ''}</td>
+            <td class="num">${r.s.avg != null ? fmt(r.s.avg, true) : '—'}</td>
+            <td class="num total-col"><b>${r.s.sum != null ? fmt(r.s.sum) : '—'}</b>${r.s.count && r.s.count < n ? html`<small class="warn-text">${r.s.count}/${n}</small>` : null}</td>
+            ${view === 'order' ? html`<td class="num w-pos">${rankCell}</td>` : null}
+          </tr>`;
+        })}
+      </tbody>
+    </table></div>
+    <p class="legend muted small"><span class="vote-ro dropped">7</span> głos odrzucony jako skrajny (jedna najniższa i jedna najwyższa ocena zawodnika)</p>
   </div>`;
 }
 

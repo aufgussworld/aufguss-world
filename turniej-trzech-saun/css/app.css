@@ -822,3 +822,29 @@ textarea.fb-text { margin-top: 4px; font-size: 14.5px; line-height: 1.55; }
 .check .switch { flex: none; }
 ol.steps-list { margin: 4px 0 14px 18px; display: grid; gap: 3px; color: var(--ink-2); }
 .handover p { line-height: 1.55; }
+
+/* głosy publiczności: podium, ranking, odrzucone głosy */
+.aud-podium { margin-bottom: 14px; }
+.aud-podium h3 { margin-bottom: 10px; }
+.podium { list-style: none; display: flex; flex-wrap: wrap; gap: 10px; }
+.pod { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface-2); min-width: 240px; }
+.pod.p1 { background: #fbf3dc; border-color: #ead8a4; }
+.pod-rank, .aud-rank-n { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; font: 600 15px var(--f-display); font-variant-numeric: tabular-nums lining-nums; background: var(--surface); border: 1px solid var(--line); flex: none; }
+.pod.p1 .pod-rank, .aud-rank-n.top.p1 { background: #f2dc9b; border-color: #e3c675; }
+.pod.p2 .pod-rank, .aud-rank-n.top.p2 { background: #dfe2e6; border-color: #c8ccd2; }
+.pod.p3 .pod-rank, .aud-rank-n.top.p3 { background: #ecc7a3; border-color: #ddb085; }
+.pod-name { flex: 1; font-weight: 600; line-height: 1.25; }
+.pod-name small { display: block; font-size: 11px; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; }
+.pod-score { display: grid; justify-items: end; }
+.pod-score b { font: 600 22px/1 var(--f-display); font-variant-numeric: tabular-nums lining-nums; }
+.pod.p1 .pod-score b { font-size: 26px; }
+.pod-score small { font-size: 11.5px; color: var(--muted); }
+.audience .w-pos { width: 64px; text-align: center; }
+.audience td.w-pos small { display: block; font-size: 9.5px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em; }
+.audience tbody th .who small { display: block; font-size: 11.5px; color: var(--muted); font-weight: 500; }
+.audience tr.leader th, .audience tr.leader td { background: #fdf8ea; }
+.audience tr.leader td.total-col { background: #f8eccb; }
+input.vote.dropped { text-decoration: line-through; color: var(--ink-3); background: var(--surface-2); border-style: dashed; }
+.vote-ro { display: inline-block; width: 46px; text-align: center; font-size: 14.5px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.vote-ro.dropped { text-decoration: line-through; color: var(--ink-3); font-weight: 500; }
+.legend .vote-ro { width: auto; padding: 0 8px; border: 1px dashed var(--line-2); border-radius: 6px; background: var(--surface-2); }

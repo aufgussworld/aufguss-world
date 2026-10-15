@@ -251,6 +251,32 @@ export function audienceStats(votes = []) {
   return { count: vals.length, sum, avg: Math.round(sum / kept.length), low: sorted[0], high: sorted[sorted.length - 1] };
 }
 
+// Które dwa głosy odpadają (indeksy): pierwszy najniższy i pierwszy najwyższy spośród pozostałych.
+export function droppedVotes(votes = []) {
+  const vals = votes.map((x, i) => [x, i]).filter(([x]) => x != null);
+  if (vals.length < 3) return [];
+  const lo = vals.reduce((a, b) => (b[0] < a[0] ? b : a));
+  const hi = vals.filter((v) => v[1] !== lo[1]).reduce((a, b) => (b[0] > a[0] ? b : a));
+  return [lo[1], hi[1]];
+}
+
+// Ranking Nagrody Publiczności: po sumie głosów (bez skrajnych), remisy ex aequo.
+export function audienceRanking(t, disc) {
+  const rows = orderedContestants(t, disc).map((c, i) => {
+    const votes = t.audience?.[disc]?.[c.id] || [];
+    return { c, name: fullName(c), order: i + 1, votes, s: audienceStats(votes), dropped: droppedVotes(votes), rank: null, tie: false };
+  });
+  const ranked = rows.filter((r) => r.s.sum != null).sort((a, b) => b.s.sum - a.s.sum || a.name.localeCompare(b.name, 'pl'));
+  let prev = null, rank = 0;
+  ranked.forEach((r, i) => {
+    if (r.s.sum !== prev) rank = i + 1;
+    r.rank = rank;
+    prev = r.s.sum;
+  });
+  ranked.forEach((r) => (r.tie = ranked.filter((x) => x.rank === r.rank).length > 1));
+  return { byOrder: rows, byRank: [...ranked, ...rows.filter((r) => r.s.sum == null)], voted: ranked.length, size: t.audienceSize || 12 };
+}
+
 // ---------- harmonogram ----------
 
 export const startOf = (c, disc) => (c.start && c.start[disc]) || {};
