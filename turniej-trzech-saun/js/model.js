@@ -54,6 +54,11 @@ export function fmt(tenths, fixed = false) {
   return (neg ? '−' : '') + s;
 }
 export const fmtInput = (tenths) => (tenths == null ? '' : fmt(tenths));
+// Średnia w setnych częściach: 9,4 / 4,71 / 7,0.
+export function fmtAvg(hundredths) {
+  if (hundredths == null) return '—';
+  return (hundredths / 100).toFixed(2).replace(/0$/, '').replace('.', ',');
+}
 
 const DAY_SHORT = ['nd', 'pn', 'wt', 'śr', 'cz', 'pt', 'sb'];
 const DAY_LONG = ['niedziela', 'poniedziałek', 'wtorek', 'środa', 'czwartek', 'piątek', 'sobota'];
@@ -241,14 +246,18 @@ export function finalResults(t) {
   return assignRanks(rows);
 }
 
-// Głosy publiczności: odrzucamy jedną najwyższą i jedną najniższą ocenę.
+// Głosy publiczności (regulamin): odrzucamy jedną najwyższą i jedną najniższą ocenę,
+// z pozostałych liczymy średnią arytmetyczną i mnożymy ją przez 10. Przy komplecie głosów
+// wynik równa się sumie pozostałych, a przy niepełnym komplecie braki nie obniżają wyniku.
+// sum i score w dziesiątych częściach punktu, avg w setnych (średnia zaokrąglona do 0,01, więc score = avg × 10).
 export function audienceStats(votes = []) {
   const vals = votes.filter((x) => x != null);
-  if (vals.length < 3) return { count: vals.length, sum: null, avg: null, low: null, high: null };
+  if (vals.length < 3) return { count: vals.length, kept: 0, sum: null, avg: null, score: null, low: null, high: null };
   const sorted = [...vals].sort((a, b) => a - b);
   const kept = sorted.slice(1, -1);
   const sum = kept.reduce((a, b) => a + b, 0);
-  return { count: vals.length, sum, avg: Math.round(sum / kept.length), low: sorted[0], high: sorted[sorted.length - 1] };
+  const avg = Math.round((sum * 10) / kept.length);
+  return { count: vals.length, kept: kept.length, sum, avg, score: avg, low: sorted[0], high: sorted[sorted.length - 1] };
 }
 
 // Które dwa głosy odpadają (indeksy): pierwszy najniższy i pierwszy najwyższy spośród pozostałych.
@@ -260,21 +269,21 @@ export function droppedVotes(votes = []) {
   return [lo[1], hi[1]];
 }
 
-// Ranking Nagrody Publiczności: po sumie głosów (bez skrajnych), remisy ex aequo.
+// Ranking Nagrody Publiczności: po wyniku (średnia bez skrajnych × 10), remisy ex aequo.
 export function audienceRanking(t, disc) {
   const rows = orderedContestants(t, disc).map((c, i) => {
     const votes = t.audience?.[disc]?.[c.id] || [];
     return { c, name: fullName(c), order: i + 1, votes, s: audienceStats(votes), dropped: droppedVotes(votes), rank: null, tie: false };
   });
-  const ranked = rows.filter((r) => r.s.sum != null).sort((a, b) => b.s.sum - a.s.sum || a.name.localeCompare(b.name, 'pl'));
+  const ranked = rows.filter((r) => r.s.score != null).sort((a, b) => b.s.score - a.s.score || a.name.localeCompare(b.name, 'pl'));
   let prev = null, rank = 0;
   ranked.forEach((r, i) => {
-    if (r.s.sum !== prev) rank = i + 1;
+    if (r.s.score !== prev) rank = i + 1;
     r.rank = rank;
-    prev = r.s.sum;
+    prev = r.s.score;
   });
   ranked.forEach((r) => (r.tie = ranked.filter((x) => x.rank === r.rank).length > 1));
-  return { byOrder: rows, byRank: [...ranked, ...rows.filter((r) => r.s.sum == null)], voted: ranked.length, size: t.audienceSize || 12 };
+  return { byOrder: rows, byRank: [...ranked, ...rows.filter((r) => r.s.score == null)], voted: ranked.length, size: t.audienceSize || 12 };
 }
 
 // ---------- harmonogram ----------

@@ -3,7 +3,7 @@
 
 import { html, useEffect, useRef, useState } from './lib.js';
 import {
-  DISCIPLINES, TYPES, STATUS, FINAL_ORDER, disciplinesOf, fullName, fmt, fmtDate, fmtRange, fmtStamp,
+  DISCIPLINES, TYPES, STATUS, FINAL_ORDER, disciplinesOf, fullName, fmt, fmtAvg, fmtDate, fmtRange, fmtStamp,
   entryStats, getEntry, contestantDisc, disciplineResults, finalResults, audienceStats, audienceRanking, orderedContestants,
   startOf, findItem, parseScore, cardMax, excludedKey, dqKey, toCSV, download, prettyCode,
 } from './model.js';
@@ -309,7 +309,7 @@ function JudgeBreakdown({ t, c, disc, showTitle, onOpenCard }) {
         <td class="num total-col"><b>${fmt(r.total, true)}</b></td><td colspan="2"></td></tr></tfoot>
     </table></div>
     <div class="bd-foot">
-      <span class="muted small"><${Icon} name="megaphone" size=${14} /> Publiczność: ${aud.sum != null ? html`<b>${fmt(aud.sum)}</b> pkt (${aud.count} głosów, bez skrajnych)` : 'brak głosów'}</span>
+      <span class="muted small"><${Icon} name="megaphone" size=${14} /> Publiczność: ${aud.score != null ? html`<b>${fmt(aud.score)}</b> pkt (${aud.count} głosów; średnia bez skrajnych ${fmtAvg(aud.avg)} × 10)` : 'brak głosów'}</span>
       <span class="grow"></span>
       <label class="check"><input type="checkbox" checked=${!!dq || dqOpen} onChange=${(e) => { if (e.currentTarget.checked) { setDqOpen(true); setDq('Decyzja sędziego technicznego'); } else { setDqOpen(false); setDq(null); } }} />Dyskwalifikacja</label>
       ${dq != null ? html`<input type="text" class="dq-reason" value=${dq} aria-label="Powód dyskwalifikacji" onInput=${(e) => setDq(e.currentTarget.value)} />` : null}
@@ -520,14 +520,14 @@ function VoteCell({ value, onSet, label, mode, dropped }) {
 function audienceCSV(t, disc) {
   const { byRank, size } = audienceRanking(t, disc);
   const head = ['Miejsce', 'Zawodnik', 'Nr startowy', 'Dzień startu', 'Godzina', ...Array.from({ length: size }, (_, i) => `Głos ${i + 1}`),
-    'Odrzucona najniższa', 'Odrzucona najwyższa', 'Liczba głosów', 'Średnia', 'Suma'];
+    'Odrzucona najniższa', 'Odrzucona najwyższa', 'Liczba głosów', 'Suma pozostałych', 'Średnia pozostałych', 'Wynik (średnia × 10)'];
   const rows = byRank.map((r) => {
     const st = startOf(r.c, disc);
     return [
       r.rank ? `${r.rank}${r.tie ? ' ex aequo' : ''}` : '', r.name, r.order, st.date || '', st.time || '',
       ...Array.from({ length: size }, (_, i) => (r.votes[i] == null ? '' : fmt(r.votes[i]))),
       r.s.low != null ? fmt(r.s.low) : '', r.s.high != null ? fmt(r.s.high) : '', r.s.count,
-      r.s.avg != null ? fmt(r.s.avg, true) : '', r.s.sum != null ? fmt(r.s.sum) : '',
+      r.s.sum != null ? fmt(r.s.sum) : '', r.s.avg != null ? fmtAvg(r.s.avg) : '', r.s.score != null ? fmt(r.s.score) : '',
     ];
   });
   download(`nagroda-publicznosci-${t.id}-${disc}.csv`, toCSV([head, ...rows]));
@@ -556,7 +556,7 @@ function AudienceTab({ t }) {
   return html`<div class="page">
     <div class="page-head row">
       <div><h1>Głosy publiczności</h1>
-        <p class="muted">Głosuje ${n} wylosowanych osób, skala 0–10. Odrzucamy jedną najwyższą i jedną najniższą ocenę. Punkty publiczności nie liczą się do wyniku turnieju — wyłaniają laureata Nagrody Publiczności.</p></div>
+        <p class="muted">Głosuje ${n} wylosowanych osób, skala 0–10. Odrzucamy jedną najwyższą i jedną najniższą ocenę, a średnią pozostałych mnożymy przez 10 — przy niepełnym komplecie głosów braki nie obniżają wyniku. Punkty publiczności nie liczą się do wyniku turnieju — wyłaniają laureata Nagrody Publiczności.</p></div>
       <div class="actions">
         <button class="btn" onClick=${() => audienceCSV(t, disc)}><${Icon} name="download" />Ranking CSV</button>
         <button class="btn" onClick=${pdf} disabled=${busy}><${Icon} name="file-text" />${busy ? 'Przygotowuję…' : 'Ranking PDF'}</button>
@@ -577,7 +577,7 @@ function AudienceTab({ t }) {
           <span class="pod-rank">${r.rank}</span>
           <${Avatar} c=${r.c} size=${r.rank === 1 ? 52 : 42} />
           <span class="pod-name">${r.name}${r.tie ? html`<small>ex aequo</small>` : null}</span>
-          <span class="pod-score"><b>${fmt(r.s.sum)}</b><small>średnia ${fmt(r.s.avg, true)}</small></span>
+          <span class="pod-score"><b>${fmt(r.s.score)}</b><small>średnia ${fmtAvg(r.s.avg)}</small></span>
         </li>`)}
       </ol>`}
     </section>
@@ -588,7 +588,7 @@ function AudienceTab({ t }) {
         <th class="num w-pos">${view === 'rank' ? 'Miejsce' : 'Nr'}</th>
         <th>Zawodnik</th>
         ${Array.from({ length: n }, (_, i) => html`<th class="num" key=${i}>${i + 1}</th>`)}
-        <th class="num">Odrzucone</th><th class="num">Średnia</th><th class="num total-col">Suma</th>
+        <th class="num">Odrzucone</th><th class="num" title="Średnia pozostałych głosów">Średnia</th><th class="num total-col" title="Średnia pozostałych głosów × 10">Wynik</th>
         ${view === 'order' ? html`<th class="num w-pos">Miejsce</th>` : null}
       </tr></thead>
       <tbody>
@@ -603,14 +603,14 @@ function AudienceTab({ t }) {
               : html`<${VoteCell} value=${r.votes[i] ?? null} mode=${t.decimalMode} dropped=${r.dropped.includes(i)}
                   label=${`${r.name}, głos ${i + 1}`} onSet=${(x) => setVote(r.c.id, i, x)} />`}</td>`)}
             <td class="num muted small">${r.s.sum != null ? `${fmt(r.s.low)} / ${fmt(r.s.high)}` : ''}</td>
-            <td class="num">${r.s.avg != null ? fmt(r.s.avg, true) : '—'}</td>
-            <td class="num total-col"><b>${r.s.sum != null ? fmt(r.s.sum) : '—'}</b>${r.s.count && r.s.count < n ? html`<small class="warn-text">${r.s.count}/${n}</small>` : null}</td>
+            <td class="num">${r.s.avg != null ? fmtAvg(r.s.avg) : '—'}</td>
+            <td class="num total-col"><b>${r.s.score != null ? fmt(r.s.score) : '—'}</b>${r.s.count && r.s.count < n ? html`<small class="warn-text" title="Niepełny komplet głosów — wynik ze średniej pozostałych × 10">${r.s.count}/${n}</small>` : null}</td>
             ${view === 'order' ? html`<td class="num w-pos">${rankCell}</td>` : null}
           </tr>`;
         })}
       </tbody>
     </table></div>
-    <p class="legend muted small"><span class="vote-ro dropped">7</span> głos odrzucony jako skrajny (jedna najniższa i jedna najwyższa ocena zawodnika)</p>
+    <p class="legend muted small"><span class="vote-ro dropped">7</span> głos odrzucony jako skrajny (jedna najniższa i jedna najwyższa ocena zawodnika). Wynik = średnia pozostałych głosów × 10.</p>
   </div>`;
 }
 
