@@ -29,7 +29,7 @@ function useHash() {
 }
 
 const sessionFromRemote = (who) => (who.role === 'supervisor'
-  ? { role: 'sup', mustChange: who.codeSetBy !== 'supervisor', codeChangedAt: who.codeChangedAt }
+  ? { role: 'sup', mustChange: who.codeSetBy !== 'supervisor', codeSetBy: who.codeSetBy, codeChangedAt: who.codeChangedAt }
   : { role: 'judge', tid: who.tournamentId, jid: who.judgeId });
 
 // ---------- logowanie ----------
@@ -144,9 +144,14 @@ function ForcedCodeChange({ session, initialOld, onDone, onLogout }) {
     <div class="panel gate-card">
       <${SRLogo} height=${54} onLight />
       <h1>Ustaw własny kod supervisora</h1>
-      <p>Obecny kod nadał lub zresetował administrator systemu${when ? ` (${when})` : ''}. Ustaw kod znany tylko Tobie.
-        Od tej chwili administrator nie zaloguje się do panelu, a z jego kodem nie da się zobaczyć żadnych danych turnieju.</p>
-      <p class="muted small">Jeśli kiedykolwiek zobaczysz ten ekran ponownie, choć nie zmieniałeś kodu, oznacza to, że administrator go zresetował.</p>
+      ${session.codeSetBy === 'handover' ? html`
+        <p>Ten kod przekazał poprzedni supervisor${when ? ` (${when})` : ''}, a dostarczył go organizator. Ustaw kod znany tylko Tobie —
+          od tej chwili ani poprzedni supervisor, ani organizator nie zalogują się do panelu, a kod przekazany przestanie działać.</p>
+        <p class="muted small">Po turnieju możesz w ten sam sposób przekazać dostęp kolejnemu supervisorowi: „Kod dostępu i kopie” → „Przekaż dostęp”.</p>`
+      : html`
+        <p>Obecny kod nadał lub zresetował administrator systemu${when ? ` (${when})` : ''}. Ustaw kod znany tylko Tobie.
+          Od tej chwili administrator nie zaloguje się do panelu, a z jego kodem nie da się zobaczyć żadnych danych turnieju.</p>
+        <p class="muted small">Jeśli kiedykolwiek zobaczysz ten ekran ponownie, choć nie zmieniałeś kodu, oznacza to, że administrator go zresetował.</p>`}
       <${ChangeCodeForm} initialOld=${initialOld} forced onDone=${onDone} onCancel=${onLogout} />
     </div>
   </div>`;
@@ -221,11 +226,19 @@ function App() {
     })();
     const onErr = (e) => toast(e.detail, 'err');
     const onLost = () => logout('Zostałeś wylogowany — kod dostępu mógł zostać zmieniony na innym urządzeniu. Zaloguj się ponownie.');
+    const onHandover = () => {
+      typedCode.current = '';
+      setSess(null);
+      setNotice('Dostęp przekazany. Kod dla następcy jest aktywny — przekaż go organizatorowi. Ty zostałeś wylogowany, a Twój dotychczasowy kod już nie działa.');
+      go('#/');
+    };
     window.addEventListener('tts-sync-error', onErr);
     window.addEventListener('tts-session-lost', onLost);
+    window.addEventListener('tts-handover-done', onHandover);
     return () => {
       window.removeEventListener('tts-sync-error', onErr);
       window.removeEventListener('tts-session-lost', onLost);
+      window.removeEventListener('tts-handover-done', onHandover);
     };
   }, []);
 

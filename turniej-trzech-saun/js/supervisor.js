@@ -642,6 +642,44 @@ function nextHalfHour() {
   return `${String(d.getHours()).padStart(2, '0')}:30`;
 }
 
+function HandoverForm({ remote }) {
+  const [open, setOpen] = useState(false);
+  const [cur, setCur] = useState('');
+  const [next, setNext] = useState('');
+  const [rep, setRep] = useState('');
+  const [err, setErr] = useState(null);
+  const [busy, setBusy] = useState(false);
+  if (!open) {
+    return html`<div class="row-actions left"><button class="btn" onClick=${() => setOpen(true)}><${Icon} name="key" size=${16} />Przekaż dostęp…</button></div>`;
+  }
+  const submit = async (e) => {
+    e.preventDefault();
+    if (next.length < 8) return setErr('Kod do przekazania musi mieć co najmniej 8 znaków.');
+    if (next !== rep) return setErr('Powtórzony kod nie jest taki sam.');
+    if (next === cur) return setErr('Kod do przekazania musi być inny niż Twój obecny kod.');
+    if (!confirm('Przekazać dostęp? Zostaniesz wylogowany, a Twój obecny kod przestanie działać. Do panelu wejdzie tylko osoba, która dostanie kod do przekazania.')) return;
+    setBusy(true);
+    try {
+      await remote.handoverCode(cur, next);
+      window.dispatchEvent(new CustomEvent('tts-handover-done'));
+    } catch (x) {
+      setErr(x.message);
+      setBusy(false);
+    }
+  };
+  const field = (setter) => (e) => { setter(e.currentTarget.value); setErr(null); };
+  return html`<form class="code-form" onSubmit=${submit}>
+    <label>Twój obecny kod<input type="password" autocomplete="current-password" value=${cur} onInput=${field(setCur)} /></label>
+    <label>Kod dla następcy (min. 8 znaków)<input type="password" autocomplete="new-password" value=${next} onInput=${field(setNext)} /></label>
+    <label>Powtórz kod dla następcy<input type="password" autocomplete="new-password" value=${rep} onInput=${field(setRep)} /></label>
+    ${err ? html`<p class="err" role="alert"><${Icon} name="alert" size=${14} />${err}</p>` : null}
+    <div class="row-actions left">
+      <button class="btn primary" type="submit" disabled=${busy}><${Icon} name="key" size=${16} />${busy ? 'Przekazuję…' : 'Przekaż dostęp i wyloguj'}</button>
+      <button class="btn ghost" type="button" onClick=${() => setOpen(false)} disabled=${busy}>Anuluj</button>
+    </div>
+  </form>`;
+}
+
 export function SystemPage({ go, remote, ChangeCodeForm }) {
   const [backups, setBackups] = useState(null);
   const [auto, setAuto] = useState(autoBackupEnabled());
@@ -725,6 +763,19 @@ export function SystemPage({ go, remote, ChangeCodeForm }) {
           ? html`<${ChangeCodeForm} onDone=${() => setCodeOpen(false)} onCancel=${() => setCodeOpen(false)} />`
           : html`<div class="row-actions left"><button class="btn" onClick=${() => setCodeOpen(true)}><${Icon} name="pencil" size=${16} />Zmień kod</button></div>`}`
         : html`<p class="muted small">W wersji demonstracyjnej PIN supervisora to 2026. W wersji produkcyjnej administrator nadaje pierwszy kod, a supervisor przy pierwszym logowaniu ustawia własny — od tej chwili administrator nie ma dostępu do panelu.</p>`}
+    </section>
+
+    <section class="panel form handover">
+      <h3><${Icon} name="users" size=${17} />Przekaż dostęp kolejnemu supervisorowi</h3>
+      <p>Po turnieju ustaw kod dla następcy i przekaż go organizatorowi. Kolejny supervisor przy pierwszym logowaniu będzie musiał ustawić własny kod —
+        dopóki tego nie zrobi, z kodem przekazanym nie widać żadnych danych.</p>
+      <ol class="steps-list small">
+        <li>System zapisze kopię zapasową całego stanu.</li>
+        <li>Twój dotychczasowy kod przestanie działać, a wszystkie urządzenia supervisora zostaną wylogowane — także to.</li>
+        <li>Kod do przekazania działa tylko do chwili, gdy następca ustawi własny.</li>
+      </ol>
+      ${LIVE ? html`<${HandoverForm} remote=${remote} />`
+        : html`<p class="muted small">W wersji demonstracyjnej przekazanie dostępu jest wyłączone — działa w wersji produkcyjnej.</p>`}
     </section>
 
     <section class="panel form">

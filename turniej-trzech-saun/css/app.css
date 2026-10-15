@@ -820,3 +820,5 @@ textarea.fb-text { margin-top: 4px; font-size: 14.5px; line-height: 1.55; }
 .backups td.w-act { white-space: nowrap; }
 .backups td.w-act .btn + .btn { margin-left: 4px; }
 .check .switch { flex: none; }
+ol.steps-list { margin: 4px 0 14px 18px; display: grid; gap: 3px; color: var(--ink-2); }
+.handover p { line-height: 1.55; }

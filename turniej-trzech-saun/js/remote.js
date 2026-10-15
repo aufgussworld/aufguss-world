@@ -147,7 +147,8 @@ export async function loginSupervisor(code) {
   const { data, error } = await sb.rpc('tts_login_supervisor', { p_code: code });
   if (error) throw friendly(error);
   session = data;
-  if (session.codeSetBy !== 'admin') await loadAll();
+  // z kodem administratora albo przekazanym przez poprzednika danych nie widać — najpierw własny kod
+  if (session.codeSetBy === 'supervisor') await loadAll();
   return session;
 }
 
@@ -155,8 +156,15 @@ export async function changeSupervisorCode(oldCode, newCode) {
   const { data, error } = await sb.rpc('tts_change_supervisor_code', { p_old: oldCode, p_new: newCode });
   if (error) throw friendly(error);
   session = data;
-  if (!store.get().loaded) await loadAll();
+  await loadAll();
   return session;
+}
+
+// Przekazanie dostępu następcy: baza zapisuje kopię, ustawia kod do przekazania i wylogowuje supervisorów.
+export async function handoverCode(currentCode, newCode) {
+  const { error } = await sb.rpc('tts_handover_code', { p_current: currentCode, p_new: newCode });
+  if (error) throw friendly(error);
+  await logout();
 }
 
 // Po przeładowaniu strony: sesja urządzenia zostaje w tej karcie przeglądarki.
@@ -175,7 +183,7 @@ export async function resume() {
   }
   if (!who) return null; // sesja wygasła, np. po zmianie kodu
   session = who;
-  if (session.role === 'supervisor' && session.codeSetBy === 'admin') return session;
+  if (session.role === 'supervisor' && session.codeSetBy !== 'supervisor') return session;
   await loadAll();
   return session;
 }
