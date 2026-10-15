@@ -1,8 +1,7 @@
-// Konfiguracja wersji produkcyjnej systemu sędziowskiego.
-// Adres i klucz publiczny (anon / publishable) z Supabase → Project Settings → API.
-// Klucz publiczny może być jawny — dostęp do danych chronią zasady RLS w bazie.
+// Konfiguracja wersji produkcyjnej systemu sędziowskiego (projekt Supabase „turniej-trzech-saun”).
+// Klucz publiczny (publishable) może być jawny — dostęp do danych chronią zasady RLS w bazie.
 window.TTS_CONFIG = {
   mode: 'live',
-  supabaseUrl: '',
-  supabaseAnonKey: '',
+  supabaseUrl: 'https://wripvwhwginexvcmwdsq.supabase.co',
+  supabaseAnonKey: 'sb_publishable_qGUCyM2A9UGluqcJFYDHDg_4T8Gid31',
 };
