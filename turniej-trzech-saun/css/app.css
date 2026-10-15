@@ -790,3 +790,33 @@ textarea.fb-text { margin-top: 4px; font-size: 14.5px; line-height: 1.55; }
   .kpis { grid-template-columns: repeat(4, 1fr); }
   .results tbody tr { break-inside: avoid; }
 }
+
+/* ---------- wersja produkcyjna: zapis do bazy, bramki, kopie ---------- */
+.sync { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 999px; font-size: 12.5px; font-weight: 600; white-space: nowrap; }
+.sync.ok { background: rgba(255, 255, 255, 0.12); color: #fff; }
+.sync.busy { background: rgba(255, 255, 255, 0.12); color: var(--gold); }
+.sync.busy .ic { animation: spin 1.2s linear infinite; }
+.sync.warn { background: #fde8c8; color: #6b4000; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.boot-screen { min-height: 100dvh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; color: var(--muted); }
+.gate { min-height: calc(100dvh - var(--top-h)); display: flex; align-items: center; justify-content: center; padding: 32px 16px; }
+.role-none .gate, .gate:only-child { min-height: 100dvh; }
+.gate-card { max-width: 560px; width: 100%; padding: 30px 32px; display: grid; gap: 12px; justify-items: start; margin: 0; }
+.gate-card h1 { font: 600 26px/1.15 var(--f-display); color: var(--brand-deep); margin-top: 6px; }
+.gate-card p { line-height: 1.55; }
+.code-form { display: grid; gap: 12px; width: 100%; margin-top: 4px; }
+.code-form label { display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600; color: var(--ink-2); }
+.code-form .err { margin: 0; }
+.login-foot { text-align: center; }
+.login-foot a { color: var(--brand); font-weight: 600; }
+
+.empty-start { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; padding: 40px 24px; color: var(--brand); }
+.empty-start h2 { font: 600 22px var(--f-display); color: var(--ink); }
+.empty-start p { max-width: 560px; }
+
+.sc-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.safety ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 14px; line-height: 1.5; }
+.backups td.w-act { white-space: nowrap; }
+.backups td.w-act .btn + .btn { margin-left: 4px; }
+.check .switch { flex: none; }

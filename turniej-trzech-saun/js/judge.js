@@ -7,8 +7,25 @@ import {
   orderedContestants, startOf, startNumber, cardMax, categoryMax, disciplinesOf, assignRanks,
 } from './model.js';
 import { setScore, logChange, setNote, setItemNote } from './store.js';
-import { Icon, Avatar, DiscBadge, StatusIcon, Segmented, Empty, Modal, NoteTip, tipProps } from './ui.js';
+import { Icon, Avatar, DiscBadge, StatusIcon, Segmented, Empty, Modal, NoteTip, tipProps, toast } from './ui.js';
 import { FeedbackModal } from './feedback.js';
+import { cardPDF, slug } from './pdf.js';
+import { cardWorkbook } from './backup.js';
+
+// Eksport karty po seansie — zabezpieczenie na wypadek awarii systemu albo internetu.
+async function exportCard(kind, t, disc, cid, jid) {
+  try {
+    if (kind === 'pdf') await cardPDF(t, disc, cid, jid);
+    else {
+      const c = t.contestants.find((x) => x.id === cid);
+      const j = t.judges.find((x) => x.id === jid);
+      await cardWorkbook(t, disc, cid, jid, `karta-${slug(DISCIPLINES[disc].label)}-${slug(fullName(c))}-${slug(fullName(j))}.xlsx`);
+    }
+  } catch (e) {
+    console.error(e);
+    toast('Nie udało się przygotować pliku — sprawdź połączenie z internetem', 'err');
+  }
+}
 
 // ---------- pola punktów ----------
 
@@ -245,9 +262,16 @@ export function ScoreCard({ t, disc, cid, jid, readOnly = false, judgeName, onPr
     ${locked && !readOnly ? html`<div class="alert info"><${Icon} name="lock" />Turniej jest zakończony — karta jest tylko do odczytu. Feedback dla zawodnika możesz nadal przygotować.</div>` : null}
     <div class="sc-toolbar">
       ${!locked ? html`<p class="hint-line"><${Icon} name="info" size=${14} /> Wpisuj liczby z dokładnością do 0,1 — przecinek lub kropka. Punkty karne wpisuj bez minusa. <kbd>Enter</kbd> przenosi dalej, <kbd>Esc</kbd> cofa zmianę, <${Icon} name="note" size=${14} /> dodaje uwagę do pozycji.</p>` : html`<span></span>`}
-      ${!readOnly || fb ? html`<button class=${'btn ' + (fb ? '' : 'fb-cta')} onClick=${() => setFbOpen(true)} disabled=${!stats.started && !fb}
-          title=${!stats.started && !fb ? 'Najpierw wypełnij kartę' : ''}>
-          <${Icon} name=${fb ? 'file-text' : 'sparkles'} size=${16} />${fb ? (readOnly ? 'Feedback sędziego' : 'Feedback — edytuj') : 'Feedback dla zawodnika'}</button>` : null}
+      <div class="sc-actions">
+        ${stats.started ? html`
+          <button class="btn sm" onClick=${() => exportCard('pdf', t, disc, cid, jid)} title="Pobierz kartę jako PDF (do wydruku i podpisu)">
+            <${Icon} name="download" size=${15} />Karta PDF</button>
+          <button class="btn sm" onClick=${() => exportCard('xlsx', t, disc, cid, jid)} title="Pobierz kartę jako arkusz Excel">
+            <${Icon} name="download" size=${15} />Excel</button>` : null}
+        ${!readOnly || fb ? html`<button class=${'btn sm ' + (fb ? '' : 'fb-cta')} onClick=${() => setFbOpen(true)} disabled=${!stats.started && !fb}
+            title=${!stats.started && !fb ? 'Najpierw wypełnij kartę' : ''}>
+            <${Icon} name=${fb ? 'file-text' : 'sparkles'} size=${15} />${fb ? (readOnly ? 'Feedback sędziego' : 'Feedback — edytuj') : 'Feedback dla zawodnika'}</button>` : null}
+      </div>
     </div>
     ${fbOpen ? html`<${FeedbackModal} t=${t} disc=${disc} cid=${cid} jid=${jid} readOnly=${readOnly} onClose=${() => setFbOpen(false)} />` : null}
 

@@ -1,7 +1,7 @@
 // Pliki PDF (feedback dla zawodnika, wyniki) z logo Sommer Residence.
 // pdfmake ładujemy dopiero przy pierwszym eksporcie — wbudowana czcionka Roboto obsługuje polskie znaki.
 
-import { DISCIPLINES, TYPES, fmt, fmtDate, fmtRange, fullName, startOf, disciplineResults, finalResults, FINAL_ORDER } from './model.js';
+import { DISCIPLINES, TYPES, fmt, fmtDate, fmtRange, fullName, startOf, disciplineResults, finalResults, FINAL_ORDER, entryStats, cardMax } from './model.js';
 
 const PDFMAKE_URL = 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.12/pdfmake.min.js';
 const FONTS_URL = 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.12/vfs_fonts.min.js';
@@ -187,6 +187,85 @@ export async function feedbackPDF(t, disc, cid, jid, sections, stats) {
     },
   ];
   pdfMake.createPdf(doc).download(`ocena-seansu-${slug(fullName(c))}-${slug(fullName(j))}.pdf`);
+}
+
+// Karta jednego sędziego dla jednego zawodnika — kopia „na papierze” z miejscem na podpis.
+export async function cardPDF(t, disc, cid, jid) {
+  const [pdfMake, logo] = await Promise.all([loadPdfMake(), logoDataURL()]);
+  const c = t.contestants.find((x) => x.id === cid);
+  const j = t.judges.find((x) => x.id === jid);
+  const card = t.cards[disc];
+  const e = t.scores?.[disc]?.[cid]?.[jid] || {};
+  const st = entryStats(card, e);
+  const d = DISCIPLINES[disc];
+  const s = startOf(c, disc);
+  const range = (it) => (it.kind === 'minus' ? `0 do −${fmt(Math.round(it.max * 10))}` : it.kind === 'bin' ? `0 / ${fmt(Math.round(it.max * 10))}` : `0–${fmt(Math.round(it.max * 10))}`);
+  const value = (it) => {
+    const v = e.v?.[it.id];
+    if (v == null) return '—';
+    return it.kind === 'minus' ? (v ? '−' + fmt(v) : '0') : fmt(v);
+  };
+  const doc = base(t, logo, { title: `Karta sędziego: ${fullName(c)}`, right: d.label.toUpperCase(), rightColor: DISC_COLOR[disc] });
+  const meta = (label, val) => ({ stack: [{ text: label.toUpperCase(), style: 'metaL' }, { text: val, style: 'metaV' }] });
+  doc.content = [
+    { text: 'KARTA SĘDZIEGO', style: 'eyebrow', color: DISC_COLOR[disc] },
+    { text: fullName(c), style: 'h1' },
+    { text: `sędzia: ${fullName(j)}`, style: 'sub' },
+    {
+      columns: [
+        meta('Konkurencja', `${d.label}${card.duration ? ` · ${card.duration}` : ''}`),
+        meta('Start', s.date ? `${fmtDate(s.date, true)}${s.time ? ', ' + s.time : ''}` : '—'),
+        meta('Wynik', `${fmt(st.total, true)} / ${fmt(cardMax(card))} pkt`),
+      ],
+      columnGap: 14,
+      margin: [0, 0, 0, 12],
+    },
+    ...card.categories.flatMap((cat, ci) => [
+      {
+        table: {
+          headerRows: 1,
+          dontBreakRows: true,
+          widths: ['*', 58, 48],
+          body: [
+            [{ text: cat.name.toUpperCase(), bold: true, color: BRAND, fontSize: 9.5 }, { text: 'ZAKRES', style: 'th', alignment: 'right' }, { text: 'OCENA', style: 'th', alignment: 'right' }],
+            ...cat.items.map((it) => [
+              {
+                stack: [
+                  { text: [{ text: it.label }, it.kind === 'minus' ? { text: '  KARA', color: '#B42318', fontSize: 7.5, bold: true } : ''] },
+                  e.ni?.[it.id] ? { text: `Uwaga: ${e.ni[it.id]}`, italics: true, color: '#6B655C', fontSize: 9 } : null,
+                ].filter(Boolean),
+              },
+              { text: range(it), alignment: 'right', color: it.kind === 'minus' ? '#B42318' : '#6B655C', fontSize: 9 },
+              { text: value(it), alignment: 'right', bold: true, color: it.kind === 'minus' && e.v?.[it.id] ? '#B42318' : '#1B1A17' },
+            ]),
+            [{ text: 'Suma kategorii', bold: true }, { text: `maks. ${fmt(st.cats[ci].max)}`, alignment: 'right', fontSize: 9, color: '#6B655C' }, { text: fmt(st.cats[ci].sum, true), alignment: 'right', bold: true }],
+          ],
+        },
+        layout: tableLayout,
+        unbreakable: true,
+        fontSize: 9.8,
+        margin: [0, 0, 0, e.n?.[cat.id] ? 3 : 10],
+      },
+      e.n?.[cat.id] ? { text: [{ text: 'Dodatkowe uwagi: ', bold: true }, e.n[cat.id]], fontSize: 9.5, margin: [0, 0, 0, 10] } : null,
+    ].filter(Boolean)),
+    {
+      unbreakable: true,
+      margin: [0, 8, 0, 0],
+      columns: [
+        { stack: [{ text: 'WYNIK CAŁKOWITY', style: 'metaL' }, { text: `${fmt(st.total, true)} / ${fmt(cardMax(card))} pkt`, fontSize: 16, bold: true }] },
+        {
+          width: 220,
+          stack: [
+            { text: ' ', margin: [0, 14, 0, 0] },
+            { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 220, y2: 0, lineWidth: 0.7, lineColor: '#8A8378' }] },
+            { text: `podpis sędziego (${fullName(j)})`, style: 'muted', fontSize: 8.5, margin: [0, 3, 0, 0] },
+          ],
+        },
+      ],
+    },
+    { text: `Wygenerowano z systemu sędziowskiego: ${new Date().toLocaleString('pl-PL')} · ${st.filled} z ${st.required} ocen`, style: 'muted', fontSize: 8, margin: [0, 16, 0, 0] },
+  ];
+  pdfMake.createPdf(doc).download(`karta-${slug(d.label)}-${slug(fullName(c))}-${slug(fullName(j))}.pdf`);
 }
 
 export async function resultsPDF(t, disc) {

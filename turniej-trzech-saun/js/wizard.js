@@ -3,7 +3,7 @@
 import { html, useState } from './lib.js';
 import { TYPES, DISCIPLINES, disciplinesOf, fullName, uid, fmt, fmtRange, cardMax, prettyCode, addDays } from './model.js';
 import { defaultCard } from './templates.js';
-import { store } from './store.js';
+import { createTournament } from './store.js';
 import { Icon, DiscBadge, toast } from './ui.js';
 import { ContestantsEditor, JudgesEditor, CardEditor, QualifierImport, ensureOrder } from './editors.js';
 
@@ -87,7 +87,7 @@ export function Wizard({ go }) {
     ensureOrder(t);
     t.status = openNow ? 'live' : 'draft';
     t.createdAt = Date.now();
-    store.mutate((s) => s.tournaments.push(t));
+    createTournament(t);
     toast('Turniej utworzony');
     go(`#/s/t/${t.id}/wyniki`);
   };
