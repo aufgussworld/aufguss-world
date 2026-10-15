@@ -539,3 +539,11 @@ export async function restoreSnapshot(data) {
   await refresh();
   return r;
 }
+
+// Potwierdzenie kodem supervisora przed operacją, której nie wolno wykonać przypadkiem (przywrócenie kopii).
+// Baza sprawdza kod tą samą funkcją co przy logowaniu — dla tego urządzenia odświeża tylko jego sesję.
+export async function verifySupervisorCode(code) {
+  const who = await rpc('tts_login_supervisor', { p_code: code });
+  if (!who || who.role !== 'supervisor') throw new Error('Nieprawidłowy kod supervisora');
+  session = who;
+}

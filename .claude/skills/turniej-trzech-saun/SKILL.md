@@ -1,6 +1,6 @@
 ---
 name: turniej-trzech-saun
-description: Kompletny poradnik systemu sędziowskiego Turnieju Trzech Saun (Sommer Residence, Kuniów k. Kluczborka) — aplikacja w folderze turniej-trzech-saun/ tego repozytorium (Preact + htm bez budowania, GitHub Pages) z bazą Supabase. Używaj przy KAŻDEJ zmianie w systemie (wygląd, karty oceny, punktacja, głosy publiczności, PDF/Excel, feedback), przy wdrażaniu poprawek, przy awarii w trakcie turnieju (logowanie sędziów, brak internetu, kody supervisora, kopie zapasowe, przywracanie) oraz przy rozpoczęciu pracy na nowym komputerze.
+description: Kompletny poradnik systemu sędziowskiego Turnieju Trzech Saun (Sommer Residence, Kuniów k. Kluczborka) — aplikacja w folderze turniej-trzech-saun/ tego repozytorium (Preact + htm bez budowania, GitHub Pages) z bazą Supabase. Używaj przy KAŻDEJ zmianie w systemie (wygląd, karty oceny, punktacja, głosy publiczności, PDF/Excel, feedback), przy wdrażaniu poprawek, przy awarii w trakcie turnieju (logowanie sędziów, brak internetu, kody supervisora, kopie zapasowe, przywracanie) oraz przy rozpoczęciu pracy na nowym komputerze. Po KAŻDEJ zmianie w systemie ten skill trzeba zaktualizować w tym samym commicie.
 ---
 
 # System sędziowski Turnieju Trzech Saun
@@ -20,6 +20,25 @@ zawodnicy, każdy sędzia ma osobną kartę na każdą konkurencję. Wynik fina�
 
 Każdy push na `main` publikuje się automatycznie (GitHub Pages) w ok. 1 minutę.
 
+## Każda zmiana = aktualizacja tego skilla (obowiązkowo)
+
+Ten skill jest JEDYNĄ dokumentacją systemu i musi zawsze opisywać stan na `main` — niezależnie od tego,
+czy zmianę robi się na komputerze stacjonarnym, na laptopie, w claude.ai/code czy ręcznie na github.com.
+Pamięć Claude nie przechodzi między komputerami; ten skill przechodzi (jest w repozytorium).
+
+Przy KAŻDEJ zmianie w systemie, w tym samym commicie:
+
+1. Popraw pliki skilla, których zmiana dotyczy:
+   - nowy lub zmieniony moduł, trasa, komponent, pole danych, zasada punktacji → [reference/architektura.md](reference/architektura.md);
+   - tabela, funkcja, uprawnienie, harmonogram w bazie → [supabase/setup.sql](supabase/setup.sql) i [reference/baza-danych.md](reference/baza-danych.md);
+   - nowa funkcja w panelu, nowy komunikat albo procedura dla supervisora / sędziów → [reference/awarie.md](reference/awarie.md)
+     (i „Szybkie przepisy” niżej);
+   - zmiana sposobu pracy, wdrażania lub narzędzi → ten plik i [reference/nowy-komputer.md](reference/nowy-komputer.md).
+2. Dopisz zmianę do „Dziennika zmian” na końcu tego pliku (data, co, dlaczego).
+3. Commituj razem: `git add turniej-trzech-saun .claude` — kod i dokumentacja nigdy osobno.
+
+Zmiana, której nie ma w skillu, jest niedokończona.
+
 ## Zasady nienaruszalne
 
 1. **Produkcja to żywy turniej.** Push na `main` zmienia aplikację wszystkim sędziom naraz. W trakcie
@@ -35,7 +54,7 @@ Każdy push na `main` publikuje się automatycznie (GitHub Pages) w ok. 1 minut�
    z miejscem `'WPISZ-KOD'`. Nie odczytuj zapisanych zapytań użytkownika, w których mogą być kody.
 5. **Nigdy nie używaj klucza `service_role` / secret.** W `config.js` jest tylko klucz publishable
    (może być jawny — dane chroni RLS). Repozytorium jest PUBLICZNE: żadnych sekretów w commitach.
-6. **Nie kasuj danych w bazie bez kopii** (panel „Kod dostępu i kopie” → kopia ręczna, albo
+6. **Nie kasuj danych w bazie bez kopii** (panel „Kopie i przywracanie” → „Zrób kopię teraz”, albo
    `select public.tts_backup('manual');` w SQL Editorze).
 7. Styl: interfejs po polsku, nazwy plików po angielsku, ikony wyłącznie SVG z `ui.js` (zero emoji),
    kolory z tokenów CSS (`--brand: #8d2732`, HOT pomarańczowy, Relax niebieski, Banya zielony).
@@ -70,19 +89,20 @@ z podłączonym repo `aufgussworld/aufguss-world` (opis w tym samym pliku).
    ```bash
    node .claude/skills/turniej-trzech-saun/scripts/check.js
    ```
-5. Wdrożenie:
+5. **Aktualizacja skilla** — sekcja „Każda zmiana = aktualizacja tego skilla” wyżej (pliki reference + dziennik zmian).
+6. Wdrożenie (kod i skill w jednym commicie):
    ```bash
-   git add turniej-trzech-saun && git commit -m "Turniej Trzech Saun: <co i dlaczego>" && git push
+   git add turniej-trzech-saun .claude && git commit -m "Turniej Trzech Saun: <co i dlaczego>" && git push
    gh api repos/aufgussworld/aufguss-world/pages/builds/latest --jq '.status + " " + .commit[0:7]'
    ```
    Powtarzaj drugie polecenie, aż pokaże `built <twój commit>` (zwykle < 1 min). Potwierdź na żywo, np.
    `curl -s https://aufgussworld.github.io/aufguss-world/turniej-trzech-saun/js/model.js | grep -c <nowa-nazwa>`.
-6. **Odświeżenie u wszystkich:** GitHub Pages pozwala przeglądarkom trzymać pliki do 10 minut
+7. **Odświeżenie u wszystkich:** GitHub Pages pozwala przeglądarkom trzymać pliki do 10 minut
    (`Cache-Control: max-age=600`), a moduły nie mają numerów wersji. Po wdrożeniu poproś sędziów
    i supervisora o **Ctrl+F5** (twarde odświeżenie). Logowanie i niewysłane oceny przetrwają
    odświeżenie tej samej karty. Bez tego przeglądarka może połączyć stary plik z nowym — przy nowych
    eksportach skończy się to białym ekranem do czasu twardego odświeżenia.
-7. Coś poszło źle → natychmiastowy powrót: `git revert --no-edit HEAD && git push` (potem Ctrl+F5 u wszystkich).
+8. Coś poszło źle → natychmiastowy powrót: `git revert --no-edit HEAD && git push` (potem Ctrl+F5 u wszystkich).
 
 ## Szybkie przepisy
 
@@ -99,6 +119,8 @@ z podłączonym repo `aufgussworld/aufguss-world` (opis w tym samym pliku).
 | Generator feedbacku (szablony zdań) | `js/feedback.js` |
 | Dane przykładowe demo | `js/seed.js` — po zmianie podbij `SEED_VERSION` |
 | Funkcję lub uprawnienia w bazie | `supabase/setup.sql` w tym skillu → użytkownik uruchamia zmieniony fragment w SQL Editorze → commit |
+| Przywrócić dane z wybranej godziny | w aplikacji: supervisor → „Kopie i przywracanie” → „Podgląd” → strzałki między godzinami → „Przywróć ten stan…” → kod supervisora |
+| Kolejność wierszy w wynikach / głosach publiczności | przełącznik „Kolejność startowa / Ranking” w `ResultsTab` i `AudienceTab` (`js/supervisor.js`) |
 
 ## Awaria w trakcie turnieju
 
@@ -115,3 +137,21 @@ Najpierw zawsze: co dokładnie widzi użytkownik (treść komunikatu) i na ilu u
 - [supabase/setup.sql](supabase/setup.sql) — pełny schemat bazy (źródło prawdy dla bazy)
 - [scripts/check.js](scripts/check.js) — kontrola przed wdrożeniem
 - [scripts/serve.js](scripts/serve.js) — lokalny podgląd na porcie 8123
+
+## Dziennik zmian
+
+Najnowsze na górze. Każdy wpis: data — co — dlaczego.
+
+- **2026-10-15** — Wyniki na żywo: przełącznik „Kolejność startowa” (domyślnie, z kolumną „Nr”) / „Ranking”;
+  w klasyfikacji łącznej finału kolejność z pierwszego dnia (Relax). Kopie: podgląd stanu z wybranej godziny
+  obok obecnych wyników (strzałki między kopiami, zaznaczone różnice), kolumna „Zmiana” liczby kart na liście kopii,
+  przywracanie z bazy i z pliku wymaga kodu supervisora (demo: PIN). Strona „Kopie zapasowe i kod dostępu”
+  z przywracaniem na górze. Poprawka: zmiana turnieju w adresie nie przenosi już ustawień widoku poprzedniego
+  turnieju (`key` na `TournamentView`). Powód: prośba organizatora przed turniejem w Kuniowie.
+- **2026-10-15** — Zasada „każda zmiana = aktualizacja skilla” i dziennik zmian w tym pliku.
+- **2026-10-15** — Głosy publiczności: wynik = średnia bez skrajnych × 10 (regulamin; głosów bywa mniej niż 12);
+  widok kolejność występów / ranking, podium, eksport CSV/PDF.
+- **2026-10-15** — Poradnik serwisowy jako skill w repozytorium (praca z innego komputera).
+- **2026-10-15** — Przekazanie dostępu kolejnemu supervisorowi (`tts_handover_code`).
+- **2026-10-15** — Wersja produkcyjna na Supabase: logowanie kodami, RLS, kolejka offline, kopie co godzinę,
+  eksport kart sędziów do PDF/Excel; baza oddana pusta, kod supervisora ustawiony przez supervisora.

@@ -49,7 +49,7 @@ Realtime włączony dla: `tts_tournaments`, `tts_tournament_private`, `tts_entri
 | `tts_handover_code(p_current, p_new)` | supervisor | kopia ręczna + kod dla następcy (`set_by = 'handover'`) + wylogowanie wszystkich supervisorów |
 | `tts_admin_set_supervisor_code(p_code)` | **tylko SQL Editor** | nadanie / reset kodu (`set_by = 'admin'`), wylogowuje supervisorów |
 | `tts_make_backup()` / `tts_list_backups()` / `tts_get_backup(id)` | supervisor | kopia ręczna / lista / pobranie |
-| `tts_restore_backup(id)` / `tts_restore_snapshot(json)` | supervisor | przywrócenie (najpierw kopia `before-restore`, potem zastąpienie WSZYSTKICH turniejów stanem z kopii) |
+| `tts_restore_backup(id)` / `tts_restore_snapshot(json)` | supervisor | przywrócenie (najpierw kopia `before-restore`, potem zastąpienie WSZYSTKICH turniejów stanem z kopii). Aplikacja wywołuje je dopiero po potwierdzeniu kodem supervisora — kod sprawdza `tts_login_supervisor` (bez zmian w bazie). Wzmocnienie na przyszłość: parametr `p_code` sprawdzany w samych funkcjach przywracania (wymaga `drop function` starych sygnatur i nowych `grant`). |
 | `tts_backup(kind)` | `pg_cron` / SQL Editor | kopia; `auto` pomijana, gdy nic się nie zmieniło; automatycznych trzymamy 168 |
 
 `pg_cron`: zadanie `tts-backup`, harmonogram `30 * * * *` (co godzinę o :30).

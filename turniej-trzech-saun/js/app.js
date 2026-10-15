@@ -147,7 +147,7 @@ function ForcedCodeChange({ session, initialOld, onDone, onLogout }) {
       ${session.codeSetBy === 'handover' ? html`
         <p>Ten kod przekazał poprzedni supervisor${when ? ` (${when})` : ''}, a dostarczył go organizator. Ustaw kod znany tylko Tobie —
           od tej chwili ani poprzedni supervisor, ani organizator nie zalogują się do panelu, a kod przekazany przestanie działać.</p>
-        <p class="muted small">Po turnieju możesz w ten sam sposób przekazać dostęp kolejnemu supervisorowi: „Kod dostępu i kopie” → „Przekaż dostęp”.</p>`
+        <p class="muted small">Po turnieju możesz w ten sam sposób przekazać dostęp kolejnemu supervisorowi: „Kopie zapasowe i kod dostępu” → „Przekaż dostęp”.</p>`
       : html`
         <p>Obecny kod nadał lub zresetował administrator systemu${when ? ` (${when})` : ''}. Ustaw kod znany tylko Tobie.
           Od tej chwili administrator nie zaloguje się do panelu, a z jego kodem nie da się zobaczyć żadnych danych turnieju.</p>
@@ -327,7 +327,7 @@ function App() {
     else if (parts[1] === 'system') body = html`<${SystemPage} go=${go} remote=${remote} ChangeCodeForm=${ChangeCodeForm} />`;
     else if (parts[1] === 't') {
       const tt = s.tournaments.find((x) => x.id === parts[2]);
-      body = tt ? html`<${TournamentView} t=${tt} tab=${parts[3] || 'wyniki'} go=${go} />` : html`<${SupervisorHome} go=${go} />`;
+      body = tt ? html`<${TournamentView} key=${tt.id} t=${tt} tab=${parts[3] || 'wyniki'} go=${go} />` : html`<${SupervisorHome} go=${go} />`;
     } else body = html`<${SupervisorHome} go=${go} />`;
   }
 

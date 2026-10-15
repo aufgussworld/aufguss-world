@@ -27,7 +27,7 @@
 | `js/wizard.js` | kreator nowego turnieju (rodzaj → zawodnicy → harmonogram → sędziowie → karta → podsumowanie) |
 | `js/editors.js` | edytory: zawodnicy i harmonogram startów, import finalistów z eliminacji, sędziowie i kody (+ wydruk kodów PDF), edytor karty oceny |
 | `js/judge.js` | panel sędziego: karta ocen (`ScoreCard`), pola z walidacją, uwagi do pozycji i kategorii, eksport karty PDF/Excel, porównanie zawodników, „Mój ranking” |
-| `js/supervisor.js` | panel supervisora: lista turniejów, wyniki na żywo, karty sędziów (macierz), porównanie „oczami sędziego”, historia zmian, głosy publiczności, ustawienia, strona „Kod dostępu i kopie” |
+| `js/supervisor.js` | panel supervisora: lista turniejów, wyniki na żywo (`ResultsTab`: kolejność startowa / ranking), karty sędziów (macierz), porównanie „oczami sędziego”, historia zmian, głosy publiczności (`AudienceTab`: kolejność występów / ranking, podium, CSV/PDF), ustawienia, strona „Kopie zapasowe i kod dostępu” (`SystemPage`: lista kopii, `BackupPreview` — podgląd kopii obok obecnego stanu, `RestoreDialog` — przywrócenie po wpisaniu kodu, zmiana kodu, przekazanie dostępu) |
 | `js/feedback.js` | generator feedbacku dla zawodnika (szablony zdań; opcjonalnie `TTS_CONFIG.feedbackEndpoint` — miejsce na przyszłe AI) + okno edycji |
 | `js/pdf.js` | PDF: karta sędziego, feedback, wyniki, ranking publiczności (nagłówek z logo, stopka z adresem) |
 | `js/backup.js` | format kopii `tts-backup-1` (JSON), podział turnieju na wiersze bazy, eksport Excel, automatyczne pobieranie kopii o :30 |
@@ -39,9 +39,17 @@
 
 - `#/` logowanie (sędzia: kod 6 znaków; supervisor: kod dostępu; w demo również PIN i szybkie wejścia).
 - Sędzia: `#/j/ocena/<disc>/<idZawodnika>`, `#/j/porownanie/<disc>`, `#/j/ranking/<disc>`.
-- Supervisor: `#/s` (lista), `#/s/new` (kreator), `#/s/system` (kod dostępu i kopie),
+- Supervisor: `#/s` (lista), `#/s/new` (kreator), `#/s/system` (kopie zapasowe, przywracanie, kod dostępu),
   `#/s/t/<idTurnieju>/<zakładka>`: `wyniki`, `karty`, `porownanie`, `historia`, `publicznosc`,
-  `zawodnicy`, `sedziowie`, `karta`, `ustawienia`.
+  `zawodnicy`, `sedziowie`, `karta`, `ustawienia`. `TournamentView` ma `key` = id turnieju, więc stan
+  zakładek (np. wybrana konkurencja) zeruje się przy przejściu do innego turnieju.
+
+## Kolejność wierszy (wyniki i głosy publiczności)
+
+- „Kolejność startowa” (domyślnie): `orderedContestants(t, disc)` — po dacie i godzinie startu, potem po `t.order`;
+  kolumna „Nr” = pozycja na tej liście. W klasyfikacji łącznej finału — kolejność z pierwszego dnia (`FINAL_ORDER[0]` = Relax).
+- „Ranking”: `disciplineResults` / `finalResults` (miejsca ex aequo, DSQ na końcu); głosy publiczności — `audienceRanking`.
+- Eksporty wyników (CSV, PDF) są zawsze w kolejności rankingu.
 
 ## Model danych (obiekt turnieju w aplikacji)
 
@@ -103,8 +111,17 @@
 ## Kopie zapasowe i eksporty
 
 - W bazie: `pg_cron` co godzinę o :30 (tylko gdy coś się zmieniło), automatyczne trzymane 168 sztuk (7 dni),
-  ręczne i „sprzed przywrócenia” — bezterminowo. Lista, pobieranie (Excel/JSON) i przywracanie: strona
-  „Kod dostępu i kopie” (`#/s/system`).
+  ręczne i „sprzed przywrócenia” — bezterminowo. Strona „Kopie zapasowe i kod dostępu” (`#/s/system`):
+  lista kopii z kolumną „Zmiana” (ile kart przybyło/ubyło od poprzedniej kopii — spadek = sygnał problemu),
+  przyciski Podgląd / Excel / JSON / Przywróć….
+- **Podgląd** (`BackupPreview`): wczytuje kopię (`tts_get_backup`, pamięć podręczna w oknie), pokazuje wybrany
+  turniej i konkurencję: wynik w kopii, wynik teraz, różnicę; liczby kart, zmian w historii i głosów (kopia vs teraz);
+  strzałki „Wcześniejsza / Późniejsza” przechodzą po kopiach. Ten sam podgląd otwiera się po wybraniu pliku JSON.
+- **Przywracanie** (`RestoreDialog`): wymaga wpisania kodu supervisora — w produkcji sprawdza go baza funkcją
+  `tts_login_supervisor` (`remote.verifySupervisorCode`; dla tego urządzenia tylko odświeża sesję), w demo PIN `2026`.
+  Potem `tts_restore_backup(id)` albo `tts_restore_snapshot(json)`: kopia „sprzed przywrócenia”, zastąpienie
+  WSZYSTKICH turniejów. Usunięcie i odtworzenie kodów sędziów wylogowuje sędziów (wyzwalacz `tts_codes_kick`) —
+  logują się ponownie tymi samymi kodami, a ich niewysłane oceny z kolejki dochodzą po zalogowaniu.
 - Na komputerze supervisora: o :30 automatycznie pobierają się pliki Excel + JSON (przełącznik na tej samej
   stronie, zapamiętywany w przeglądarce), gdy jakiś turniej ma status „W trakcie”.
 - Sędzia: po seansie może pobrać swoją kartę jako PDF lub Excel (zabezpieczenie na wypadek awarii).

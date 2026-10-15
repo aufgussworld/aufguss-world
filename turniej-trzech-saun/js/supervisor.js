@@ -5,7 +5,7 @@ import { html, useEffect, useRef, useState } from './lib.js';
 import {
   DISCIPLINES, TYPES, STATUS, FINAL_ORDER, disciplinesOf, fullName, fmt, fmtAvg, fmtDate, fmtRange, fmtStamp,
   entryStats, getEntry, contestantDisc, disciplineResults, finalResults, audienceStats, audienceRanking, orderedContestants,
-  startOf, findItem, parseScore, cardMax, excludedKey, dqKey, toCSV, download, prettyCode,
+  startOf, findItem, parseScore, cardMax, excludedKey, dqKey, toCSV, download, prettyCode, plural,
 } from './model.js';
 import { store, updateT, deleteTournament, LIVE } from './store.js';
 import { Icon, Avatar, DiscBadge, StatusIcon, Segmented, Modal, Empty, LiveDot, toast } from './ui.js';
@@ -49,7 +49,7 @@ export function SupervisorHome({ go }) {
     <div class="page-head row">
       <div><h1>Turnieje</h1><p class="muted">Sommer Hot, Sommer Relax, Sommer Banya i Finał Turnieju Trzech Saun.</p></div>
       <div class="actions">
-        <button class="btn lg" onClick=${() => go('#/s/system')}><${Icon} name="key" />Kod dostępu i kopie</button>
+        <button class="btn lg" onClick=${() => go('#/s/system')}><${Icon} name="history" />Kopie zapasowe i kod dostępu</button>
         <button class="btn primary lg" onClick=${() => go('#/s/new')}><${Icon} name="plus" />Nowy turniej</button>
       </div>
     </div>
@@ -119,7 +119,7 @@ export function TournamentView({ t, tab = 'wyniki', go }) {
               <${Icon} name=${n[2]} size=${17} />${n[1]}${n[0] === 'wyniki' && warnings ? html`<span class="count warn">${warnings}</span>` : null}</a></li>`
           : html`<li class="sn-sep" key=${'sep' + i}>Przygotowanie</li>`)}
         <li class="sn-sep">System</li>
-        <li><a href="#/s/system"><${Icon} name="key" size=${17} />Kod dostępu i kopie</a></li>
+        <li><a href="#/s/system"><${Icon} name="history" size=${17} />Kopie i przywracanie</a></li>
       </ul>
     </nav>
     <main class="sup-main" id="main">
@@ -174,9 +174,13 @@ function resultsCSV(t, disc) {
 function ResultsTab({ t }) {
   const isFinal = t.type === 'final';
   const [disc, setDisc] = useState(isFinal ? 'all' : t.type);
+  const [view, setView] = useState('order');
   const [open, setOpen] = useState(null);
   const discs = disc === 'all' ? FINAL_ORDER : [disc];
-  const rows = disc === 'all' ? finalResults(t) : disciplineResults(t, disc);
+  const ranked = disc === 'all' ? finalResults(t) : disciplineResults(t, disc);
+  // kolejność startowa; w klasyfikacji łącznej finału — z pierwszego dnia (Relax)
+  const startPos = new Map(orderedContestants(t, disc === 'all' ? FINAL_ORDER[0] : disc).map((c, i) => [c.id, i + 1]));
+  const rows = view === 'rank' ? ranked : [...ranked].sort((a, b) => startPos.get(a.c.id) - startPos.get(b.c.id));
   let done = 0, expected = 0, scoredFully = 0, over = [];
   for (const d of discs) {
     for (const c of t.contestants) {
@@ -202,7 +206,12 @@ function ResultsTab({ t }) {
           <${Icon} name="file-text" />Wyniki PDF</button>
       </div>
     </div>
-    ${isFinal ? html`<div class="toolbar"><${Segmented} label="Konkurencja" value=${disc} onChange=${setDisc} options=${discOptions(t, true)} /></div>` : null}
+    <div class="toolbar">
+      ${isFinal ? html`<${Segmented} label="Konkurencja" value=${disc} onChange=${setDisc} options=${discOptions(t, true)} />` : null}
+      <${Segmented} label="Kolejność wierszy" value=${view} onChange=${setView}
+        options=${[{ value: 'order', label: 'Kolejność startowa', icon: 'clock' }, { value: 'rank', label: 'Ranking', icon: 'ranking' }]} />
+      ${view === 'order' && disc === 'all' ? html`<span class="muted small">Kolejność z pierwszego dnia finału (Relax)</span>` : null}
+    </div>
 
     <div class="kpis">
       <${Kpi} label="Kompletne karty (liczone)" value=${`${done} / ${expected}`} sub=${`${t.panelSize} sędziów na ceremonię`} />
@@ -221,6 +230,7 @@ function ResultsTab({ t }) {
     <div class="table-wrap">
       <table class=${'results ' + (disc !== 'all' ? 'd-' + disc : '')}>
         <thead><tr>
+          ${view === 'order' ? html`<th class="num w-pos">Nr</th>` : null}
           <th class="w-rank">Miejsce</th><th>Zawodnik</th>
           ${disc === 'all'
             ? FINAL_ORDER.map((d) => html`<th class="num" key=${d}><${DiscBadge} disc=${d} small /></th>`)
@@ -234,6 +244,7 @@ function ResultsTab({ t }) {
             const qualifies = isQual && r.rank && r.rank <= 5;
             return html`<tr key=${r.c.id} class=${`${r.dq ? 'is-dq' : ''} ${!r.scored ? 'is-pending' : ''} ${qualifies ? 'qual' : ''}`}
               onClick=${() => setOpen({ cid: r.c.id, disc })} tabindex="0" onKeyDown=${(e) => e.key === 'Enter' && setOpen({ cid: r.c.id, disc })}>
+              ${view === 'order' ? html`<td class="num w-pos"><span class="muted">${startPos.get(r.c.id)}</span></td>` : null}
               <td class="w-rank">${rankCell(r, isFinal, isQual)}</td>
               <td><div class="who"><${Avatar} c=${r.c} size=${36} /><span><b>${r.name}</b>
                 <small>${r.dq ? html`<span class="neg-text">Dyskwalifikacja: ${r.dq}</span>` : st && st.date ? `${fmtDate(st.date)}, ${st.time || ''}${!r.scored ? ' · czeka na start' : disc !== 'all' && r.complete < t.panelSize && t.status === 'live' ? ' · oceny w toku' : ''}` : ''}</small></span>
@@ -671,7 +682,7 @@ function SettingsTab({ t, go }) {
       <div class="row-actions left">
         <button class="btn" onClick=${() => resultsCSV(t, t.type === 'final' ? 'all' : t.type)}><${Icon} name="download" />Wyniki (CSV)</button>
         <button class="btn" onClick=${() => backupWorkbook([t], `${t.name}_${stamp()}.xlsx`).catch(() => toast('Nie udało się przygotować pliku Excel', 'err'))}><${Icon} name="download" />Turniej w Excelu</button>
-        <button class="btn" onClick=${() => go('#/s/system')}><${Icon} name="key" />Kopie zapasowe i przywracanie</button>
+        <button class="btn" onClick=${() => go('#/s/system')}><${Icon} name="history" />Kopie zapasowe i przywracanie</button>
       </div>
     </section>
 
@@ -731,11 +742,165 @@ function HandoverForm({ remote }) {
   </form>`;
 }
 
+// Przywrócenie kopii zastępuje wszystkie turnieje — wymaga wpisania kodu supervisora,
+// żeby nikt nie zrobił tego przypadkowym kliknięciem.
+function RestoreDialog({ item, remote, onRestore, onClose }) {
+  const [code, setCode] = useState('');
+  const [err, setErr] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const submit = async (e) => {
+    e.preventDefault();
+    if (!code.trim()) return setErr(LIVE ? 'Wpisz kod supervisora.' : 'Wpisz PIN supervisora.');
+    setBusy(true);
+    try {
+      if (LIVE) await remote.verifySupervisorCode(code);
+      else if (code.trim() !== store.get().supervisorPin) throw new Error('Nieprawidłowy PIN.');
+      await onRestore(item);
+      onClose();
+    } catch (x) {
+      setErr(x.message || 'Przywracanie nie powiodło się');
+      setBusy(false);
+    }
+  };
+  return html`<${Modal} title="Przywróć dane z kopii" onClose=${() => !busy && onClose()}>
+    <form class="code-form restore-form" onSubmit=${submit}>
+      <p>Przywracasz stan systemu z <b>${item.label}</b>${item.sub ? html` <span class="muted">(${item.sub})</span>` : null}.</p>
+      <ol class="steps-list small">
+        <li>Wszystkie obecne turnieje, karty, historia i głosy publiczności zostaną zastąpione zawartością tej kopii.</li>
+        <li>${LIVE ? 'Najpierw system sam zapisze kopię bieżącego stanu („sprzed przywrócenia”) — przywrócenie można więc cofnąć.' : 'W wersji demonstracyjnej bieżący stan nie jest zapisywany — w razie potrzeby pobierz wcześniej kopię JSON.'}</li>
+        ${LIVE ? html`<li>Sędziowie zostaną wylogowani i zalogują się ponownie tymi samymi kodami. Oceny, które czekały u nich na wysłanie, dotrą po zalogowaniu.</li>` : null}
+      </ol>
+      <label>${LIVE ? 'Kod supervisora (ten sam co przy logowaniu)' : 'PIN supervisora'}
+        <input type="password" autocomplete="current-password" data-autofocus value=${code} onInput=${(e) => { setCode(e.currentTarget.value); setErr(null); }} /></label>
+      ${err ? html`<p class="err" role="alert"><${Icon} name="alert" size=${14} />${err}</p>` : null}
+      <div class="row-actions">
+        <button class="btn ghost" type="button" onClick=${onClose} disabled=${busy}>Anuluj</button>
+        <button class="btn danger" type="submit" disabled=${busy || !code}><${Icon} name="history" size=${16} />${busy ? 'Przywracam…' : 'Przywróć ten stan'}</button>
+      </div>
+    </form>
+  </${Modal}>`;
+}
+
+function snapshotStats(t) {
+  if (!t) return null;
+  let cards = 0, votes = 0;
+  for (const byC of Object.values(t.scores || {})) {
+    for (const byJ of Object.values(byC || {})) for (const e of Object.values(byJ || {})) if (e && e.v && Object.keys(e.v).length) cards++;
+  }
+  for (const byC of Object.values(t.audience || {})) for (const arr of Object.values(byC || {})) votes += (arr || []).filter((v) => v != null).length;
+  return { cards, votes, history: (t.history || []).length, contestants: t.contestants.length };
+}
+
+// Podgląd kopii: wyniki z wybranej godziny obok obecnych. Strzałkami przechodzi się do kopii wcześniejszej
+// i późniejszej — tak znajdziesz moment, w którym coś się popsuło, zanim cokolwiek przywrócisz.
+export function BackupPreview({ items, start = 0, onRestore, onClose }) {
+  const [idx, setIdx] = useState(start);
+  const [state, setState] = useState({});
+  const [tid, setTid] = useState(null);
+  const [disc, setDisc] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const cache = useRef(new Map());
+  const item = items[idx];
+
+  useEffect(() => {
+    let alive = true;
+    if (cache.current.has(item.key)) { setState({ key: item.key, data: cache.current.get(item.key) }); return undefined; }
+    setState({ key: item.key, loading: true });
+    Promise.resolve()
+      .then(() => item.fetch())
+      .then((d) => {
+        const list = fromSnapshot(d);
+        cache.current.set(item.key, list);
+        if (alive) setState({ key: item.key, data: list });
+      })
+      .catch((e) => alive && setState({ key: item.key, error: e.message || 'Nie udało się wczytać kopii' }));
+    return () => { alive = false; };
+  }, [item.key]);
+
+  const list = state.key === item.key && state.data ? state.data : null;
+  const t = list ? list.find((x) => x.id === tid) || list[0] || null : null;
+  const now = t ? store.get().tournaments.find((x) => x.id === t.id) || null : null;
+  const discs = t ? (t.type === 'final' ? ['all', ...FINAL_ORDER] : [t.type]) : [];
+  const d = discs.includes(disc) ? disc : discs[0];
+  const results = (x) => {
+    if (!x) return [];
+    if (d === 'all') return finalResults(x);
+    return x.cards && x.cards[d] ? disciplineResults(x, d) : [];
+  };
+  const rows = t ? results(t) : [];
+  const nowRows = new Map(results(now).map((r) => [r.c.id, r]));
+  const changed = rows.filter((r) => {
+    const n = nowRows.get(r.c.id);
+    return !n || n.total !== r.total || n.scored !== r.scored || !!n.dq !== !!r.dq;
+  }).length;
+  const s = snapshotStats(t), sn = snapshotStats(now);
+  const cmp = (a, b) => (b == null ? '' : a === b ? ' (teraz tyle samo)' : ` (teraz ${b})`);
+  const xlsx = async () => {
+    setBusy(true);
+    try { await backupWorkbook(list, `turniej-trzech-saun_kopia_${item.stamp || stamp()}.xlsx`); } catch (e) { toast(e.message || 'Nie udało się przygotować pliku', 'err'); } finally { setBusy(false); }
+  };
+
+  return html`<${Modal} title="Podgląd kopii zapasowej" wide onClose=${onClose}
+    footer=${html`
+      <button class="btn" onClick=${xlsx} disabled=${!list || busy}><${Icon} name="download" />Pobierz tę kopię — Excel</button>
+      <button class="btn danger" onClick=${() => onRestore(item)} disabled=${!list}><${Icon} name="history" size=${16} />Przywróć ten stan…</button>`}>
+    <div class="bk-nav">
+      <button class="btn sm" onClick=${() => setIdx(idx + 1)} disabled=${idx >= items.length - 1}><${Icon} name="chevron-left" size=${16} />Wcześniejsza</button>
+      <div class="bk-when"><b>${item.label}</b>${item.sub ? html`<small>${item.sub}</small>` : null}
+        ${items.length > 1 ? html`<small>kopia ${items.length - idx} z ${items.length} (od najstarszej)</small>` : null}</div>
+      <button class="btn sm" onClick=${() => setIdx(idx - 1)} disabled=${idx <= 0}>Późniejsza<${Icon} name="chevron-right" size=${16} /></button>
+    </div>
+    ${state.error ? html`<div class="alert err"><${Icon} name="alert" />${state.error}</div>`
+      : !list ? html`<p class="muted">Wczytywanie kopii…</p>`
+      : !t ? html`<p class="empty-line">Ta kopia nie zawiera żadnego turnieju.</p>`
+      : html`
+      <div class="toolbar">
+        ${list.length > 1 ? html`<label class="inline-select">Turniej
+          <select value=${t.id} onChange=${(e) => setTid(e.currentTarget.value)}>
+            ${list.map((x) => html`<option key=${x.id} value=${x.id}>${x.name}</option>`)}
+          </select></label>` : html`<b>${t.name}</b>`}
+        ${discs.length > 1 ? html`<${Segmented} label="Konkurencja" value=${d} onChange=${setDisc}
+          options=${discs.map((x) => ({ value: x, label: x === 'all' ? 'Łącznie' : DISCIPLINES[x].label }))} />` : null}
+      </div>
+      <p class="bk-stats small">
+        <span>Status: <b>${STATUS[t.status]?.label || t.status}</b>${now && now.status !== t.status ? ` (teraz ${STATUS[now.status]?.label || now.status})` : ''}</span>
+        <span>Karty z ocenami: <b>${s.cards}</b>${cmp(s.cards, sn && sn.cards)}</span>
+        <span>Zmiany w historii: <b>${s.history}</b>${cmp(s.history, sn && sn.history)}</span>
+        <span>Głosy publiczności: <b>${s.votes}</b>${cmp(s.votes, sn && sn.votes)}</span>
+      </p>
+      ${!now ? html`<div class="alert warn"><${Icon} name="alert" />Tego turnieju nie ma w obecnym stanie systemu — przywrócenie kopii go odtworzy.</div>`
+        : html`<p class=${'bk-verdict ' + (changed ? 'diff' : 'same')}><${Icon} name=${changed ? 'alert' : 'check'} size=${16} />
+          ${changed ? `Wyniki różnią się od obecnych u ${changed} ${plural(changed, 'zawodnika', 'zawodników', 'zawodników')} — zaznaczone poniżej.` : 'Wyniki w tej kopii są takie same jak obecnie.'}</p>`}
+      <div class="table-wrap"><table class="results compact bk-table">
+        <thead><tr><th class="w-rank">Miejsce</th><th>Zawodnik</th><th class="num">Wynik w kopii</th>
+          ${now ? html`<th class="num">Teraz</th><th class="num">Zmiana od kopii</th>` : null}
+          <th class="num">Karty w kopii</th></tr></thead>
+        <tbody>${rows.map((r) => {
+          const n = nowRows.get(r.c.id);
+          const diff = n && n.scored && r.scored ? n.total - r.total : null;
+          const isChanged = now && (!n || n.total !== r.total || n.scored !== r.scored || !!n.dq !== !!r.dq);
+          return html`<tr key=${r.c.id} class=${isChanged ? 'changed' : ''}>
+            <td class="w-rank">${r.dq ? 'DSQ' : r.rank ? `${r.rank}${r.tie ? ' ex aequo' : ''}` : '—'}</td>
+            <td><b>${r.name}</b></td>
+            <td class="num">${r.scored ? fmt(r.total, true) : '—'}</td>
+            ${now ? html`<td class="num">${!n ? html`<span class="muted">brak</span>` : n.scored ? fmt(n.total, true) : '—'}</td>
+              <td class="num">${diff ? html`<b class=${diff < 0 ? 'neg-text' : ''}>${diff > 0 ? '+' : '−'}${fmt(Math.abs(diff), true)}</b>`
+                : !isChanged ? ''
+                : html`<span class="warn-text">${!n ? 'brak zawodnika teraz' : !!n.dq !== !!r.dq ? 'inna dyskwalifikacja' : r.scored ? 'brak ocen teraz' : 'brak ocen w kopii'}</span>`}</td>` : null}
+            <td class="num muted">${d === 'all' ? `${r.complete}/${t.panelSize * 3}` : `${r.complete}/${t.panelSize}`}</td>
+          </tr>`;
+        })}</tbody>
+      </table></div>`}
+  </${Modal}>`;
+}
+
 export function SystemPage({ go, remote, ChangeCodeForm }) {
   const [backups, setBackups] = useState(null);
   const [auto, setAuto] = useState(autoBackupEnabled());
   const [codeOpen, setCodeOpen] = useState(false);
   const [busy, setBusy] = useState(null);
+  const [preview, setPreview] = useState(null); // { items, start }
+  const [toRestore, setToRestore] = useState(null);
   const who = LIVE && remote ? remote.getSessionInfo() : null;
   const live = store.get().tournaments.some((t) => t.status === 'live');
 
@@ -767,42 +932,112 @@ export function SystemPage({ go, remote, ChangeCodeForm }) {
     if (kind === 'json') downloadJSON(d, `${name}.json`);
     else await backupWorkbook(fromSnapshot(d), `${name}.xlsx`);
   });
-  const restore = (b) => {
-    const when = new Date(b.created_at).toLocaleString('pl-PL');
-    const msg = `Przywrócić stan systemu z ${when}? Wszystkie obecne turnieje i karty zostaną zastąpione zawartością kopii. Przed przywróceniem system sam zapisze kopię bieżącego stanu.`;
-    if (!confirm(msg)) return;
-    run(`r${b.id}`, async () => {
-      await remote.restoreBackup(b.id);
-      toast('Przywrócono stan z kopii');
-      await loadBackups();
-    });
+  // kopie z bazy jako pozycje podglądu (od najnowszej); stan wczytuje się dopiero przy oglądaniu
+  const backupItems = (backups || []).map((b) => ({
+    key: `b${b.id}`,
+    id: b.id,
+    stamp: stamp(new Date(b.created_at)),
+    label: new Date(b.created_at).toLocaleString('pl-PL', { dateStyle: 'long', timeStyle: 'short' }),
+    sub: `kopia ${KIND_LABEL[b.kind] || b.kind} · karty: ${b.entries}`,
+    fetch: () => remote.getBackup(b.id),
+  }));
+  const doRestore = async (item) => {
+    if (item.id != null) {
+      await remote.restoreBackup(item.id);
+    } else {
+      const list = fromSnapshot(item.data);
+      if (LIVE) await remote.restoreSnapshot(item.data.format === 'tts-backup-1' ? item.data : toSnapshot(list));
+      else store.replace({ ...store.get(), tournaments: list });
+    }
+    toast(`Przywrócono stan z kopii: ${item.label}`);
+    setPreview(null);
+    if (LIVE) await loadBackups();
   };
-  const restoreFile = (file) => {
+  const previewFile = (file) => {
     if (!file) return;
     const fr = new FileReader();
-    fr.onload = () => run('file', async () => {
+    fr.onload = () => {
       let data;
-      try { data = JSON.parse(fr.result); } catch (_) { throw new Error('Plik nie jest kopią zapasową systemu (JSON).'); }
-      const list = fromSnapshot(data);
-      if (!confirm(`Wczytać kopię z pliku (turnieje: ${list.length})? Obecne dane zostaną zastąpione.`)) return;
-      if (LIVE) {
-        await remote.restoreSnapshot(data.format === 'tts-backup-1' ? data : toSnapshot(list));
-        await loadBackups();
-      } else {
-        store.replace({ ...store.get(), tournaments: list });
-      }
-      toast('Dane wczytane z pliku');
-      go('#/s');
-    });
+      try { data = JSON.parse(fr.result); fromSnapshot(data); } catch (_) { toast('Ten plik nie jest kopią zapasową systemu sędziowskiego (JSON).', 'err'); return; }
+      const created = data.createdAt ? new Date(data.createdAt) : null;
+      setPreview({
+        start: 0,
+        items: [{
+          key: `file:${file.name}:${file.size}:${file.lastModified}`,
+          data,
+          stamp: created ? stamp(created) : undefined,
+          label: created ? created.toLocaleString('pl-PL', { dateStyle: 'long', timeStyle: 'short' }) : file.name,
+          sub: `plik ${file.name}`,
+          fetch: () => data,
+        }],
+      });
+    };
     fr.readAsText(file);
   };
   const toggleAuto = (on) => { setAutoBackup(on); setAuto(on); };
   const last = lastAutoBackup();
 
   return html`<div class="page narrow">
-    <div class="page-head row"><div><h1>Kod dostępu i kopie zapasowe</h1>
-      <p class="muted">Zabezpieczenia na wypadek awarii internetu, przeglądarki albo bazy danych.</p></div>
+    <div class="page-head row"><div><h1>Kopie zapasowe i kod dostępu</h1>
+      <p class="muted">Przywracanie danych z wybranej godziny, kopie na tym komputerze oraz kod dostępu supervisora.</p></div>
       <button class="btn ghost" onClick=${() => go('#/s')}><${Icon} name="chevron-left" />Turnieje</button></div>
+
+    ${LIVE ? html`<section class="panel form">
+      <h3><${Icon} name="history" size=${17} />Przywracanie danych z kopii w bazie</h3>
+      <p class="muted small">Baza zapisuje kopię całego systemu co godzinę o :30, jeśli od poprzedniej coś się zmieniło (automatyczne — przez tydzień, ręczne — na stałe).
+        Gdy coś się popsuło: otwórz <b>Podgląd</b> i przechodź strzałkami między godzinami — podgląd pokazuje wyniki z kopii obok obecnych i zaznacza różnice.
+        Przywrócenie wybranego stanu wymaga wpisania kodu supervisora.</p>
+      <div class="row-actions left">
+        <button class="btn primary" onClick=${make} disabled=${busy === 'make'}><${Icon} name="check" />${busy === 'make' ? 'Zapisuję…' : 'Zrób kopię teraz'}</button>
+        <button class="btn ghost" onClick=${loadBackups}><${Icon} name="refresh" size=${16} />Odśwież listę</button>
+      </div>
+      ${backups == null ? html`<p class="muted small">Wczytywanie listy…</p>` : !backups.length ? html`<p class="empty-line">Brak kopii — pierwsza powstanie automatycznie o najbliższej :30 albo po kliknięciu „Zrób kopię teraz”.</p>` : html`
+      <div class="table-wrap"><table class="history backups">
+        <thead><tr><th>Data i godzina</th><th>Rodzaj</th><th class="num">Turnieje</th><th class="num">Karty</th>
+          <th class="num" title="Ile kart przybyło lub ubyło od poprzedniej kopii">Zmiana</th><th class="num">Rozmiar</th><th class="w-act"><span class="sr">Akcje</span></th></tr></thead>
+        <tbody>${backups.map((b, i) => {
+          const prev = backups[i + 1];
+          const delta = prev ? b.entries - prev.entries : null;
+          return html`<tr key=${b.id}>
+          <td class="mono">${new Date(b.created_at).toLocaleString('pl-PL')}</td>
+          <td>${KIND_LABEL[b.kind] || b.kind}</td>
+          <td class="num">${b.tournaments}</td><td class="num">${b.entries}</td>
+          <td class="num">${delta == null ? html`<span class="muted">—</span>` : delta === 0 ? html`<span class="muted">0</span>`
+            : html`<b class=${delta < 0 ? 'neg-text' : ''} title=${delta < 0 ? 'Ubyło kart — sprawdź w podglądzie' : ''}>${delta > 0 ? '+' : '−'}${Math.abs(delta)}</b>`}</td>
+          <td class="num">${sizeLabel(b.size_bytes || 0)}</td>
+          <td class="w-act">
+            <button class="btn sm primary" onClick=${() => setPreview({ items: backupItems, start: i })} disabled=${!!busy}><${Icon} name="eye" size=${14} />Podgląd</button>
+            <button class="btn sm" onClick=${() => fetchBackup(b, 'xlsx')} disabled=${!!busy}>Excel</button>
+            <button class="btn sm" onClick=${() => fetchBackup(b, 'json')} disabled=${!!busy}>JSON</button>
+            <button class="btn sm danger" onClick=${() => setToRestore(backupItems[i])} disabled=${!!busy}>Przywróć…</button>
+          </td></tr>`;
+        })}</tbody>
+      </table></div>`}
+    </section>` : null}
+
+    <section class="panel form">
+      <h3><${Icon} name="upload" size=${17} />Przywróć z pliku</h3>
+      <p class="muted small">Wczytaj plik JSON z kopii (np. zapisanej automatycznie na tym komputerze). Najpierw zobaczysz podgląd — dane zostaną zastąpione dopiero po potwierdzeniu
+        ${LIVE ? 'kodem supervisora, a system wcześniej sam zapisze kopię bieżącego stanu' : 'PIN-em supervisora'}.</p>
+      <div class="row-actions left">
+        <label class="btn"><${Icon} name="upload" />Wybierz plik kopii (.json)<input type="file" accept="application/json,.json" class="sr"
+          onChange=${(e) => { previewFile(e.currentTarget.files[0]); e.currentTarget.value = ''; }} /></label>
+      </div>
+    </section>
+
+    <section class="panel form">
+      <h3><${Icon} name="download" size=${17} />Kopia na tym komputerze</h3>
+      <label class="check big"><span class="switch"><input type="checkbox" checked=${auto} onChange=${(e) => toggleAuto(e.currentTarget.checked)} /><span></span></span>
+        Zapisuj kopię automatycznie co godzinę o :30 (11:30, 12:30, 13:30…)</label>
+      <p class="muted small">Działa, gdy trwa turniej i panel supervisora jest otwarty. Przeglądarka zapisze w folderze „Pobrane” dwa pliki:
+        Excel (wyniki, wszystkie karty i historia zmian — do czytania) oraz JSON (do przywrócenia systemu). Przy pierwszej kopii przeglądarka może zapytać o zgodę na pobieranie wielu plików — zezwól.</p>
+      <p class="small">${auto ? (live ? html`Następna kopia: <b>${nextHalfHour()}</b>` : 'Żaden turniej nie trwa — kopie ruszą po otwarciu turnieju.') : 'Automatyczne kopie są wyłączone.'}
+        ${last ? ` · ostatnia: ${last.replace('_', ' ').replace(/-(\d\d)$/, ':$1')}` : ''}</p>
+      <div class="row-actions left">
+        <button class="btn" onClick=${nowXLSX} disabled=${busy === 'xlsx'}><${Icon} name="download" />Pobierz teraz — Excel</button>
+        <button class="btn" onClick=${nowJSON}><${Icon} name="file-json" />Pobierz teraz — JSON</button>
+      </div>
+    </section>
 
     <section class="panel form">
       <h3><${Icon} name="key" size=${17} />Kod dostępu supervisora</h3>
@@ -829,58 +1064,18 @@ export function SystemPage({ go, remote, ChangeCodeForm }) {
         : html`<p class="muted small">W wersji demonstracyjnej przekazanie dostępu jest wyłączone — działa w wersji produkcyjnej.</p>`}
     </section>
 
-    <section class="panel form">
-      <h3><${Icon} name="download" size=${17} />Kopia na tym komputerze</h3>
-      <label class="check big"><span class="switch"><input type="checkbox" checked=${auto} onChange=${(e) => toggleAuto(e.currentTarget.checked)} /><span></span></span>
-        Zapisuj kopię automatycznie co godzinę o :30 (11:30, 12:30, 13:30…)</label>
-      <p class="muted small">Działa, gdy trwa turniej i panel supervisora jest otwarty. Przeglądarka zapisze w folderze „Pobrane” dwa pliki:
-        Excel (wyniki, wszystkie karty i historia zmian — do czytania) oraz JSON (do przywrócenia systemu). Przy pierwszej kopii przeglądarka może zapytać o zgodę na pobieranie wielu plików — zezwól.</p>
-      <p class="small">${auto ? (live ? html`Następna kopia: <b>${nextHalfHour()}</b>` : 'Żaden turniej nie trwa — kopie ruszą po otwarciu turnieju.') : 'Automatyczne kopie są wyłączone.'}
-        ${last ? ` · ostatnia: ${last.replace('_', ' ').replace(/-(\d\d)$/, ':$1')}` : ''}</p>
-      <div class="row-actions left">
-        <button class="btn" onClick=${nowXLSX} disabled=${busy === 'xlsx'}><${Icon} name="download" />Pobierz teraz — Excel</button>
-        <button class="btn" onClick=${nowJSON}><${Icon} name="file-json" />Pobierz teraz — JSON</button>
-      </div>
-    </section>
-
-    ${LIVE ? html`<section class="panel form">
-      <h3><${Icon} name="history" size=${17} />Kopie w bazie danych</h3>
-      <p class="muted small">Baza zapisuje kopię całego systemu co godzinę o :30, jeśli od poprzedniej coś się zmieniło. Kopie automatyczne są przechowywane przez tydzień, ręczne — na stałe.</p>
-      <div class="row-actions left">
-        <button class="btn primary" onClick=${make} disabled=${busy === 'make'}><${Icon} name="check" />${busy === 'make' ? 'Zapisuję…' : 'Zrób kopię teraz'}</button>
-        <button class="btn ghost" onClick=${loadBackups}><${Icon} name="refresh" size=${16} />Odśwież listę</button>
-      </div>
-      ${backups == null ? html`<p class="muted small">Wczytywanie listy…</p>` : !backups.length ? html`<p class="empty-line">Brak kopii — pierwsza powstanie automatycznie o najbliższej :30 albo po kliknięciu „Zrób kopię teraz”.</p>` : html`
-      <div class="table-wrap"><table class="history backups">
-        <thead><tr><th>Data i godzina</th><th>Rodzaj</th><th class="num">Turnieje</th><th class="num">Karty</th><th class="num">Rozmiar</th><th class="w-act"><span class="sr">Akcje</span></th></tr></thead>
-        <tbody>${backups.map((b) => html`<tr key=${b.id}>
-          <td class="mono">${new Date(b.created_at).toLocaleString('pl-PL')}</td>
-          <td>${KIND_LABEL[b.kind] || b.kind}</td>
-          <td class="num">${b.tournaments}</td><td class="num">${b.entries}</td><td class="num">${sizeLabel(b.size_bytes || 0)}</td>
-          <td class="w-act">
-            <button class="btn sm" onClick=${() => fetchBackup(b, 'xlsx')} disabled=${!!busy}>Excel</button>
-            <button class="btn sm" onClick=${() => fetchBackup(b, 'json')} disabled=${!!busy}>JSON</button>
-            <button class="btn sm danger" onClick=${() => restore(b)} disabled=${!!busy}>Przywróć</button>
-          </td></tr>`)}</tbody>
-      </table></div>`}
-    </section>` : null}
-
-    <section class="panel form">
-      <h3><${Icon} name="upload" size=${17} />Przywróć z pliku</h3>
-      <p class="muted small">Wczytaj plik JSON z kopii (np. zapisanej automatycznie na tym komputerze). Obecne dane zostaną zastąpione${LIVE ? ', a system wcześniej sam zapisze kopię bieżącego stanu' : ''}.</p>
-      <div class="row-actions left">
-        <label class="btn"><${Icon} name="upload" />Wybierz plik kopii (.json)<input type="file" accept="application/json,.json" class="sr" onChange=${(e) => restoreFile(e.currentTarget.files[0])} /></label>
-      </div>
-    </section>
-
     <section class="panel safety">
       <h3><${Icon} name="info" size=${17} />Co się dzieje przy awarii</h3>
       <ul>
         <li><b>Brak internetu u sędziego:</b> oceny zapisują się w jego przeglądarce i wysyłają same, gdy połączenie wróci. Pasek u góry pokazuje, ile zmian czeka.</li>
         <li><b>Po każdym seansie</b> sędzia może pobrać swoją kartę do PDF (z miejscem na podpis) albo do Excela.</li>
         <li><b>Co godzinę o :30</b> baza zapisuje kopię całego systemu, a komputer supervisora — pliki Excel i JSON.</li>
+        <li><b>Coś się popsuło w danych:</b> w podglądzie kopii przejdź godzina po godzinie i przywróć ostatni dobry stan.</li>
         <li><b>Awaria bazy:</b> po jej przywróceniu wczytaj ostatnią kopię (z bazy albo z pliku) — oceny, które nie zdążyły się wysłać, dośle przeglądarka sędziego.</li>
       </ul>
     </section>
+
+    ${preview ? html`<${BackupPreview} items=${preview.items} start=${preview.start} onRestore=${setToRestore} onClose=${() => setPreview(null)} />` : null}
+    ${toRestore ? html`<${RestoreDialog} item=${toRestore} remote=${remote} onRestore=${doRestore} onClose=${() => setToRestore(null)} />` : null}
   </div>`;
 }

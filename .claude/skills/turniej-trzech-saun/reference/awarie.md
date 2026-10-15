@@ -10,7 +10,7 @@ i w kopiach (baza co godzinę o :30 + pliki na komputerze supervisora). Nie czy�
 2. Zaloguj się w aplikacji jako supervisor — wczytują się turnieje.
 3. Turniej ma status „W trakcie” (Ustawienia), zawodnicy mają godziny startu, sędziowie mają kody
    (wydruk: „Sędziowie i kody” → „Drukuj kody”).
-4. Na komputerze supervisora: „Kod dostępu i kopie” → włączone automatyczne pobieranie kopii o :30.
+4. Na komputerze supervisora: „Kopie i przywracanie” → włączone automatyczne pobieranie kopii o :30.
 5. Każdy laptop sędziego: zaloguj kodem, wpisz próbnie i usuń jedną ocenę (znacznik w pasku górnym: „Zapisano”).
 6. Zapas: wydrukowane papierowe karty oceny na wypadek całkowitej awarii.
 
@@ -30,10 +30,28 @@ i w kopiach (baza co godzinę o :30 + pliki na komputerze supervisora). Nie czy�
 | Supervisor wylogowany z komunikatem o zmianie kodu | kod zmieniono na innym urządzeniu (albo reset przez administratora) | zalogować się aktualnym kodem |
 | Wszyscy: „Brak połączenia z bazą danych” przy logowaniu, a internet działa | projekt Supabase uśpiony lub awaria Supabase | panel Supabase → Restore project; status: https://status.supabase.com; w razie dłuższej awarii — papierowe karty, potem wpisanie ocen |
 | Biały ekran / „Ładowanie…” bez końca po wdrożeniu | przeglądarka połączyła stare i nowe pliki (cache do 10 min) albo błąd w kodzie | **Ctrl+F5**; jeśli nadal — konsola (F12) pokaże błąd; natychmiast `git revert --no-edit HEAD && git push`, potem Ctrl+F5 |
-| Błędne lub skasowane dane (np. usunięty zawodnik z ocenami) | pomyłka w panelu | supervisor: „Kod dostępu i kopie” → lista kopii → „Przywróć” wybraną (bieżący stan zapisze się najpierw jako „sprzed przywrócenia”); albo „Przywróć z pliku” z kopii JSON z komputera |
+| Błędne lub skasowane dane (np. usunięty zawodnik z ocenami, „zniknęły” karty) | pomyłka w panelu albo błąd | procedura „Przywracanie danych z wybranej godziny” niżej |
 | Sędzia wpisał ocenę złemu zawodnikowi | — | sędzia poprawia sam (karty są edytowalne, dopóki turniej nie jest „Zakończony”); każda zmiana jest w „Historii zmian” |
 | Pięciu sędziów zamiast czterech | — | supervisor: wyniki → zawodnik → odznaczyć „Liczy się” przy wybranej karcie |
 | Wyniki trzeba zamrozić | koniec konkurencji | Ustawienia → status „Zakończony” (karty tylko do odczytu); można cofnąć na „W trakcie” |
+
+## Przywracanie danych z wybranej godziny
+
+1. Supervisor: menu boczne turnieju → **„Kopie i przywracanie”** (albo na liście turniejów „Kopie zapasowe i kod dostępu”).
+2. Na liście kopii kolumna **„Zmiana”** pokazuje, ile kart przybyło lub ubyło od poprzedniej kopii — ujemna
+   liczba (na czerwono) to pierwszy trop, kiedy coś się popsuło.
+3. **„Podgląd”** przy wybranej kopii → wybierz turniej i konkurencję. Podgląd pokazuje wynik w kopii, wynik teraz
+   i różnicę (wiersze z różnicą są zaznaczone) oraz liczby kart, zmian w historii i głosów.
+   Strzałkami **„Wcześniejsza / Późniejsza”** przechodzisz godzina po godzinie i szukasz ostatniego dobrego stanu.
+4. **„Przywróć ten stan…”** → wpisz **kod supervisora** (ten sam co przy logowaniu) → „Przywróć ten stan”.
+   - Najpierw zapisze się kopia bieżącego stanu („sprzed przywrócenia”) — przywrócenie można cofnąć tą samą drogą.
+   - Zastąpione zostają WSZYSTKIE turnieje (zwykle trwa tylko jeden, więc to bez znaczenia).
+   - Sędziowie zostaną wylogowani — logują się ponownie tymi samymi kodami; ich niewysłane oceny dojdą po zalogowaniu.
+5. Ten sam przebieg dla pliku: „Przywróć z pliku” → wybierz JSON (np. z folderu „Pobrane” komputera supervisora)
+   → podgląd → przywrócenie z kodem.
+
+Kopia powstaje o :30 tylko wtedy, gdy od poprzedniej coś się zmieniło — brak kopii z danej godziny jest normalny.
+Przed ryzykowną operacją w panelu warto kliknąć „Zrób kopię teraz”.
 
 ## Gdy trzeba poprawić kod w trakcie zawodów
 
@@ -46,5 +64,5 @@ i w kopiach (baza co godzinę o :30 + pliki na komputerze supervisora). Nie czy�
 
 Kopia JSON (`tts-backup-1`) i Excel z komputera supervisora zawierają wszystkie karty. Excel ma arkusze
 wyników i kart — w ostateczności wyniki można policzyć w arkuszu. Kopie z bazy pobiera się na stronie
-„Kod dostępu i kopie” (Excel / JSON), a administrator może je też odczytać w SQL Editorze
+„Kopie zapasowe i kod dostępu” (Excel / JSON), a administrator może je też odczytać w SQL Editorze
 (`select data from public.tts_backups where id = …;`).
