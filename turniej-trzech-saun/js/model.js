@@ -171,6 +171,23 @@ export function entryStats(card, entry) {
   return { cats, total, filled, required, started: any, complete: status === 'complete', status };
 }
 
+// Feedback sędziego: szkic (approved: false) albo zatwierdzony. Do zbiorczego PDF dla zawodnika
+// trafia wyłącznie feedback zatwierdzony i niepusty.
+export const feedbackState = (e) => (!e || !e.fb ? 'none' : e.fb.approved ? 'approved' : 'draft');
+export const fbApproved = (e) => !!(e && e.fb && e.fb.approved && (e.fb.sections || []).some((s) => (s.text || '').trim()));
+export function approvedFeedback(t, cid) {
+  const out = [];
+  for (const d of disciplinesOf(t)) {
+    const card = t.cards[d];
+    if (!card) continue;
+    for (const j of t.judges) {
+      const e = getEntry(t, d, cid, j.id);
+      if (fbApproved(e)) out.push({ disc: d, judge: j, fb: e.fb, stats: { ...entryStats(card, e), max: cardMax(card) } });
+    }
+  }
+  return out;
+}
+
 export const excludedKey = (disc, cid, jid) => `${disc}|${cid}|${jid}`;
 export const dqKey = (disc, cid) => `${disc}|${cid}`;
 export const getEntry = (t, disc, cid, jid) => t.scores?.[disc]?.[cid]?.[jid];

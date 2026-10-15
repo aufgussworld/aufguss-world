@@ -118,8 +118,9 @@ z podłączonym repo `aufgussworld/aufguss-world` (opis w tym samym pliku).
 | Zasady punktacji, ranking, ex aequo, głosy publiczności | `js/model.js` (+ eksporty w `pdf.js`, `backup.js`) |
 | Wygląd, kolory, odstępy | `css/app.css` (tokeny na górze pliku) |
 | Teksty w panelu supervisora / sędziego | `js/supervisor.js` / `js/judge.js` |
-| Wydruki PDF (karta, wyniki, feedback, ranking publiczności) | `js/pdf.js` |
-| Generator feedbacku (szablony zdań) | `js/feedback.js` |
+| Wydruki PDF (karta, wyniki, zbiorczy feedback zawodnika, ranking publiczności) | `js/pdf.js` |
+| Generator feedbacku (szablony zdań), okno szkic / zatwierdź / usuń | `js/feedback.js` |
+| Wysłać zawodnikom feedback po turnieju | w aplikacji: supervisor → „Feedback zawodników” → „Pobierz wszystkie — ZIP” (albo PDF przy zawodniku) → pliki do maili |
 | Dane przykładowe demo | `js/seed.js` — po zmianie podbij `SEED_VERSION` |
 | Funkcję lub uprawnienia w bazie | `supabase/setup.sql` w tym skillu → użytkownik uruchamia zmieniony fragment w SQL Editorze → commit |
 | Przywrócić dane z wybranej godziny | w aplikacji: supervisor → „Kopie i przywracanie” → „Podgląd” → strzałki między godzinami → „Przywróć ten stan…” → kod supervisora |
@@ -147,6 +148,12 @@ Najpierw zawsze: co dokładnie widzi użytkownik (treść komunikatu) i na ilu u
 ## Dziennik zmian
 
 Najnowsze na górze. Każdy wpis: data — co — dlaczego.
+
+- **2026-10-15** — Feedback zbiorczy: sędzia tylko zapisuje szkic, zatwierdza albo usuwa feedback (bez PDF); supervisor w nowej
+  zakładce „Feedback zawodników” pobiera dla każdego zawodnika jeden PDF z zatwierdzonymi opiniami wszystkich sędziów (każda na
+  osobnej stronie; w finale ze wszystkich trzech dni) albo wszystkie pliki naraz w ZIP. Pole `fb.approved` / `fb.approvedAt`
+  (bez zmian w bazie — `fb` to jsonb). Dane demo z przykładowym feedbackiem (SEED_VERSION 3). Instrukcja dla sędziów: rozdział 8
+  przepisany, nowe zrzuty okna feedbacku. Powód: zawodnik ma dostać po turnieju jeden plik z opiniami wszystkich sędziów.
 
 - **2026-10-15** — Instrukcja obsługi dla sędziów (`turniej-trzech-saun/instrukcja/`, 14 rozdziałów, zrzuty z demo,
   wersja do druku); przycisk „Instrukcja” w górnym pasku sędziego i odnośnik pod logowaniem sędziego; ikona `book`.

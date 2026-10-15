@@ -5,12 +5,13 @@ import { html, useEffect, useRef, useState } from './lib.js';
 import {
   DISCIPLINES, TYPES, STATUS, FINAL_ORDER, disciplinesOf, fullName, fmt, fmtAvg, fmtDate, fmtRange, fmtStamp,
   entryStats, getEntry, contestantDisc, disciplineResults, finalResults, audienceStats, audienceRanking, orderedContestants,
-  startOf, findItem, parseScore, cardMax, excludedKey, dqKey, toCSV, download, prettyCode, plural,
+  startOf, findItem, parseScore, cardMax, excludedKey, dqKey, toCSV, download, prettyCode, plural, feedbackState, fbApproved, approvedFeedback,
 } from './model.js';
 import { store, updateT, deleteTournament, LIVE } from './store.js';
 import { Icon, Avatar, DiscBadge, StatusIcon, Segmented, Modal, Empty, LiveDot, toast } from './ui.js';
 import { ScoreCard, CompareView } from './judge.js';
-import { resultsPDF, audiencePDF } from './pdf.js';
+import { resultsPDF, audiencePDF, contestantFeedbackPDF, feedbackZip } from './pdf.js';
+import { FeedbackModal } from './feedback.js';
 import { ContestantsEditor, JudgesEditor, CardEditor, QualifierImport } from './editors.js';
 import {
   toSnapshot, fromSnapshot, downloadJSON, backupWorkbook, stamp, autoBackupEnabled, setAutoBackup, lastAutoBackup,
@@ -94,6 +95,7 @@ const NAV = [
   ['porownanie', 'Porównanie', 'columns'],
   ['historia', 'Historia zmian', 'history'],
   ['publicznosc', 'Głosy publiczności', 'megaphone'],
+  ['feedback', 'Feedback zawodników', 'message'],
   null,
   ['zawodnicy', 'Zawodnicy i starty', 'users'],
   ['sedziowie', 'Sędziowie i kody', 'gavel'],
@@ -128,6 +130,7 @@ export function TournamentView({ t, tab = 'wyniki', go }) {
       ${tab === 'porownanie' ? html`<${CompareTab} t=${t} />` : null}
       ${tab === 'historia' ? html`<${HistoryTab} t=${t} />` : null}
       ${tab === 'publicznosc' ? html`<${AudienceTab} t=${t} />` : null}
+      ${tab === 'feedback' ? html`<${FeedbackTab} t=${t} />` : null}
       ${tab === 'zawodnicy' ? html`<div class="page"><div class="page-head"><h1>Zawodnicy i starty</h1>
           <p class="muted">Po losowaniu ustal kolejność oraz dzień i godzinę startu — sędziowie zobaczą zawodników w tej kolejności, ze zdjęciem i godziną.</p></div>
           ${t.type === 'final' ? html`<${QualifierImport} t=${t} update=${update} />` : null}
@@ -387,9 +390,9 @@ function MatrixTab({ t }) {
                 return html`<td key=${j.id} class="mx-cell">
                   ${s.started
                     ? html`<button class=${`mx-btn s-${s.status} ${ex ? 'ex' : ''}`} onClick=${() => setOpen({ cid: c.id, jid: j.id })}
-                        aria-label=${`${fullName(j)} — ${fullName(c)}: ${fmt(s.total, true)} pkt${ex ? ', nie liczy się' : ''}${e?.fb ? ', feedback gotowy' : ''}`}>
+                        aria-label=${`${fullName(j)} — ${fullName(c)}: ${fmt(s.total, true)} pkt${ex ? ', nie liczy się' : ''}${e?.fb ? (e.fb.approved ? ', feedback zatwierdzony' : ', szkic feedbacku') : ''}`}>
                         <${StatusIcon} status=${s.status} size=${15} /><span>${fmt(s.total, true)}</span>
-                        ${e?.fb ? html`<${Icon} name="file-text" size=${14} cls="mx-fb" />` : null}</button>`
+                        ${e?.fb ? html`<${Icon} name=${e.fb.approved ? 'file-text' : 'pencil'} size=${14} cls=${'mx-fb ' + (e.fb.approved ? 'ok' : 'draft')} />` : null}</button>`
                     : html`<span class="mx-empty" aria-label="brak karty">·</span>`}
                 </td>`;
               })}
@@ -403,11 +406,113 @@ function MatrixTab({ t }) {
     <p class="legend muted small">
       <${StatusIcon} status="complete" size=${14} withLabel /> <${StatusIcon} status="partial" size=${14} withLabel />
       <span class="lg-ex">12,5</span> nie liczy się do wyniku
-      <span class="lg-fb"><${Icon} name="file-text" size=${14} /> sędzia przygotował feedback</span>
+      <span class="lg-fb"><${Icon} name="file-text" size=${14} /> feedback zatwierdzony</span>
+      <span class="lg-fb draft"><${Icon} name="pencil" size=${14} /> szkic feedbacku</span>
     </p>
     ${open ? html`<${CardModal} t=${t} disc=${disc} cid=${open.cid} jid=${open.jid} onClose=${() => setOpen(null)} />` : null}
   </div>`;
 }
+
+// ---------- feedback dla zawodników ----------
+
+// Sędziowie zatwierdzają feedback na swoich kartach; supervisor pobiera dla każdego zawodnika jeden PDF
+// z opiniami wszystkich sędziów (każda na osobnej stronie). Szkice niezatwierdzone nie trafiają do pliku.
+function FeedbackTab({ t }) {
+  const discs = disciplinesOf(t);
+  const [disc, setDisc] = useState(discs[0]);
+  const [open, setOpen] = useState(null); // { cid, jid }
+  const [busy, setBusy] = useState(null); // id zawodnika albo 'zip'
+  const [progress, setProgress] = useState('');
+  const card = t.cards[disc];
+  const list = orderedContestants(t, disc);
+  const inPdf = new Map(t.contestants.map((c) => [c.id, approvedFeedback(t, c.id).length]));
+  const ready = [...inPdf.values()].filter((n) => n > 0).length;
+  let approved = 0, drafts = 0, missing = 0;
+  for (const d of discs) {
+    for (const c of t.contestants) {
+      for (const j of t.judges) {
+        const e = getEntry(t, d, c.id, j.id);
+        if (!entryStats(t.cards[d], e).started) continue;
+        if (fbApproved(e)) approved++;
+        else if (feedbackState(e) === 'draft') drafts++;
+        else missing++;
+      }
+    }
+  }
+  const one = async (c) => {
+    setBusy(c.id);
+    try { await contestantFeedbackPDF(t, c.id); } catch (e) { console.error(e); toast(e.message || 'Nie udało się przygotować pliku PDF', 'err'); } finally { setBusy(null); }
+  };
+  const all = async () => {
+    setBusy('zip');
+    try {
+      const n = await feedbackZip(t, (i, total) => setProgress(`${i} z ${total}`));
+      toast(`Gotowe — ${n} ${plural(n, 'plik', 'pliki', 'plików')} PDF w archiwum ZIP`);
+    } catch (e) {
+      console.error(e);
+      toast(e.message || 'Nie udało się przygotować archiwum', 'err');
+    } finally {
+      setBusy(null);
+      setProgress('');
+    }
+  };
+
+  return html`<div class="page">
+    <div class="page-head row">
+      <div><h1>Feedback dla zawodników</h1>
+        <p class="muted">Sędziowie przygotowują feedback na swoich kartach i go zatwierdzają. Zbiorczy PDF zawodnika zawiera opinie wszystkich sędziów, którzy zatwierdzili feedback — każdą na osobnej stronie. Szkice niezatwierdzone nie trafiają do pliku.</p></div>
+      <div class="actions">
+        <button class="btn primary" onClick=${all} disabled=${!!busy || !ready}>
+          <${Icon} name="download" />${busy === 'zip' ? `Przygotowuję ${progress}…` : `Pobierz wszystkie — ZIP (${ready})`}</button>
+      </div>
+    </div>
+    <div class="kpis">
+      <${Kpi} label="Zatwierdzone opinie" value=${approved} sub="trafią do plików PDF" />
+      <${Kpi} label="Szkice" value=${drafts} sub=${drafts ? 'czekają na zatwierdzenie przez sędziów' : 'brak'} tone=${drafts ? 'warn' : ''} />
+      <${Kpi} label="Karty bez feedbacku" value=${missing} sub="oceniona karta, brak opinii" />
+      <${Kpi} label="Zawodnicy z plikiem" value=${`${ready} / ${t.contestants.length}`} sub="co najmniej jedna zatwierdzona opinia" />
+    </div>
+    ${discs.length > 1 ? html`<div class="toolbar"><${Segmented} label="Konkurencja" value=${disc} onChange=${setDisc} options=${discOptions(t)} />
+      <span class="muted small">Plik PDF zawodnika obejmuje opinie ze wszystkich trzech dni finału.</span></div>` : null}
+    <div class="table-wrap">
+      <table class=${'matrix fbm d-' + disc}>
+        <thead><tr><th>Zawodnik</th>
+          ${t.judges.map((j) => html`<th key=${j.id} class="mx-j"><span>${fullName(j)}</span></th>`)}
+          <th class="num">Opinie w PDF</th><th class="w-act"><span class="sr">Plik</span></th></tr></thead>
+        <tbody>
+          ${list.map((c) => {
+            const st = startOf(c, disc);
+            const n = inPdf.get(c.id) || 0;
+            return html`<tr key=${c.id}>
+              <th scope="row"><div class="who"><${Avatar} c=${c} size=${30} /><span><b>${fullName(c)}</b><small>${st.date ? `${fmtDate(st.date)}, ${st.time || ''}` : ''}</small></span></div></th>
+              ${t.judges.map((j) => {
+                const e = getEntry(t, disc, c.id, j.id);
+                if (!entryStats(card, e).started) return html`<td key=${j.id} class="mx-cell"><span class="mx-empty" aria-label="nie oceniał">·</span></td>`;
+                const s = fbApproved(e) ? 'ok' : feedbackState(e) === 'draft' ? 'draft' : 'none';
+                return html`<td key=${j.id} class="mx-cell">${s === 'none'
+                  ? html`<span class="fbx none" title="Sędzia ocenił, ale nie przygotował feedbacku">—</span>`
+                  : html`<button class=${'fbx ' + s} onClick=${() => setOpen({ cid: c.id, jid: j.id })}
+                      aria-label=${`${fullName(j)} — ${fullName(c)}: ${s === 'ok' ? 'feedback zatwierdzony' : 'szkic feedbacku'}`}
+                      title=${s === 'ok' ? 'Zatwierdzony — kliknij, aby przeczytać' : 'Szkic niezatwierdzony — kliknij, aby przeczytać'}>
+                      <${Icon} name=${s === 'ok' ? 'check' : 'pencil'} size=${15} /></button>`}</td>`;
+              })}
+              <td class="num"><span class="fb-n">${n}</span></td>
+              <td class="w-act"><button class="btn sm" onClick=${() => one(c)} disabled=${!n || !!busy}>
+                <${Icon} name="file-text" size=${15} />${busy === c.id ? 'Przygotowuję…' : 'PDF'}</button></td>
+            </tr>`;
+          })}
+        </tbody>
+      </table>
+    </div>
+    <p class="legend muted small">
+      <span class="fbx ok"><${Icon} name="check" size=${14} />zatwierdzony</span> trafi do PDF
+      <span class="fbx draft"><${Icon} name="pencil" size=${14} />szkic</span> nie trafi do PDF, dopóki sędzia go nie zatwierdzi
+      <span class="fbx none">—</span> sędzia ocenił, ale nie przygotował feedbacku · <b>·</b> sędzia nie oceniał. Kliknij opinię, aby ją przeczytać.
+    </p>
+    ${open ? html`<${FeedbackModal} t=${t} disc=${disc} cid=${open.cid} jid=${open.jid} readOnly onClose=${() => setOpen(null)} />` : null}
+  </div>`;
+}
+
 
 // ---------- porównanie oczami sędziego ----------
 

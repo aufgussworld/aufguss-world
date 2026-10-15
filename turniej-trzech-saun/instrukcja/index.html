@@ -174,7 +174,7 @@
       <div>
         <p class="eyebrow">Turniej Trzech Saun · system sędziowski</p>
         <h1>Instrukcja obsługi dla sędziów</h1>
-        <p class="lead">Wszystko, czego potrzebujesz, żeby sprawnie oceniać ceremonie na laptopie: logowanie, wpisywanie punktów, uwagi, karta PDF, feedback dla zawodnika i co robić, gdy zniknie internet.</p>
+        <p class="lead">Wszystko, czego potrzebujesz, żeby sprawnie oceniać ceremonie na laptopie: logowanie, wpisywanie punktów, uwagi, karta PDF, zatwierdzanie feedbacku dla zawodnika i co robić, gdy zniknie internet.</p>
       </div>
       <div class="hero-actions">
         <a class="btn solid" href="../">Przejdź do systemu <svg class="ic"><use href="#i-arrow"/></svg></a>
@@ -216,6 +216,7 @@
           <li><svg class="ic"><use href="#i-check"/></svg><span><kbd>Enter</kbd> przenosi do następnego pola, <kbd>Esc</kbd> cofa zmianę.</span></li>
           <li><svg class="ic"><use href="#i-check"/></svg><span>Znacznik <span class="chip ok"><svg class="ic"><use href="#i-check"/></svg>Zapisano</span> u góry = wszystko jest w bazie.</span></li>
           <li><svg class="ic"><use href="#i-check"/></svg><span>Po seansie możesz pobrać swoją <b>kartę PDF</b> do podpisu.</span></li>
+          <li><svg class="ic"><use href="#i-check"/></svg><span>Feedback dla zawodnika: przygotuj szkic, popraw i <b>zatwierdź</b> — plik PDF dla zawodnika robi supervisor.</span></li>
         </ul>
       </div>
 
@@ -278,7 +279,7 @@
           <li><b class="k">2</b><span><b>Stan karty</b> i Twoja suma punktów. Kliknij zawodnika, aby otworzyć jego kartę.</span></li>
           <li><b class="k">3</b><span><b>Zawodnik:</b> numer startowy, dzień i godzina startu, czas ceremonii.</span></li>
           <li><b class="k">4</b><span><b>Twoja ocena:</b> suma na bieżąco, postęp wypełniania i godzina ostatniego zapisu.</span></li>
-          <li><b class="k">5</b><span><b>Karta PDF, Excel</b> i <b>Feedback dla zawodnika</b> (rozdziały <a href="#karta">7</a> i <a href="#feedback">8</a>).</span></li>
+          <li><b class="k">5</b><span><b>Karta PDF, Excel</b> i <b>Feedback dla zawodnika</b> — szkic, zatwierdzenie (rozdziały <a href="#karta">7</a> i <a href="#feedback">8</a>).</span></li>
           <li><b class="k">6</b><span><b>Uwaga do pozycji</b> — ikona notatnika (rozdział <a href="#uwagi">5</a>).</span></li>
           <li><b class="k">7</b><span><b>Pole oceny</b> — obok widać dozwolony zakres, np. 0–2.</span></li>
         </ul>
@@ -395,30 +396,46 @@
 
       <section id="feedback">
         <h2 class="sec"><span class="n">8</span>Feedback dla zawodnika</h2>
-        <p>Feedback to opisowa ocena seansu z Twojego punktu widzenia, którą zawodnik może dostać w PDF. System przygotowuje szkic na podstawie Twoich ocen i uwag — Ty go czytasz, poprawiasz i zapisujesz.</p>
+        <p>Feedback to opisowa ocena seansu z Twojego punktu widzenia. System przygotowuje szkic na podstawie Twoich ocen i uwag — Ty go czytasz, poprawiasz i <b>zatwierdzasz</b>. Po turnieju supervisor przygotowuje dla każdego zawodnika <b>jeden plik PDF</b> z opiniami wszystkich sędziów, którzy zatwierdzili feedback, i wysyła go zawodnikowi.</p>
         <ol class="steps">
           <li>Na karcie zawodnika kliknij <b>„Feedback dla zawodnika”</b> (przycisk działa, gdy karta ma już oceny).</li>
           <li>Kliknij <b>„Przygotuj szkic feedbacku”</b>. Jeśli karta nie jest kompletna, system Cię o tym uprzedzi.</li>
-          <li>Przeczytaj szkic i popraw, co chcesz — możesz zmieniać tytuły i treść każdej sekcji. Linie zaczynające się od „• ” w PDF staną się listą punktowaną.</li>
-          <li>Kliknij <b>„Zapisz”</b>, a potem <b>„Pobierz PDF”</b>.</li>
+          <li>Przeczytaj szkic i popraw, co chcesz — możesz zmieniać tytuły i treść każdej sekcji. Linie zaczynające się od „• ” w pliku PDF staną się listą punktowaną.</li>
+          <li>Gdy treść jest gotowa, kliknij <b>„Zatwierdź feedback”</b>. Tylko zatwierdzony feedback trafi do pliku dla zawodnika.</li>
         </ol>
         <figure>
-          <div class="shot"><img src="img/08-feedback-start.png" width="1560" height="581" alt="Okno feedbacku przed przygotowaniem szkicu z przyciskiem „Przygotuj szkic feedbacku”" loading="lazy"></div>
+          <div class="shot"><img src="img/08-feedback-start.png" width="1560" height="580" alt="Okno feedbacku przed przygotowaniem szkicu z przyciskiem „Przygotuj szkic feedbacku”" loading="lazy"></div>
           <figcaption>Okno feedbacku przed przygotowaniem szkicu.</figcaption>
         </figure>
         <figure>
-          <div class="shot"><img src="img/09-feedback-szkic.png" width="1560" height="875" alt="Szkic feedbacku z sekcjami Podsumowanie, Profesjonalizm, Show do edycji" loading="lazy"></div>
-          <figcaption>Szkic feedbacku — każdą sekcję można edytować.</figcaption>
+          <div class="shot"><img src="img/09-feedback-szkic.png" width="1560" height="950" alt="Szkic feedbacku z oznaczeniem „Szkic — niezatwierdzony” i sekcjami do edycji" loading="lazy"></div>
+          <figcaption>Zapisany szkic — znaczek „Szkic — niezatwierdzony” przypomina, że feedback nie trafi jeszcze do pliku dla zawodnika.</figcaption>
         </figure>
         <figure>
-          <div class="shot"><img src="img/10-feedback-przyciski.png" width="1560" height="83" alt="Przyciski na dole okna feedbacku: Przygotuj szkic od nowa, Zapisz, Pobierz PDF" loading="lazy"></div>
-          <figcaption>Na dole okna: „Przygotuj szkic od nowa” (zastępuje Twoje poprawki), „Zapisz” i „Pobierz PDF”.</figcaption>
+          <div class="shot"><img src="img/10-feedback-przyciski.png" width="1560" height="83" alt="Przyciski na dole okna feedbacku: Przygotuj szkic od nowa, Usuń feedback, Zapisz szkic, Zatwierdź feedback" loading="lazy"></div>
+          <figcaption>Przyciski na dole okna feedbacku.</figcaption>
         </figure>
+        <table class="simple">
+          <thead><tr><th>Przycisk</th><th>Co robi</th></tr></thead>
+          <tbody>
+            <tr><td><b>Zatwierdź feedback</b></td><td>Zapisuje ostateczną wersję. Zatwierdzony feedback supervisor dołączy do pliku PDF dla zawodnika.</td></tr>
+            <tr><td><b>Zapisz szkic</b></td><td>Zachowuje tekst, żeby wrócić do niego później — <b>szkic nie trafia</b> do pliku dla zawodnika.</td></tr>
+            <tr><td><b>Usuń feedback</b></td><td>Usuwa zapisany feedback (szkic albo zatwierdzony). Tej operacji nie można cofnąć.</td></tr>
+            <tr><td><b>Przygotuj szkic od nowa</b></td><td>Tworzy nowy szkic z aktualnych ocen i uwag — zastępuje tekst w oknie.</td></tr>
+          </tbody>
+        </table>
+        <p>Stan feedbacku widać na przycisku na karcie zawodnika:</p>
         <ul>
-          <li>Zapisany feedback zobaczysz pod przyciskiem <b>„Feedback — edytuj”</b>; możesz do niego wrócić w każdej chwili.</li>
-          <li>Przy zamykaniu okna z niezapisanymi zmianami system zapyta, czy na pewno je porzucić.</li>
-          <li>Zapisany feedback widzi też supervisor.</li>
+          <li><b>„Feedback dla zawodnika”</b> — jeszcze nie przygotowany;</li>
+          <li><b>„Feedback — szkic”</b> (żółty) — zapisany, ale niezatwierdzony;</li>
+          <li><b>„Feedback zatwierdzony”</b> (zielony) — gotowy, trafi do pliku dla zawodnika.</li>
         </ul>
+        <div class="box info"><svg class="ic"><use href="#i-info"/></svg>
+          <div>
+            <p><b>Nie pobierasz PDF z feedbackiem</b> — plik dla zawodnika przygotowuje supervisor. Każda opinia jest w nim na osobnej stronie, z imieniem i nazwiskiem sędziego oraz jego oceną w kategoriach.</p>
+            <p>Zatwierdzony feedback możesz jeszcze poprawić: zmień tekst i kliknij „Zatwierdź feedback” ponownie. Feedback możesz przygotować także po zakończeniu turnieju, gdy karta jest już tylko do odczytu.</p>
+          </div>
+        </div>
       </section>
 
       <section id="porownanie">
@@ -504,6 +521,8 @@
           <div><p>Przeczytaj czerwony komunikat pod polem. Najczęściej to minus w polu kary, liczba większa niż zakres albo dwie cyfry po przecinku (rozdział <a href="#oceny">4</a>).</p></div></details>
         <details><summary>Strona się nie ładuje albo jest biała.</summary>
           <div><p>Sprawdź internet i naciśnij <kbd>Ctrl</kbd> + <kbd>F5</kbd> (twarde odświeżenie). Jeśli to nie pomaga — zgłoś supervisorowi. Twoje oceny są zapisane w bazie.</p></div></details>
+        <details><summary>Jak wysłać zawodnikowi PDF z moim feedbackiem?</summary>
+          <div><p>Nie musisz — wystarczy, że zatwierdzisz feedback. Supervisor przygotowuje dla każdego zawodnika jeden plik z opiniami wszystkich sędziów i wysyła go po turnieju. Szkic (niezatwierdzony) do pliku nie trafi.</p></div></details>
         <details><summary>Czy inni sędziowie widzą moje oceny?</summary>
           <div><p>Nie. Widzisz wyłącznie własne karty. Supervisor widzi karty wszystkich sędziów na bieżąco.</p></div></details>
         <details><summary>Czy mogę oceniać na telefonie lub tablecie?</summary>

@@ -30,8 +30,8 @@
 | `js/editors.js` | edytory: zawodnicy i harmonogram startów, import finalistów z eliminacji, sędziowie i kody (+ wydruk kodów PDF), edytor karty oceny |
 | `js/judge.js` | panel sędziego: karta ocen (`ScoreCard`), pola z walidacją, uwagi do pozycji i kategorii, eksport karty PDF/Excel, porównanie zawodników, „Mój ranking” |
 | `js/supervisor.js` | panel supervisora: lista turniejów, wyniki na żywo (`ResultsTab`: kolejność startowa / ranking), karty sędziów (macierz), porównanie „oczami sędziego”, historia zmian, głosy publiczności (`AudienceTab`: kolejność występów / ranking, podium, CSV/PDF), ustawienia, strona „Kopie zapasowe i kod dostępu” (`SystemPage`: lista kopii, `BackupPreview` — podgląd kopii obok obecnego stanu, `RestoreDialog` — przywrócenie po wpisaniu kodu, zmiana kodu, przekazanie dostępu) |
-| `js/feedback.js` | generator feedbacku dla zawodnika (szablony zdań; opcjonalnie `TTS_CONFIG.feedbackEndpoint` — miejsce na przyszłe AI, dziś nieustawione, więc także w produkcji działa wbudowany generator) + okno edycji |
-| `js/pdf.js` | PDF: karta sędziego, feedback, wyniki, ranking publiczności (nagłówek z logo, stopka z adresem) |
+| `js/feedback.js` | generator szkicu feedbacku (szablony zdań; opcjonalnie `TTS_CONFIG.feedbackEndpoint` — miejsce na przyszłe AI, dziś nieustawione, więc także w produkcji działa wbudowany generator) + `FeedbackModal`: sędzia — „Zapisz szkic” / „Zatwierdź feedback” / „Usuń feedback” (bez PDF); supervisor (readOnly) — podgląd i „Zbiorczy PDF zawodnika”; `FeedbackBadge` |
+| `js/pdf.js` | PDF: karta sędziego, wyniki, ranking publiczności, **zbiorczy feedback zawodnika** (`contestantFeedbackPDF` — strona tytułowa + każda zatwierdzona opinia na osobnej stronie; `feedbackZip` — wszystkie pliki turnieju w ZIP, JSZip 3.10.1 z cdnjs); nagłówek z logo, stopka z adresem |
 | `js/backup.js` | format kopii `tts-backup-1` (JSON), podział turnieju na wiersze bazy, eksport Excel, automatyczne pobieranie kopii o :30 |
 | `js/ui.js` | ikony SVG (słownik `P`), logo, awatary, odznaki konkurencji, `Segmented`, `Modal`, dymki uwag, toasty |
 | `js/seed.js` | dane demo (turnieje `fin25`, `hot26`, `rlx26`, `bny26`; PIN `2026`); po zmianie podbić `SEED_VERSION` |
@@ -42,9 +42,27 @@
 - `#/` logowanie (sędzia: kod 6 znaków; supervisor: kod dostępu; w demo również PIN i szybkie wejścia).
 - Sędzia: `#/j/ocena/<disc>/<idZawodnika>`, `#/j/porownanie/<disc>`, `#/j/ranking/<disc>`.
 - Supervisor: `#/s` (lista), `#/s/new` (kreator), `#/s/system` (kopie zapasowe, przywracanie, kod dostępu),
-  `#/s/t/<idTurnieju>/<zakładka>`: `wyniki`, `karty`, `porownanie`, `historia`, `publicznosc`,
+  `#/s/t/<idTurnieju>/<zakładka>`: `wyniki`, `karty`, `porownanie`, `historia`, `publicznosc`, `feedback`,
   `zawodnicy`, `sedziowie`, `karta`, `ustawienia`. `TournamentView` ma `key` = id turnieju, więc stan
   zakładek (np. wybrana konkurencja) zeruje się przy przejściu do innego turnieju.
+
+## Feedback dla zawodników
+
+- Sędzia na swojej karcie: „Feedback dla zawodnika” → „Przygotuj szkic feedbacku” (generator z ocen i uwag) → edycja →
+  **„Zapisz szkic”** (`approved: false`) albo **„Zatwierdź feedback”** (`approved: true`, `approvedAt`) albo **„Usuń feedback”**
+  (`fb` usunięte). Sędzia NIE pobiera PDF. Przycisk na karcie pokazuje stan: „Feedback dla zawodnika” / „Feedback — szkic” (żółty) /
+  „Feedback zatwierdzony” (zielony). Zmiana tekstu i ponowne „Zatwierdź” aktualizuje wersję; feedback można przygotować także w turnieju
+  zakończonym (wyzwalacz bazy blokuje wtedy tylko `v`, `n`, `ni`).
+- `model.js`: `feedbackState(e)` → `none` / `draft` / `approved`; `fbApproved(e)` — zatwierdzony i niepusty;
+  `approvedFeedback(t, cid)` — lista `{ disc, judge, fb, stats }` ze wszystkich konkurencji turnieju (w finale trzy dni).
+- Supervisor: zakładka **„Feedback zawodników”** (`FeedbackTab`): liczniki (zatwierdzone, szkice, karty bez feedbacku, zawodnicy z plikiem),
+  tabela zawodnik × sędzia (ikona ✓ zatwierdzony, ołówek — szkic, „—” brak, „·” nie oceniał; kliknięcie otwiera opinię do odczytu),
+  przycisk **PDF** przy zawodniku i **„Pobierz wszystkie — ZIP”**. Macierz „Karty sędziów” rozróżnia szkic i zatwierdzony feedback.
+- PDF zawodnika (`ocena-seansu-<zawodnik>-<turniej>.pdf`): strona tytułowa (turniej, konkurencja/termin, liczba opinii, lista sędziów —
+  w finale z konkurencją i godziną startu), potem każda opinia od nowej strony: konkurencja, start, ocena tego sędziego z tabelą kategorii,
+  sekcje feedbacku, podpis sędziego z datą zatwierdzenia. Szkice i opinie puste są pomijane.
+- Dane demo (`seed.js`, `SEED_VERSION = 3`): przykładowy feedback (co piąta opinia to szkic) w hot26, rlx26, fin25 (6 pierwszych w każdej
+  konkurencji) i bny26 (3 pierwszych); osobny generator losowy `rng(5150)`, żeby nie zmieniać pozostałych danych demo.
 
 ## Kolejność wierszy (wyniki i głosy publiczności)
 
@@ -69,7 +87,7 @@
   cards: { [disc]: { duration, categories: [{ id, name, items: [{ id, label, kind: 'plus' | 'minus' | 'bin', max, hint? }] }] } },
   scores: { [disc]: { [cid]: { [jid]: {
     v: { [itemId]: dziesiąte },  n: { [catId]: 'Dodatkowe uwagi' },  ni: { [itemId]: 'uwaga do pozycji' },
-    fb: { sections: [{ id, title, text }], updatedAt, source },  u: znacznikCzasu } } } },
+    fb: { sections: [{ id, title, text }], updatedAt, source, approved, approvedAt },  u: znacznikCzasu } } } },
   history: [{ ts, j, c, d, i, f, t }],     // kto, komu, konkurencja, pozycja, z → na
   excluded: { 'disc|cid|jid': true },      // karty wyłączone z liczenia
   dq: { 'disc|cid': 'powód' },             // dyskwalifikacje

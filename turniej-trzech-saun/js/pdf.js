@@ -1,7 +1,7 @@
 // Pliki PDF (feedback dla zawodnika, wyniki) z logo Sommer Residence.
 // pdfmake ładujemy dopiero przy pierwszym eksporcie — wbudowana czcionka Roboto obsługuje polskie znaki.
 
-import { DISCIPLINES, TYPES, fmt, fmtAvg, fmtDate, fmtRange, fullName, startOf, disciplineResults, finalResults, FINAL_ORDER, entryStats, cardMax, audienceRanking } from './model.js';
+import { DISCIPLINES, TYPES, disciplinesOf, approvedFeedback, orderedContestants, download, fmt, fmtAvg, fmtDate, fmtRange, fullName, startOf, disciplineResults, finalResults, FINAL_ORDER, entryStats, cardMax, audienceRanking } from './model.js';
 
 const PDFMAKE_URL = 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.12/pdfmake.min.js';
 const FONTS_URL = 'https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.12/vfs_fonts.min.js';
@@ -140,24 +140,74 @@ function richText(text) {
   return out;
 }
 
-export async function feedbackPDF(t, disc, cid, jid, sections, stats) {
-  const [pdfMake, logo] = await Promise.all([loadPdfMake(), logoDataURL()]);
+// Zbiorczy feedback dla zawodnika (przygotowuje supervisor): strona tytułowa, potem każda opinia
+// sędziego na osobnej stronie. Tylko feedback zatwierdzony przez sędziego (approvedFeedback w model.js).
+export const feedbackFileName = (t, c) => `ocena-seansu-${slug(fullName(c))}-${slug(t.name)}.pdf`;
+
+export async function contestantFeedbackPDF(t, cid, { blob = false } = {}) {
   const c = t.contestants.find((x) => x.id === cid);
-  const j = t.judges.find((x) => x.id === jid);
-  const d = DISCIPLINES[disc];
-  const st = startOf(c, disc);
-  const title = `Ocena seansu zawodnika: ${fullName(c)}`;
-  const doc = base(t, logo, { title, right: d.label.toUpperCase(), rightColor: DISC_COLOR[disc] });
+  const items = approvedFeedback(t, cid);
+  if (!items.length) throw new Error(`Żaden sędzia nie zatwierdził jeszcze feedbacku dla zawodnika ${fullName(c)}.`);
+  const [pdfMake, logo] = await Promise.all([loadPdfMake(), logoDataURL()]);
+  const isFinal = t.type === 'final';
+  const doc = base(t, logo, {
+    title: `Ocena seansu — ${fullName(c)}`,
+    right: isFinal ? 'FINAŁ' : DISCIPLINES[t.type].label.toUpperCase(),
+    rightColor: DISC_COLOR[isFinal ? 'final' : t.type],
+  });
   const meta = (label, value) => ({ stack: [{ text: label.toUpperCase(), style: 'metaL' }, { text: value, style: 'metaV' }] });
-  doc.content = [
-    { text: 'OCENA SEANSU ZAWODNIKA', style: 'eyebrow', color: DISC_COLOR[disc] },
+  const startText = (d) => {
+    const st = startOf(c, d);
+    return st.date ? `${fmtDate(st.date, true)}${st.time ? ', ' + st.time : ''}` : '—';
+  };
+  const opinions = (n) => `${n} ${n === 1 ? 'opinia' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 'opinie' : 'opinii'}`;
+
+  const cover = [
+    { text: 'OCENA SEANSU · FEEDBACK SĘDZIÓW', style: 'eyebrow', color: BRAND },
     { text: fullName(c), style: 'h1' },
-    { text: `punkt widzenia sędziego: ${fullName(j)}`, style: 'sub' },
+    { text: t.name, style: 'sub' },
+    {
+      columns: isFinal
+        ? [meta('Turniej', 'Finał Turnieju Trzech Saun'), meta('Termin', fmtRange(t.dateFrom, t.dateTo)), meta('Opinie sędziów', opinions(items.length))]
+        : [meta('Konkurencja', `${DISCIPLINES[t.type].label} · ${DISCIPLINES[t.type].cup}`), meta('Start', startText(t.type)), meta('Opinie sędziów', opinions(items.length))],
+      columnGap: 14,
+      margin: [0, 0, 0, 16],
+    },
+    {
+      text: isFinal
+        ? 'W tym dokumencie znajdziesz opinie sędziów o Twoich seansach w finale. Każda opinia to osobny punkt widzenia jednego sędziego — razem pokazują, co szczególnie się udało i nad czym warto popracować przed kolejnym startem.'
+        : 'W tym dokumencie znajdziesz opinie sędziów, którzy oceniali Twój seans. Każda opinia to osobny punkt widzenia jednego sędziego — razem pokazują, co szczególnie się udało i nad czym warto popracować przed kolejnym startem.',
+      margin: [0, 0, 0, 14],
+      lineHeight: 1.3,
+    },
+    {
+      table: {
+        headerRows: 1,
+        widths: isFinal ? [90, '*', 130] : ['*'],
+        body: isFinal
+          ? [
+            [{ text: 'KONKURENCJA', style: 'th' }, { text: 'OPINIA SĘDZIEGO', style: 'th' }, { text: 'START', style: 'th' }],
+            ...items.map((x) => [
+              { text: DISCIPLINES[x.disc].label, color: DISC_COLOR[x.disc], bold: true },
+              { text: fullName(x.judge), bold: true },
+              { text: startText(x.disc), color: '#6B655C' },
+            ]),
+          ]
+          : [[{ text: 'OPINIE SĘDZIÓW W TYM DOKUMENCIE', style: 'th' }], ...items.map((x) => [{ text: fullName(x.judge), bold: true }])],
+      },
+      layout: listLayout,
+    },
+  ];
+
+  const chapter = (x) => [
+    { text: `${DISCIPLINES[x.disc].label.toUpperCase()} · OPINIA SĘDZIEGO`, style: 'eyebrow', color: DISC_COLOR[x.disc], pageBreak: 'before' },
+    { text: fullName(x.judge), style: 'h1' },
+    { text: `punkt widzenia sędziego — seans zawodnika: ${fullName(c)}`, style: 'sub' },
     {
       columns: [
-        meta('Konkurencja', `${d.label} · ${t.type === 'final' ? 'Finał' : d.cup}`),
-        meta('Start', st.date ? `${fmtDate(st.date, true)}${st.time ? ', ' + st.time : ''}` : '—'),
-        meta('Wynik', `${fmt(stats.total, true)} / ${fmt(stats.max)} pkt`),
+        meta('Konkurencja', `${DISCIPLINES[x.disc].label} · ${isFinal ? 'Finał' : DISCIPLINES[x.disc].cup}`),
+        meta('Start', startText(x.disc)),
+        meta('Ocena tego sędziego', `${fmt(x.stats.total, true)} / ${fmt(x.stats.max)} pkt`),
       ],
       columnGap: 14,
       margin: [0, 0, 0, 14],
@@ -167,26 +217,49 @@ export async function feedbackPDF(t, disc, cid, jid, sections, stats) {
         widths: ['*', 90],
         body: [
           [{ text: 'KATEGORIA', style: 'th' }, { text: 'PUNKTY', style: 'th', alignment: 'right' }],
-          ...stats.cats.map((x) => [x.name, { text: `${fmt(x.sum, true)} / ${fmt(x.max)}`, alignment: 'right' }]),
-          [{ text: 'Wynik całkowity', bold: true }, { text: `${fmt(stats.total, true)} / ${fmt(stats.max)}`, bold: true, alignment: 'right' }],
+          ...x.stats.cats.map((k) => [k.name, { text: `${fmt(k.sum, true)} / ${fmt(k.max)}`, alignment: 'right' }]),
+          [{ text: 'Wynik całkowity', bold: true }, { text: `${fmt(x.stats.total, true)} / ${fmt(x.stats.max)}`, bold: true, alignment: 'right' }],
         ],
       },
       layout: tableLayout,
       margin: [0, 0, 0, 6],
     },
-    ...sections.flatMap((s) => [{ text: s.title, style: 'h2' }, ...richText(s.text)]),
+    ...(x.fb.sections || []).filter((s) => (s.text || '').trim()).flatMap((s) => [{ text: s.title, style: 'h2' }, ...richText(s.text)]),
     {
       margin: [0, 22, 0, 0],
       unbreakable: true,
       stack: [
         { canvas: [{ type: 'line', x1: 0, y1: 0, x2: 160, y2: 0, lineWidth: 0.6, lineColor: '#D5CCBE' }] },
-        { text: fullName(j), bold: true, margin: [0, 6, 0, 0] },
+        { text: fullName(x.judge), bold: true, margin: [0, 6, 0, 0] },
         { text: `sędzia · ${t.name}`, style: 'muted', fontSize: 9.5 },
-        { text: new Date().toLocaleDateString('pl-PL', { day: 'numeric', month: 'long', year: 'numeric' }), style: 'muted', fontSize: 9.5 },
+        { text: new Date(x.fb.approvedAt || x.fb.updatedAt || Date.now()).toLocaleDateString('pl-PL', { day: 'numeric', month: 'long', year: 'numeric' }), style: 'muted', fontSize: 9.5 },
       ],
     },
   ];
-  pdfMake.createPdf(doc).download(`ocena-seansu-${slug(fullName(c))}-${slug(fullName(j))}.pdf`);
+
+  doc.content = [...cover, ...items.flatMap(chapter)];
+  const name = feedbackFileName(t, c);
+  if (blob) return { name, blob: await new Promise((res) => pdfMake.createPdf(doc).getBlob(res)) };
+  pdfMake.createPdf(doc).download(name);
+  return { name };
+}
+
+// Wszystkie zbiorcze PDF-y turnieju w jednym pliku ZIP (do rozesłania zawodnikom mailem).
+const JSZIP_URL = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+export async function feedbackZip(t, onProgress) {
+  const list = orderedContestants(t, disciplinesOf(t)[0]).filter((c) => approvedFeedback(t, c.id).length);
+  if (!list.length) throw new Error('Żaden sędzia nie zatwierdził jeszcze feedbacku.');
+  if (!window.JSZip) await loadScript(JSZIP_URL);
+  const zip = new window.JSZip();
+  let i = 0;
+  for (const c of list) {
+    if (onProgress) onProgress(++i, list.length);
+    const { name, blob } = await contestantFeedbackPDF(t, c.id, { blob: true });
+    zip.file(name, blob);
+  }
+  const out = await zip.generateAsync({ type: 'blob' });
+  download(`feedback-zawodnicy-${slug(t.name)}.zip`, out, 'application/zip');
+  return list.length;
 }
 
 // Karta jednego sędziego dla jednego zawodnika — kopia „na papierze” z miejscem na podpis.

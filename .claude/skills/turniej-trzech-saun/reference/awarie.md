@@ -55,6 +55,15 @@ i w kopiach (baza co godzinę o :30 + pliki na komputerze supervisora). Nie czy�
 Kopia powstaje o :30 tylko wtedy, gdy od poprzedniej coś się zmieniło — brak kopii z danej godziny jest normalny.
 Przed ryzykowną operacją w panelu warto kliknąć „Zrób kopię teraz”.
 
+## Po turnieju: feedback dla zawodników
+
+1. Supervisor → turniej → **„Feedback zawodników”**. Liczniki pokazują, ile opinii jest zatwierdzonych, ile czeka jako szkic
+   i ile kart nie ma feedbacku.
+2. Szkice nie trafiają do plików — jeśli sędzia ma szkic, poproś go o zatwierdzenie (sędzia może to zrobić także po zakończeniu turnieju).
+3. **„Pobierz wszystkie — ZIP”** (albo „PDF” przy zawodniku) → w folderze „Pobrane” jest archiwum z plikiem
+   `ocena-seansu-<zawodnik>-<turniej>.pdf` dla każdego zawodnika z co najmniej jedną zatwierdzoną opinią.
+4. Każdy plik dołącz do maila do właściwego zawodnika.
+
 ## Gdy trzeba poprawić kod w trakcie zawodów
 
 1. Upewnij się, że problem jest w kodzie (powtarzalny, ten sam na wielu urządzeniach, błąd w konsoli).

@@ -31,7 +31,7 @@ Uwaga: właściciel projektu Supabase zawsze może zajrzeć do tabel przez Table
 | `tts_tournaments` | `id`, `status`, `data` (jsonb: część widoczna dla sędziów — nazwa, zawodnicy, harmonogram, karty, sędziowie bez kodów) |
 | `tts_tournament_private` | `data` (jsonb: `excluded`, `dq`, `audience`) — tylko supervisor |
 | `tts_judge_codes` | `(tournament_id, judge_id) → code` (unikalny globalnie); zmiana lub usunięcie kodu wylogowuje tego sędziego (wyzwalacz `tts_codes_kick`) |
-| `tts_entries` | karta: `(tournament_id, disc, contestant_id, judge_id)` → `v`, `n`, `ni`, `fb`; wyzwalacz `tts_entries_guard` blokuje sędziom zapis w turnieju `draft` i zmiany w `closed` |
+| `tts_entries` | karta: `(tournament_id, disc, contestant_id, judge_id)` → `v`, `n`, `ni`, `fb` (feedback: `sections`, `approved`, `approvedAt`, …); wyzwalacz `tts_entries_guard` blokuje sędziom zapis w turnieju `draft` i zmiany w `closed` |
 | `tts_history` | dziennik zmian ocen (`f` → `t`, w dziesiątych) |
 | `tts_backups` | kopie (`kind`: `auto` / `manual` / `before-restore`, `data` w formacie `tts-backup-1`) |
 

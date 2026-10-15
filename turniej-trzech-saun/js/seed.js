@@ -2,7 +2,7 @@
 // Generator jest deterministyczny — po „Przywróć dane demo” kody sędziów i wyniki są zawsze te same.
 
 import { defaultCard } from './templates.js';
-import { FINAL_ORDER, addMinutes } from './model.js';
+import { FINAL_ORDER, addMinutes, fmt } from './model.js';
 
 function rng(seed) {
   return () => {
@@ -35,7 +35,7 @@ const JUDGE_POOL = [
   ['Dorota', 'Fijałkowska'], ['Leszek', 'Urban'],
 ];
 
-export const SEED_VERSION = 2;
+export const SEED_VERSION = 3;
 export const SEED_IDS = ['fin25', 'hot26', 'rlx26', 'bny26'];
 export const LEGACY_SEED_IDS = ['fin26'];
 
@@ -229,6 +229,53 @@ function judgeDiscipline(t, disc, r, opts = {}) {
   });
 }
 
+// Przykładowy feedback sędziów — osobny generator losowy, żeby nie zmieniać pozostałych danych demo.
+// Co piąta opinia zostaje szkicem (niezatwierdzona), reszta jest zatwierdzona.
+const FB_OPEN = ['Bardzo udany seans z wyraźnym pomysłem.', 'Solidny seans z kilkoma momentami, które zostaną w pamięci.', 'Seans z dobrym tempem i spójną historią.', 'Przemyślany seans, choć z miejscem na dopracowanie szczegółów.'];
+const FB_PLUS = ['Spójna historia i dobrze dobrana muzyka.', 'Bardzo równe machanie i dobra dystrybucja ciepła.', 'Świetny kontakt z publicznością od pierwszej minuty.', 'Ciekawe, dobrze wyczuwalne zapachy.', 'Pewne otwarcie i eleganckie zakończenie ceremonii.'];
+const FB_MINUS = ['Pilnować czasu — końcówka była zbyt rozciągnięta.', 'Trzeci zapach był słabo wyczuwalny.', 'Wzrost temperatury w drugiej rundzie był zbyt gwałtowny.', 'Więcej elementów show przed i po ceremonii.', 'Staranniej przygotować wykaz zapachów przed ceremonią.'];
+const FB_CLOSE = ['Gratuluję występu i powodzenia w kolejnych startach!', 'Dziękuję za seans — trzymam kciuki za kolejny turniej.', 'Brawo za pomysł i odwagę — do zobaczenia na kolejnym turnieju.'];
+
+function seedFeedback(t, disc, cids, rf) {
+  const card = t.cards[disc];
+  const pick = (arr) => arr[Math.floor(rf() * arr.length)];
+  let n = 0;
+  cids.forEach((cid) => {
+    t.judges.forEach((j) => {
+      const e = t.scores[disc]?.[cid]?.[j.id];
+      if (!e || !Object.keys(e.v).length || rf() < 0.2) return;
+      const cats = card.categories.map((cat) => {
+        let sum = 0, max = 0;
+        for (const it of cat.items) {
+          const v = e.v[it.id] || 0;
+          if (it.kind === 'minus') sum -= v;
+          else { sum += v; max += Math.round(it.max * 10); }
+        }
+        return { name: cat.name, sum, max };
+      });
+      const byShare = [...cats].sort((a, b) => b.sum / b.max - a.sum / a.max);
+      const total = cats.reduce((a, x) => a + x.sum, 0);
+      const max = cats.reduce((a, x) => a + x.max, 0);
+      const plus = pick(FB_PLUS);
+      const plus2 = pick(FB_PLUS.filter((x) => x !== plus));
+      const when = (e.u || Date.now()) + 25 * 60000;
+      const approved = ++n % 5 !== 0;
+      e.fb = {
+        sections: [
+          { id: 'sum', title: 'Podsumowanie', text: `${pick(FB_OPEN)} Wynik ${fmt(total, true)} z ${fmt(max)} pkt (${Math.round((total / max) * 100)}%). Najmocniej wypadła kategoria „${byShare[0].name}”, najwięcej do zyskania jest w kategorii „${byShare[byShare.length - 1].name}”.` },
+          { id: 'plus', title: 'Mocne strony', text: `• ${plus}\n• ${plus2}` },
+          { id: 'next', title: 'Na co zwrócić uwagę przed kolejnym startem', text: `• ${pick(FB_MINUS)}` },
+          { id: 'end', title: 'Na zakończenie', text: pick(FB_CLOSE) },
+        ],
+        source: 'local',
+        updatedAt: when,
+        approved,
+        ...(approved ? { approvedAt: when } : {}),
+      };
+    });
+  });
+}
+
 function audience(t, disc, r, cids, partialLast = false) {
   t.audience[disc] ||= {};
   cids.forEach((cid, k) => {
@@ -242,6 +289,7 @@ function audience(t, disc, r, cids, partialLast = false) {
 
 export function seedState() {
   const r = rng(20261016);
+  const rf = rng(5150); // feedback demo — osobna sekwencja losowa
   const taken = new Set();
   const tournaments = [];
 
@@ -257,6 +305,7 @@ export function seedState() {
       judgeDiscipline(t, d, r);
       audience(t, d, r, t.order[d]);
     });
+    FINAL_ORDER.forEach((d) => seedFeedback(t, d, t.order[d].slice(0, 6), rf));
     tournaments.push(t);
   }
 
@@ -269,6 +318,7 @@ export function seedState() {
     judgeDiscipline(t, 'hot', r, { allFive: 4, resolveFive: 4 });
     audience(t, 'hot', r, t.order.hot);
     t.dq[`hot|${t.order.hot[8]}`] = 'Przekroczenie czasu ceremonii o ponad 2 min';
+    seedFeedback(t, 'hot', t.order.hot, rf);
     tournaments.push(t);
   }
 
@@ -280,6 +330,7 @@ export function seedState() {
     schedule(t, 'relax', [{ date: '2026-08-08', first: '15:00', step: 60, count: 6 }, { date: '2026-08-09', first: '11:00', step: 60, count: 6 }], r);
     judgeDiscipline(t, 'relax', r);
     audience(t, 'relax', r, t.order.relax);
+    seedFeedback(t, 'relax', t.order.relax, rf);
     tournaments.push(t);
   }
 
@@ -297,6 +348,7 @@ export function seedState() {
     fillCard(t, 'banya', c6, t.judges[2], r, { start: start6, fraction: 0.55 });
     fillCard(t, 'banya', c6, t.judges[3], r, { start: start6, fraction: 0.25 });
     audience(t, 'banya', r, t.order.banya.slice(0, 6), true);
+    seedFeedback(t, 'banya', t.order.banya.slice(0, 3), rf);
     tournaments.push(t);
   }
 

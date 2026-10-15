@@ -7,7 +7,7 @@ import { html, useState } from './lib.js';
 import { DISCIPLINES, fmt, fullName, entryStats, getEntry, cardMax, startOf, fmtDate } from './model.js';
 import { setFeedback } from './store.js';
 import { Icon, Modal, DiscBadge, Avatar, toast } from './ui.js';
-import { feedbackPDF } from './pdf.js';
+import { contestantFeedbackPDF } from './pdf.js';
 
 // ---------- dane wejściowe ----------
 
@@ -195,6 +195,18 @@ export async function generateFeedback(ctx) {
 const rowsFor = (text) => Math.min(16, Math.max(3, String(text || '').split('\n').reduce((a, l) => a + Math.ceil((l.length || 1) / 92), 0) + 1));
 const clone = (x) => JSON.parse(JSON.stringify(x));
 
+const fbWhen = (ts) => (ts ? new Date(ts).toLocaleString('pl-PL', { dateStyle: 'short', timeStyle: 'short' }) : '');
+
+// Stan feedbacku sędziego — znaczek w oknie i w panelu supervisora.
+export function FeedbackBadge({ fb }) {
+  if (!fb) return null;
+  return fb.approved
+    ? html`<span class="fb-badge ok"><${Icon} name="check" size=${13} />Zatwierdzony${fb.approvedAt ? ` ${fbWhen(fb.approvedAt)}` : ''}</span>`
+    : html`<span class="fb-badge draft"><${Icon} name="pencil" size=${13} />Szkic — niezatwierdzony</span>`;
+}
+
+// Sędzia przygotowuje feedback, zapisuje szkic, zatwierdza ostateczną wersję albo usuwa feedback.
+// PDF dla zawodnika przygotowuje supervisor — zbiorczo, z zatwierdzonych opinii wszystkich sędziów.
 export function FeedbackModal({ t, disc, cid, jid, readOnly = false, onClose }) {
   const c = t.contestants.find((x) => x.id === cid);
   const j = t.judges.find((x) => x.id === jid);
@@ -207,7 +219,7 @@ export function FeedbackModal({ t, disc, cid, jid, readOnly = false, onClose }) 
   const [dirty, setDirty] = useState(false);
   const [busy, setBusy] = useState(false);
   const st = startOf(c, disc);
-  const pdfStats = { total: stats.total, max: cardMax(card), cats: stats.cats };
+  const hasText = !!secs && secs.some((s) => (s.text || '').trim());
 
   const generate = async () => {
     if (secs && !confirm('Przygotować szkic od nowa? Twoje poprawki w obecnym tekście zostaną zastąpione.')) return;
@@ -221,19 +233,30 @@ export function FeedbackModal({ t, disc, cid, jid, readOnly = false, onClose }) 
       setBusy(false);
     }
   };
-  const save = () => {
-    setFeedback(t.id, disc, cid, jid, { sections: secs, source });
+  const saveDraft = () => {
+    setFeedback(t.id, disc, cid, jid, { sections: secs, source, approved: false });
     setDirty(false);
-    toast('Feedback zapisany');
+    toast('Szkic zapisany. Do pliku dla zawodnika trafi dopiero po zatwierdzeniu.');
   };
-  const pdf = async () => {
-    if (!readOnly && dirty) save();
+  const approve = () => {
+    if (!hasText) return toast('Feedback jest pusty — uzupełnij treść przed zatwierdzeniem.', 'err');
+    setFeedback(t.id, disc, cid, jid, { sections: secs, source, approved: true, approvedAt: Date.now() });
+    toast('Feedback zatwierdzony — supervisor dołączy go do pliku dla zawodnika.');
+    onClose();
+  };
+  const remove = () => {
+    if (!confirm('Usunąć feedback dla tego zawodnika? Tej operacji nie można cofnąć.')) return;
+    setFeedback(t.id, disc, cid, jid, null);
+    toast('Feedback usunięty');
+    onClose();
+  };
+  const groupPDF = async () => {
     setBusy(true);
     try {
-      await feedbackPDF(t, disc, cid, jid, secs, pdfStats);
+      await contestantFeedbackPDF(t, cid);
     } catch (e) {
       console.error(e);
-      toast('Nie udało się przygotować pliku PDF — sprawdź połączenie z internetem', 'err');
+      toast(e.message || 'Nie udało się przygotować pliku PDF — sprawdź połączenie z internetem', 'err');
     } finally {
       setBusy(false);
     }
@@ -247,12 +270,19 @@ export function FeedbackModal({ t, disc, cid, jid, readOnly = false, onClose }) 
     setDirty(true);
   };
 
-  const footer = secs ? html`
-    ${!readOnly ? html`<button class="btn ghost" onClick=${generate} disabled=${busy}><${Icon} name="sparkles" size=${16} />Przygotuj szkic od nowa</button>` : null}
-    <span class="grow"></span>
-    <span class="muted small fb-state">${dirty ? 'Niezapisane zmiany' : saved?.updatedAt ? `Zapisano ${new Date(saved.updatedAt).toLocaleString('pl-PL', { dateStyle: 'short', timeStyle: 'short' })}` : ''}</span>
-    ${!readOnly ? html`<button class="btn" onClick=${save} disabled=${!dirty || busy}><${Icon} name="check" size=${16} />Zapisz</button>` : null}
-    <button class="btn primary" onClick=${pdf} disabled=${busy}><${Icon} name="download" size=${16} />${busy ? 'Przygotowuję…' : 'Pobierz PDF'}</button>` : null;
+  const state = dirty ? 'Niezapisane zmiany' : saved?.approved ? '' : saved?.updatedAt ? `Szkic zapisany ${fbWhen(saved.updatedAt)}` : '';
+  const footer = readOnly
+    ? html`<span class="grow"></span>
+      <button class="btn primary" onClick=${groupPDF} disabled=${busy}><${Icon} name="download" size=${16} />${busy ? 'Przygotowuję…' : 'Zbiorczy PDF zawodnika'}</button>`
+    : secs ? html`
+      <button class="btn ghost" onClick=${generate} disabled=${busy}><${Icon} name="sparkles" size=${16} />Przygotuj szkic od nowa</button>
+      ${saved ? html`<button class="btn ghost danger" onClick=${remove} disabled=${busy}><${Icon} name="trash" size=${16} />Usuń feedback</button>` : null}
+      <span class="grow"></span>
+      <span class="muted small fb-state">${state}</span>
+      <button class="btn" onClick=${saveDraft} disabled=${busy || !dirty}><${Icon} name="pencil" size=${16} />Zapisz szkic</button>
+      <button class="btn primary" onClick=${approve} disabled=${busy || !hasText || (!dirty && !!saved?.approved)}>
+        <${Icon} name="check" size=${16} />${!dirty && saved?.approved ? 'Zatwierdzony' : 'Zatwierdź feedback'}</button>`
+    : null;
 
   return html`<${Modal} title="Feedback dla zawodnika" onClose=${close} wide footer=${footer}>
     <div class=${'fb d-' + disc}>
@@ -262,6 +292,7 @@ export function FeedbackModal({ t, disc, cid, jid, readOnly = false, onClose }) 
           <p class="eyebrow">Ocena seansu zawodnika</p>
           <h3>${fullName(c)}</h3>
           <p class="muted">punkt widzenia sędziego: <b>${fullName(j)}</b></p>
+          ${saved ? html`<p class="fb-status"><${FeedbackBadge} fb=${saved} /></p>` : null}
         </div>
         <div class="fb-score">
           <${DiscBadge} disc=${disc} />
@@ -269,18 +300,21 @@ export function FeedbackModal({ t, disc, cid, jid, readOnly = false, onClose }) 
           <span class="muted small">${st.date ? `${fmtDate(st.date)}${st.time ? ', ' + st.time : ''}` : ''}</span>
         </div>
       </header>
-
       ${!secs ? html`<div class="fb-empty">
         ${readOnly
           ? html`<p class="muted">Sędzia nie przygotował jeszcze feedbacku dla tego zawodnika.</p>`
           : html`
             <${Icon} name="sparkles" size=${30} />
             <h4>Szkic na podstawie Twojej karty</h4>
-            <p class="muted">Generator przygotuje wstępną treść z Twoich ocen, uwag przy pozycjach i dodatkowych uwag w kategoriach. Potem możesz wszystko poprawić, zapisać i pobrać jako PDF z logo Sommer Residence.</p>
+            <p class="muted">Generator przygotuje wstępną treść z Twoich ocen, uwag przy pozycjach i dodatkowych uwag w kategoriach. Potem możesz wszystko poprawić i zatwierdzić — zatwierdzony feedback supervisor dołączy do pliku PDF, który dostanie zawodnik.</p>
             ${!stats.complete ? html`<div class="alert warn"><${Icon} name="alert" />Karta nie jest jeszcze kompletna (${stats.filled} z ${stats.required} ocen) — szkic może pominąć część elementów.</div>` : null}
             <button class="btn primary lg" onClick=${generate} disabled=${busy}><${Icon} name="sparkles" />${busy ? 'Przygotowuję szkic…' : 'Przygotuj szkic feedbacku'}</button>`}
       </div>` : html`
-        ${!readOnly && source === 'local' ? html`<p class="hint-line"><${Icon} name="info" size=${14} />Szkic przygotowany automatycznie z Twoich ocen i notatek — przeczytaj go i popraw przed zapisaniem.</p>` : null}
+        ${readOnly
+          ? html`<p class="hint-line"><${Icon} name="info" size=${14} />${saved?.approved
+              ? 'Feedback zatwierdzony przez sędziego — trafi do zbiorczego pliku PDF dla zawodnika.'
+              : 'Szkic niezatwierdzony — nie trafi do pliku PDF dla zawodnika, dopóki sędzia go nie zatwierdzi.'}</p>`
+          : html`<p class="hint-line"><${Icon} name="info" size=${14} />${source === 'local' && !saved ? 'Szkic przygotowany automatycznie z Twoich ocen i notatek — przeczytaj go i popraw. ' : ''}Gdy treść będzie gotowa, kliknij „Zatwierdź feedback”. „Zapisz szkic” zachowuje tekst bez zatwierdzania — szkic nie trafia do pliku dla zawodnika.</p>`}
         <div class="fb-sections">
           ${secs.map((s, i) => html`<section class="fb-sec" key=${s.id || i}>
             ${readOnly

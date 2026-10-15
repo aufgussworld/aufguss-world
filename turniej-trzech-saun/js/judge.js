@@ -268,9 +268,9 @@ export function ScoreCard({ t, disc, cid, jid, readOnly = false, judgeName, onPr
             <${Icon} name="download" size=${15} />Karta PDF</button>
           <button class="btn sm" onClick=${() => exportCard('xlsx', t, disc, cid, jid)} title="Pobierz kartę jako arkusz Excel">
             <${Icon} name="download" size=${15} />Excel</button>` : null}
-        ${!readOnly || fb ? html`<button class=${'btn sm ' + (fb ? '' : 'fb-cta')} onClick=${() => setFbOpen(true)} disabled=${!stats.started && !fb}
+        ${!readOnly || fb ? html`<button class=${'btn sm ' + (!fb ? 'fb-cta' : fb.approved ? 'fb-ok' : 'fb-draft')} onClick=${() => setFbOpen(true)} disabled=${!stats.started && !fb}
             title=${!stats.started && !fb ? 'Najpierw wypełnij kartę' : ''}>
-            <${Icon} name=${fb ? 'file-text' : 'sparkles'} size=${15} />${fb ? (readOnly ? 'Feedback sędziego' : 'Feedback — edytuj') : 'Feedback dla zawodnika'}</button>` : null}
+            <${Icon} name=${!fb ? 'sparkles' : fb.approved ? 'check' : 'pencil'} size=${15} />${!fb ? 'Feedback dla zawodnika' : fb.approved ? (readOnly ? 'Feedback sędziego · zatwierdzony' : 'Feedback zatwierdzony') : (readOnly ? 'Feedback sędziego · szkic' : 'Feedback — szkic')}</button>` : null}
       </div>
     </div>
     ${fbOpen ? html`<${FeedbackModal} t=${t} disc=${disc} cid=${cid} jid=${jid} readOnly=${readOnly} onClose=${() => setFbOpen(false)} />` : null}

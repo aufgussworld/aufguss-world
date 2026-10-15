@@ -877,3 +877,25 @@ input.vote.dropped { text-decoration: line-through; color: var(--ink-3); backgro
 @media (max-width: 1440px) {
   .role-judge .brand > span { display: none; }   /* u sędziego zostaje samo logo — miejsce na zakładki i „Instrukcję” */
 }
+
+/* feedback: szkic / zatwierdzony */
+.btn.fb-ok { border-color: var(--banya-line); color: var(--banya); background: var(--banya-tint); }
+.btn.fb-draft { border-color: var(--warn-line); color: var(--warn); background: var(--warn-tint); }
+.fb-status { margin-top: 6px; }
+.fb-badge { display: inline-flex; align-items: center; gap: 5px; padding: 2px 10px; border-radius: 999px; font-size: 12.5px; font-weight: 600; border: 1px solid; }
+.fb-badge.ok { background: var(--banya-tint); color: var(--banya); border-color: var(--banya-line); }
+.fb-badge.draft { background: var(--warn-tint); color: var(--warn); border-color: var(--warn-line); }
+.mx-fb.draft { color: var(--warn); }
+.lg-fb.draft { color: var(--warn); }
+.fbm td.mx-cell { text-align: center; }
+.fbx { display: inline-flex; align-items: center; justify-content: center; gap: 5px; height: 30px; padding: 0 8px; border-radius: 8px; font: 600 13px var(--f-ui); border: 1px solid transparent; background: none; }
+button.fbx { cursor: pointer; }
+.fbx.ok { color: var(--banya); background: var(--banya-tint); border-color: var(--banya-line); }
+.fbx.draft { color: var(--warn); background: var(--warn-tint); border-color: var(--warn-line); border-style: dashed; }
+.fbx.none { color: var(--ink-3); }
+button.fbx:hover { filter: brightness(0.97); }
+.fbm .fb-n { font: 600 18px var(--f-display); font-variant-numeric: tabular-nums lining-nums; }
+.fbm .mx-j { min-width: 0; max-width: 120px; line-height: 1.25; }
+.fbm th, .fbm td { padding: 8px 6px; }
+.fbm .fbx { width: 34px; padding: 0; }
+.fbm .mx-j { max-width: 110px; }
