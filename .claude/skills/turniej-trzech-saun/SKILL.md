@@ -13,6 +13,7 @@ zawodnicy, każdy sędzia ma osobną kartę na każdą konkurencję. Wynik fina�
 | Co | Gdzie |
 |---|---|
 | Aplikacja (produkcja, prawdziwa baza) | https://aufgussworld.github.io/aufguss-world/turniej-trzech-saun/ |
+| Instrukcja dla sędziów (przycisk „Instrukcja” w panelu sędziego) | https://aufgussworld.github.io/aufguss-world/turniej-trzech-saun/instrukcja/ |
 | Wersja demo (dane przykładowe w przeglądarce, PIN supervisora `2026`) | https://aufgussworld.github.io/aufguss-world/turniej-trzech-saun/demo/ |
 | Kod źródłowy | repo `aufgussworld/aufguss-world`, gałąź `main`, folder `turniej-trzech-saun/` |
 | Baza danych | Supabase, projekt `turniej-trzech-saun`, ref `wripvwhwginexvcmwdsq` (org. aufguss.world, Frankfurt, plan Free) — https://supabase.com/dashboard/project/wripvwhwginexvcmwdsq |
@@ -33,7 +34,9 @@ Przy KAŻDEJ zmianie w systemie, w tym samym commicie:
    - tabela, funkcja, uprawnienie, harmonogram w bazie → [supabase/setup.sql](supabase/setup.sql) i [reference/baza-danych.md](reference/baza-danych.md);
    - nowa funkcja w panelu, nowy komunikat albo procedura dla supervisora / sędziów → [reference/awarie.md](reference/awarie.md)
      (i „Szybkie przepisy” niżej);
-   - zmiana sposobu pracy, wdrażania lub narzędzi → ten plik i [reference/nowy-komputer.md](reference/nowy-komputer.md).
+   - zmiana sposobu pracy, wdrażania lub narzędzi → ten plik i [reference/nowy-komputer.md](reference/nowy-komputer.md);
+   - zmiana WIDOCZNA DLA SĘDZIEGO → także instrukcja dla sędziów `turniej-trzech-saun/instrukcja/` (tekst, a przy zmianie
+     wyglądu — zrzuty); procedura w [reference/instrukcja-sedziow.md](reference/instrukcja-sedziow.md).
 2. Dopisz zmianę do „Dziennika zmian” na końcu tego pliku (data, co, dlaczego).
 3. Commituj razem: `git add turniej-trzech-saun .claude` — kod i dokumentacja nigdy osobno.
 
@@ -120,6 +123,7 @@ z podłączonym repo `aufgussworld/aufguss-world` (opis w tym samym pliku).
 | Dane przykładowe demo | `js/seed.js` — po zmianie podbij `SEED_VERSION` |
 | Funkcję lub uprawnienia w bazie | `supabase/setup.sql` w tym skillu → użytkownik uruchamia zmieniony fragment w SQL Editorze → commit |
 | Przywrócić dane z wybranej godziny | w aplikacji: supervisor → „Kopie i przywracanie” → „Podgląd” → strzałki między godzinami → „Przywróć ten stan…” → kod supervisora |
+| Instrukcję dla sędziów (tekst, zrzuty ekranu) | `turniej-trzech-saun/instrukcja/index.html` + `img/` — [reference/instrukcja-sedziow.md](reference/instrukcja-sedziow.md) |
 | Kolejność wierszy w wynikach / głosach publiczności | przełącznik „Kolejność startowa / Ranking” w `ResultsTab` i `AudienceTab` (`js/supervisor.js`) |
 
 ## Awaria w trakcie turnieju
@@ -134,13 +138,21 @@ Najpierw zawsze: co dokładnie widzi użytkownik (treść komunikatu) i na ilu u
 - [reference/architektura.md](reference/architektura.md) — mapa plików, model danych, zasady punktacji, synchronizacja, trasy
 - [reference/baza-danych.md](reference/baza-danych.md) — tabele, RLS, funkcje RPC, kody, kopie, przydatne zapytania SQL
 - [reference/awarie.md](reference/awarie.md) — objaw → przyczyna → co zrobić
+- [reference/instrukcja-sedziow.md](reference/instrukcja-sedziow.md) — instrukcja dla sędziów: kiedy aktualizować, jak robić zrzuty ekranu
 - [supabase/setup.sql](supabase/setup.sql) — pełny schemat bazy (źródło prawdy dla bazy)
 - [scripts/check.js](scripts/check.js) — kontrola przed wdrożeniem
 - [scripts/serve.js](scripts/serve.js) — lokalny podgląd na porcie 8123
+- [scripts/receive-files.js](scripts/receive-files.js), [scripts/build-font-css.js](scripts/build-font-css.js) — narzędzia do zrzutów ekranu instrukcji
 
 ## Dziennik zmian
 
 Najnowsze na górze. Każdy wpis: data — co — dlaczego.
+
+- **2026-10-15** — Instrukcja obsługi dla sędziów (`turniej-trzech-saun/instrukcja/`, 14 rozdziałów, zrzuty z demo,
+  wersja do druku); przycisk „Instrukcja” w górnym pasku sędziego i odnośnik pod logowaniem sędziego; ikona `book`.
+  Pasek sędziego nie łamie się przy ~1280 px (napisy w jednej linii, przy ≤ 1440 px chowa się napis obok logo).
+  Okno feedbacku nie twierdzi już, że w produkcji szkic pisze model AI (pisze go wbudowany generator).
+  Zasada: zmiana widoczna dla sędziego = aktualizacja instrukcji. Powód: prośba organizatora.
 
 - **2026-10-15** — Favicon: sygnet z logo Sommer Residence (biały na bordowym, 16/32 px + ikona 180 px na telefon)
   zamiast trzech kolorowych słupków. Powód: spójność z marką organizatora.

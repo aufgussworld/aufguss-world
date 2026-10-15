@@ -280,7 +280,7 @@ export function FeedbackModal({ t, disc, cid, jid, readOnly = false, onClose }) 
             ${!stats.complete ? html`<div class="alert warn"><${Icon} name="alert" />Karta nie jest jeszcze kompletna (${stats.filled} z ${stats.required} ocen) — szkic może pominąć część elementów.</div>` : null}
             <button class="btn primary lg" onClick=${generate} disabled=${busy}><${Icon} name="sparkles" />${busy ? 'Przygotowuję szkic…' : 'Przygotuj szkic feedbacku'}</button>`}
       </div>` : html`
-        ${!readOnly && source === 'local' ? html`<p class="hint-line"><${Icon} name="info" size=${14} />Szkic przygotowany automatycznie z Twoich ocen i notatek — przeczytaj go i popraw przed zapisaniem. W wersji demonstracyjnej działa wbudowany generator tekstu; w wersji produkcyjnej szkic napisze model AI.</p>` : null}
+        ${!readOnly && source === 'local' ? html`<p class="hint-line"><${Icon} name="info" size=${14} />Szkic przygotowany automatycznie z Twoich ocen i notatek — przeczytaj go i popraw przed zapisaniem.</p>` : null}
         <div class="fb-sections">
           ${secs.map((s, i) => html`<section class="fb-sec" key=${s.id || i}>
             ${readOnly

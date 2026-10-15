@@ -18,6 +18,7 @@
 | `index.html` | wejście produkcyjne: wczytuje `config.js`, potem `js/app.js` |
 | `config.js` | `window.TTS_CONFIG = { mode: 'live', supabaseUrl, supabaseAnonKey }` (klucz publishable); opcjonalnie `feedbackEndpoint` |
 | `demo/index.html` | wersja demo: `TTS_CONFIG = { mode: 'demo' }`, te same `../css` i `../js` |
+| `instrukcja/index.html`, `instrukcja/img/` | instrukcja obsługi dla sędziów (statyczna strona, własny CSS, zrzuty z demo); przycisk „Instrukcja” w pasku sędziego i odnośnik pod logowaniem — patrz [instrukcja-sedziow.md](instrukcja-sedziow.md) |
 | `assets/login-hero.jpg` | grafika ekranu logowania (od organizatora) |
 | `assets/favicon-16.png`, `assets/favicon-32.png`, `assets/apple-touch-icon.png` | favicon i ikona na ekran telefonu: biały sygnet Sommer Residence (wieniec z monogramem SR, wycięty z `logo-sommer-residence.png`, wiersze 0–130, kolumny 45–205) na bordowym tle `#8D2732`; podpięte w `index.html` i `demo/index.html` |
 | `js/app.js` | start aplikacji, ekran logowania, wymuszona zmiana kodu supervisora, routing po `#hash`, pasek górny, znacznik synchronizacji, automatyczna kopia co godzinę o :30 (supervisor) |
@@ -29,7 +30,7 @@
 | `js/editors.js` | edytory: zawodnicy i harmonogram startów, import finalistów z eliminacji, sędziowie i kody (+ wydruk kodów PDF), edytor karty oceny |
 | `js/judge.js` | panel sędziego: karta ocen (`ScoreCard`), pola z walidacją, uwagi do pozycji i kategorii, eksport karty PDF/Excel, porównanie zawodników, „Mój ranking” |
 | `js/supervisor.js` | panel supervisora: lista turniejów, wyniki na żywo (`ResultsTab`: kolejność startowa / ranking), karty sędziów (macierz), porównanie „oczami sędziego”, historia zmian, głosy publiczności (`AudienceTab`: kolejność występów / ranking, podium, CSV/PDF), ustawienia, strona „Kopie zapasowe i kod dostępu” (`SystemPage`: lista kopii, `BackupPreview` — podgląd kopii obok obecnego stanu, `RestoreDialog` — przywrócenie po wpisaniu kodu, zmiana kodu, przekazanie dostępu) |
-| `js/feedback.js` | generator feedbacku dla zawodnika (szablony zdań; opcjonalnie `TTS_CONFIG.feedbackEndpoint` — miejsce na przyszłe AI) + okno edycji |
+| `js/feedback.js` | generator feedbacku dla zawodnika (szablony zdań; opcjonalnie `TTS_CONFIG.feedbackEndpoint` — miejsce na przyszłe AI, dziś nieustawione, więc także w produkcji działa wbudowany generator) + okno edycji |
 | `js/pdf.js` | PDF: karta sędziego, feedback, wyniki, ranking publiczności (nagłówek z logo, stopka z adresem) |
 | `js/backup.js` | format kopii `tts-backup-1` (JSON), podział turnieju na wiersze bazy, eksport Excel, automatyczne pobieranie kopii o :30 |
 | `js/ui.js` | ikony SVG (słownik `P`), logo, awatary, odznaki konkurencji, `Segmented`, `Modal`, dymki uwag, toasty |

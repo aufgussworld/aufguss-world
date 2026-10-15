@@ -1,0 +1,517 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Instrukcja dla sędziów — Turniej Trzech Saun</title>
+  <meta name="description" content="Instrukcja obsługi systemu sędziowskiego Turnieju Trzech Saun dla sędziów: logowanie, wpisywanie ocen, uwagi, karta PDF, feedback, porównanie, praca bez internetu.">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#5c1520">
+  <link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../assets/favicon-16.png">
+  <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap">
+  <style>
+    :root {
+      --bg: #f4f1eb; --surface: #ffffff; --surface-2: #faf7f2;
+      --ink: #1b1a17; --ink-2: #45413a; --muted: #696358;
+      --line: #e7e1d7; --line-2: #d5ccbe;
+      --brand: #8d2732; --brand-deep: #5c1520; --brand-tint: #f8edee; --brand-line: #ebd9db; --gold: #e6c79a;
+      --ok: #15803d; --ok-tint: #e8f6ee; --ok-line: #b3e0c4;
+      --warn: #9a5b00; --warn-tint: #fff6e5; --warn-line: #f0d49c;
+      --neg: #b42318; --neg-tint: #fef1ef; --neg-line: #f3c4bd;
+      --f-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+      --f-ui: 'Instrument Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      --f-mono: 'JetBrains Mono', ui-monospace, Consolas, monospace;
+      --r: 14px;
+      --sh: 0 1px 2px rgba(27, 26, 23, 0.06), 0 8px 24px rgba(27, 26, 23, 0.06);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 20px; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.62 var(--f-ui); -webkit-font-smoothing: antialiased; }
+    img { max-width: 100%; height: auto; display: block; }
+    a { color: var(--brand); }
+    kbd { display: inline-block; min-width: 1.6em; padding: 1px 7px; font: 600 0.82em/1.5 var(--f-mono); text-align: center; color: var(--ink); background: var(--surface); border: 1px solid var(--line-2); border-bottom-width: 2px; border-radius: 6px; white-space: nowrap; }
+    .ic { width: 1.1em; height: 1.1em; vertical-align: -0.18em; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* nagłówek */
+    .hero { background: var(--brand-deep); color: #fff; box-shadow: inset 0 -3px 0 rgba(230, 199, 154, 0.45); }
+    .hero-in { max-width: 1180px; margin: 0 auto; padding: 28px 24px 34px; display: grid; grid-template-columns: auto 1fr auto; gap: 24px; align-items: center; }
+    .hero img { width: 92px; }
+    .hero .eyebrow { margin: 0 0 4px; font-size: 12.5px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gold); }
+    .hero h1 { margin: 0; font: 600 clamp(28px, 4.2vw, 42px)/1.08 var(--f-display); letter-spacing: -0.01em; }
+    .hero p.lead { margin: 8px 0 0; color: rgba(255, 255, 255, 0.82); max-width: 640px; }
+    .hero-actions { display: flex; flex-direction: column; gap: 8px; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 42px; padding: 0 16px; border-radius: 10px; font: 600 14.5px var(--f-ui); text-decoration: none; cursor: pointer; border: 1px solid rgba(255, 255, 255, 0.35); color: #fff; background: transparent; white-space: nowrap; }
+    .btn:hover { background: rgba(255, 255, 255, 0.12); }
+    .btn.solid { background: #fff; color: var(--brand-deep); border-color: #fff; }
+    .btn.solid:hover { background: #f4ecec; }
+    .btn:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+
+    /* układ */
+    .wrap { max-width: 1180px; margin: 0 auto; padding: 32px 24px 64px; display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 40px; align-items: start; }
+    .toc { position: sticky; top: 20px; font-size: 14px; }
+    .toc h2 { margin: 0 0 8px; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+    .toc ol { list-style: none; margin: 0; padding: 0; counter-reset: toc; }
+    .toc li { counter-increment: toc; }
+    .toc a { display: flex; gap: 10px; padding: 6px 10px; border-radius: 8px; color: var(--ink-2); text-decoration: none; line-height: 1.35; }
+    .toc a::before { content: counter(toc); flex: none; width: 20px; color: var(--muted); font-variant-numeric: tabular-nums; }
+    .toc a:hover { background: var(--surface); color: var(--ink); }
+    main { min-width: 0; }
+
+    /* treść */
+    section { padding-top: 8px; margin-bottom: 44px; }
+    h2.sec { display: flex; align-items: baseline; gap: 12px; margin: 0 0 14px; font: 600 28px/1.2 var(--f-display); letter-spacing: -0.01em; }
+    h2.sec .n { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; background: var(--brand); color: #fff; font: 600 17px var(--f-ui); transform: translateY(-3px); }
+    h3 { margin: 26px 0 8px; font: 600 19px/1.3 var(--f-display); }
+    p { margin: 0 0 12px; }
+    ul, ol { margin: 0 0 14px; padding-left: 22px; }
+    li { margin-bottom: 6px; }
+    li::marker { color: var(--brand); }
+    .steps { list-style: none; padding: 0; counter-reset: st; }
+    .steps > li { counter-increment: st; position: relative; padding-left: 42px; margin-bottom: 12px; }
+    .steps > li::before { content: counter(st); position: absolute; left: 0; top: 0; width: 28px; height: 28px; border-radius: 50%; background: var(--brand-tint); color: var(--brand); border: 1px solid var(--brand-line); font-weight: 700; font-size: 14px; display: flex; align-items: center; justify-content: center; }
+
+    .quick { background: var(--surface); border: 1px solid var(--line); border-left: 5px solid var(--brand); border-radius: var(--r); padding: 22px 24px 10px; box-shadow: var(--sh); margin-bottom: 44px; }
+    .quick h2 { margin: 0 0 12px; font: 600 22px var(--f-display); }
+    .quick ul { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 24px; }
+    .quick li { display: flex; gap: 10px; margin: 0; }
+    .quick li .ic { flex: none; color: var(--ok); margin-top: 4px; }
+
+    .box { display: flex; gap: 12px; padding: 14px 16px; border-radius: 12px; margin: 16px 0; border: 1px solid; font-size: 15px; }
+    .box .ic { flex: none; margin-top: 3px; }
+    .box p:last-child, .box ul:last-child { margin-bottom: 0; }
+    .box.tip { background: var(--ok-tint); border-color: var(--ok-line); }
+    .box.tip > .ic { color: var(--ok); }
+    .box.warn { background: var(--warn-tint); border-color: var(--warn-line); }
+    .box.warn > .ic { color: var(--warn); }
+    .box.info { background: var(--brand-tint); border-color: var(--brand-line); }
+    .box.info > .ic { color: var(--brand); }
+
+    figure { margin: 18px 0 24px; }
+    .shot { position: relative; border-radius: var(--r); overflow: hidden; border: 1px solid var(--line); box-shadow: var(--sh); background: var(--surface); }
+    .shot.narrow { max-width: 520px; }
+    .shot.mid { max-width: 760px; }
+    figcaption { margin-top: 8px; font-size: 13.5px; color: var(--muted); }
+    .pin { position: absolute; transform: translate(-50%, -50%); width: 28px; height: 28px; border-radius: 50%; background: var(--gold); color: var(--brand-deep); border: 2px solid #fff; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35); font: 700 14px/24px var(--f-ui); text-align: center; }
+    .shot.topbar { overflow: visible; margin-bottom: 18px; border-radius: 10px; }
+    .shot.topbar img { border-radius: 10px; }
+    .shot.topbar .pin { top: 100% !important; }
+    .legend { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px 22px; margin-top: 14px; }
+    .legend li { display: flex; gap: 10px; margin: 0; font-size: 15px; line-height: 1.45; }
+    .legend li b.k { flex: none; width: 24px; height: 24px; border-radius: 50%; background: var(--gold); color: var(--brand-deep); font: 700 13px/24px var(--f-ui); text-align: center; margin-top: 1px; }
+
+    table.simple { width: 100%; border-collapse: collapse; margin: 12px 0 18px; font-size: 15px; background: var(--surface); border-radius: 12px; overflow: hidden; box-shadow: var(--sh); }
+    table.simple th, table.simple td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    table.simple th { background: var(--surface-2); font-size: 12.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+    table.simple tr:last-child td { border-bottom: 0; }
+
+    .chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; font-size: 13.5px; font-weight: 600; white-space: nowrap; vertical-align: 1px; }
+    .chip.ok { background: rgba(21, 128, 61, 0.12); color: var(--ok); }
+    .chip.busy { background: rgba(141, 39, 50, 0.1); color: var(--brand); }
+    .chip.off { background: var(--warn-tint); color: var(--warn); border: 1px solid var(--warn-line); }
+    .st { display: inline-flex; vertical-align: -0.2em; }
+    .st svg { width: 18px; height: 18px; }
+    .tag-neg { display: inline-block; padding: 0 7px; border-radius: 6px; border: 1px solid var(--neg-line); background: var(--neg-tint); color: var(--neg); font-size: 11.5px; font-weight: 700; letter-spacing: 0.06em; }
+
+    details { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; margin-bottom: 10px; }
+    details summary { cursor: pointer; padding: 14px 18px; font-weight: 600; list-style: none; display: flex; justify-content: space-between; gap: 12px; }
+    details summary::-webkit-details-marker { display: none; }
+    details summary::after { content: '+'; font-size: 20px; line-height: 1; color: var(--brand); }
+    details[open] summary::after { content: '−'; }
+    details > div { padding: 0 18px 14px; color: var(--ink-2); }
+
+    footer.end { border-top: 1px solid var(--line); padding: 22px 24px 40px; text-align: center; font-size: 13.5px; color: var(--muted); }
+
+    @media (max-width: 1060px) {
+      .wrap { grid-template-columns: 1fr; gap: 0; }
+      .toc { position: static; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px 14px 10px; margin-bottom: 32px; }
+      .toc ol { columns: 2; column-gap: 16px; }
+    }
+    @media (max-width: 720px) {
+      .hero-in { grid-template-columns: 1fr; gap: 14px; padding: 22px 16px 26px; }
+      .hero img { width: 70px; }
+      .hero-actions { flex-direction: row; flex-wrap: wrap; }
+      .wrap { padding: 22px 16px 48px; }
+      .quick ul { grid-template-columns: 1fr; }
+      .toc ol { columns: 1; }
+      h2.sec { font-size: 23px; }
+      .pin { width: 22px; height: 22px; font-size: 12px; line-height: 18px; }
+    }
+    @media print {
+      body { background: #fff; font-size: 11pt; }
+      .hero { background: #fff; color: var(--ink); box-shadow: none; border-bottom: 2px solid var(--brand); }
+      .hero img { filter: brightness(0) saturate(100%) invert(19%) sepia(52%) saturate(2400%) hue-rotate(332deg) brightness(88%); }
+      .hero p.lead { color: var(--ink-2); }
+      .hero-actions, .toc { display: none; }
+      .wrap { display: block; padding: 12px 0; }
+      section, figure, .box, .quick, table, details { break-inside: avoid; }
+      h2.sec { break-after: avoid; }
+      .shot, .quick, table.simple { box-shadow: none; }
+      details > div { display: block; }
+      a { color: var(--ink); text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4M12 17h.01"/></symbol>
+    <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7V16h8v-1.3A7 7 0 0 0 12 2Z"/></symbol>
+    <symbol id="i-print" viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></symbol>
+    <symbol id="i-note" viewBox="0 0 24 24"><path d="M15.5 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.5z"/><path d="M15 3v6h6"/></symbol>
+    <symbol id="i-note-text" viewBox="0 0 24 24"><path d="M15.5 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.5z"/><path d="M15 3v6h6M7 12h6M7 16h9"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></symbol>
+  </svg>
+
+  <header class="hero">
+    <div class="hero-in">
+      <img src="../assets/logo-sommer-residence.png" width="250" height="199" alt="Sommer Residence">
+      <div>
+        <p class="eyebrow">Turniej Trzech Saun · system sędziowski</p>
+        <h1>Instrukcja obsługi dla sędziów</h1>
+        <p class="lead">Wszystko, czego potrzebujesz, żeby sprawnie oceniać ceremonie na laptopie: logowanie, wpisywanie punktów, uwagi, karta PDF, feedback dla zawodnika i co robić, gdy zniknie internet.</p>
+      </div>
+      <div class="hero-actions">
+        <a class="btn solid" href="../">Przejdź do systemu <svg class="ic"><use href="#i-arrow"/></svg></a>
+        <button class="btn" type="button" onclick="window.print()"><svg class="ic"><use href="#i-print"/></svg>Drukuj / zapisz PDF</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <nav class="toc" aria-label="Spis treści">
+      <h2>Spis treści</h2>
+      <ol>
+        <li><a href="#zanim">Zanim zaczniesz</a></li>
+        <li><a href="#logowanie">Logowanie</a></li>
+        <li><a href="#ekran">Ekran oceniania</a></li>
+        <li><a href="#oceny">Wpisywanie ocen</a></li>
+        <li><a href="#uwagi">Uwagi do ocen</a></li>
+        <li><a href="#poprawki">Poprawianie ocen</a></li>
+        <li><a href="#karta">Karta PDF i Excel</a></li>
+        <li><a href="#feedback">Feedback dla zawodnika</a></li>
+        <li><a href="#porownanie">Porównanie zawodników</a></li>
+        <li><a href="#ranking">Mój ranking</a></li>
+        <li><a href="#final">Finał — trzy karty</a></li>
+        <li><a href="#internet">Zapis i brak internetu</a></li>
+        <li><a href="#koniec">Koniec pracy</a></li>
+        <li><a href="#pytania">Pytania i problemy</a></li>
+      </ol>
+    </nav>
+
+    <main>
+      <div class="quick">
+        <h2>Najważniejsze w pół minuty</h2>
+        <ul>
+          <li><svg class="ic"><use href="#i-check"/></svg><span>Zaloguj się <b>kodem z kartki</b> od supervisora.</span></li>
+          <li><svg class="ic"><use href="#i-check"/></svg><span>Wybierz zawodnika z <b>listy po lewej</b> i wpisuj punkty.</span></li>
+          <li><svg class="ic"><use href="#i-check"/></svg><span>Zapis jest <b>automatyczny</b> — nie ma przycisku „Zapisz”.</span></li>
+          <li><svg class="ic"><use href="#i-check"/></svg><span>Liczby z dokładnością do <b>0,1</b> — przecinek albo kropka.</span></li>
+          <li><svg class="ic"><use href="#i-check"/></svg><span>Punkty karne wpisuj <b>bez minusa</b> — system sam je odejmie.</span></li>
+          <li><svg class="ic"><use href="#i-check"/></svg><span><kbd>Enter</kbd> przenosi do następnego pola, <kbd>Esc</kbd> cofa zmianę.</span></li>
+          <li><svg class="ic"><use href="#i-check"/></svg><span>Znacznik <span class="chip ok"><svg class="ic"><use href="#i-check"/></svg>Zapisano</span> u góry = wszystko jest w bazie.</span></li>
+          <li><svg class="ic"><use href="#i-check"/></svg><span>Po seansie możesz pobrać swoją <b>kartę PDF</b> do podpisu.</span></li>
+        </ul>
+      </div>
+
+      <section id="zanim">
+        <h2 class="sec"><span class="n">1</span>Zanim zaczniesz</h2>
+        <ul>
+          <li><b>Laptop z przeglądarką</b> — Chrome, Edge, Firefox albo Safari w aktualnej wersji. System działa też na tablecie, ale najwygodniej ocenia się na laptopie z klawiaturą.</li>
+          <li><b>Internet</b> — hotelowe Wi-Fi wystarczy. Gdy na chwilę zniknie, nic nie przepada (rozdział <a href="#internet">12</a>).</li>
+          <li><b>Kod logowania</b> — 6 znaków (litery i cyfry), dostajesz go na kartce od supervisora. W kodach nie ma liter O ani I ani cyfr 0 ani 1, więc nie da się ich pomylić.</li>
+          <li><b>Adres systemu:</b> <a href="../">aufgussworld.github.io/aufguss-world/turniej-trzech-saun</a></li>
+        </ul>
+        <div class="box tip"><svg class="ic"><use href="#i-bulb"/></svg>
+          <p>Chcesz poćwiczyć przed turniejem? Otwórz <a href="../demo/">wersję demonstracyjną</a> — ma przykładowych zawodników i przyciski szybkiego logowania. Nic, co tam zrobisz, nie wpływa na prawdziwy turniej.</p>
+        </div>
+      </section>
+
+      <section id="logowanie">
+        <h2 class="sec"><span class="n">2</span>Logowanie</h2>
+        <ol class="steps">
+          <li>Otwórz adres systemu. Po lewej zobaczysz grafikę turnieju, po prawej ramkę <b>„Sędzia”</b>.</li>
+          <li>Wpisz swój kod w polu <b>„Kod logowania”</b>. Wielkość liter i spacje nie mają znaczenia — <kbd>k7m4qx</kbd> działa tak samo jak <kbd>K7M 4QX</kbd>.</li>
+          <li>Kliknij <b>„Zaloguj się”</b>. System otworzy kartę pierwszego zawodnika, którego jeszcze nie oceniłeś do końca.</li>
+        </ol>
+        <figure>
+          <div class="shot narrow"><img src="img/01-logowanie.png" width="760" height="516" alt="Ramka logowania sędziego z polem „Kod logowania” i przyciskiem „Zaloguj się”" loading="lazy"></div>
+          <figcaption>Logowanie sędziego. Pod przyciskiem jest też odnośnik do tej instrukcji.</figcaption>
+        </figure>
+        <table class="simple">
+          <thead><tr><th>Komunikat</th><th>Co zrobić</th></tr></thead>
+          <tbody>
+            <tr><td>„Nie znaleziono sędziego z takim kodem…”</td><td>Sprawdź kod na kartce i wpisz go jeszcze raz. Jeśli dalej nie działa — poproś supervisora o sprawdzenie kodu.</td></tr>
+            <tr><td>„Kod ma 6 znaków, np. K7M 4QX.”</td><td>Kod jest za krótki — sprawdź, czy wpisałeś wszystkie znaki.</td></tr>
+            <tr><td>„Ten turniej nie został jeszcze otwarty przez supervisora.”</td><td>Supervisor musi otworzyć turniej. Poczekaj chwilę i zaloguj się ponownie.</td></tr>
+            <tr><td>„Brak połączenia z bazą danych…”</td><td>Sprawdź, czy laptop jest połączony z Wi-Fi.</td></tr>
+          </tbody>
+        </table>
+        <div class="box info"><svg class="ic"><use href="#i-info"/></svg>
+          <p>Logowanie dotyczy jednej karty przeglądarki. Odświeżenie strony (<kbd>F5</kbd>) Cię nie wyloguje, ale w nowej karcie lub nowym oknie trzeba zalogować się ponownie.</p>
+        </div>
+      </section>
+
+      <section id="ekran">
+        <h2 class="sec"><span class="n">3</span>Ekran oceniania</h2>
+        <p>Po lewej masz listę zawodników, po prawej kartę oceny wybranego zawodnika.</p>
+        <figure>
+          <div class="shot">
+            <img src="img/02-ekran-oceny.png" width="1920" height="1200" alt="Ekran oceniania: lista zawodników po lewej, karta oceny zawodnika po prawej" loading="lazy">
+            <span class="pin" style="left:19.3%;top:11%">1</span>
+            <span class="pin" style="left:24.5%;top:49%">2</span>
+            <span class="pin" style="left:36.5%;top:15%">3</span>
+            <span class="pin" style="left:80%;top:14%">4</span>
+            <span class="pin" style="left:82.2%;top:33.5%">5</span>
+            <span class="pin" style="left:80.8%;top:51.2%">6</span>
+            <span class="pin" style="left:93%;top:51.2%">7</span>
+          </div>
+          <figcaption>Ekran oceniania (wersja demonstracyjna, zawodnicy fikcyjni).</figcaption>
+        </figure>
+        <ul class="legend">
+          <li><b class="k">1</b><span><b>Lista zawodników</b> w kolejności startu, pogrupowana według dni, z paskiem postępu: ile Twoich kart jest kompletnych.</span></li>
+          <li><b class="k">2</b><span><b>Stan karty</b> i Twoja suma punktów. Kliknij zawodnika, aby otworzyć jego kartę.</span></li>
+          <li><b class="k">3</b><span><b>Zawodnik:</b> numer startowy, dzień i godzina startu, czas ceremonii.</span></li>
+          <li><b class="k">4</b><span><b>Twoja ocena:</b> suma na bieżąco, postęp wypełniania i godzina ostatniego zapisu.</span></li>
+          <li><b class="k">5</b><span><b>Karta PDF, Excel</b> i <b>Feedback dla zawodnika</b> (rozdziały <a href="#karta">7</a> i <a href="#feedback">8</a>).</span></li>
+          <li><b class="k">6</b><span><b>Uwaga do pozycji</b> — ikona notatnika (rozdział <a href="#uwagi">5</a>).</span></li>
+          <li><b class="k">7</b><span><b>Pole oceny</b> — obok widać dozwolony zakres, np. 0–2.</span></li>
+        </ul>
+        <h3>Stan karty na liście zawodników</h3>
+        <p>
+          <span class="st" style="color:#b9ae9c"><svg class="ic"><circle cx="12" cy="12" r="10" stroke-dasharray="3 3"/></svg></span> nieoceniona &nbsp;·&nbsp;
+          <span class="st" style="color:#e9a23b"><svg class="ic"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 0 20z" fill="currentColor"/></svg></span> w trakcie &nbsp;·&nbsp;
+          <span class="st" style="color:var(--ink)"><svg class="ic"><circle cx="12" cy="12" r="10" fill="currentColor"/><path d="m7.5 12.5 3 3 6-7" stroke="#fff" stroke-width="2.2"/></svg></span> kompletna
+        </p>
+        <h3>Górny pasek</h3>
+        <figure>
+          <div class="shot topbar">
+            <img src="img/03-pasek-gorny.png" width="1920" height="90" alt="Górny pasek: nazwa turnieju, zakładki Ocenianie, Porównanie, Mój ranking, znacznik Zapisano, imię sędziego, Instrukcja, Wyloguj" loading="lazy">
+            <span class="pin" style="left:16.8%">1</span>
+            <span class="pin" style="left:33.8%">2</span>
+            <span class="pin" style="left:43.9%">3</span>
+            <span class="pin" style="left:54.3%">4</span>
+            <span class="pin" style="left:65.3%">5</span>
+            <span class="pin" style="left:85.6%">6</span>
+            <span class="pin" style="left:94.8%">7</span>
+          </div>
+        </figure>
+        <ul class="legend">
+          <li><b class="k">1</b><span>Turniej i konkurencja, którą oceniasz.</span></li>
+          <li><b class="k">2</b><span><b>Ocenianie</b> — lista zawodników i karty.</span></li>
+          <li><b class="k">3</b><span><b>Porównanie</b> zawodników (rozdział <a href="#porownanie">9</a>).</span></li>
+          <li><b class="k">4</b><span><b>Mój ranking</b> (rozdział <a href="#ranking">10</a>).</span></li>
+          <li><b class="k">5</b><span><b>Stan zapisu</b> — „Zapisano” oznacza, że wszystko jest w bazie (rozdział <a href="#internet">12</a>).</span></li>
+          <li><b class="k">6</b><span><b>Instrukcja</b> — ta strona, otwiera się w nowej karcie.</span></li>
+          <li><b class="k">7</b><span><b>Wyloguj</b> (rozdział <a href="#koniec">13</a>).</span></li>
+        </ul>
+      </section>
+
+      <section id="oceny">
+        <h2 class="sec"><span class="n">4</span>Wpisywanie ocen</h2>
+        <ol class="steps">
+          <li>Kliknij w pole oceny i wpisz liczbę. Dozwolony zakres widać tuż obok pola (np. <b>0–2</b>).</li>
+          <li>Naciśnij <kbd>Enter</kbd> (albo strzałkę w dół) — przejdziesz do następnej pozycji. <kbd>Shift</kbd> + <kbd>Enter</kbd> lub strzałka w górę wraca do poprzedniej.</li>
+          <li>Ocena zapisuje się sama przy każdej zmianie. Suma kategorii i całej karty liczy się na bieżąco.</li>
+          <li>Na dole karty przyciskiem <b>„Następny zawodnik”</b> przejdziesz dalej (albo wybierz zawodnika z listy).</li>
+        </ol>
+        <figure>
+          <div class="shot mid"><img src="img/04-wpisywanie.png" width="1341" height="890" alt="Kategoria Profesjonalizm z wpisanymi ocenami; w pozycji karnej wpisano -1 i pojawił się komunikat o wpisywaniu liczby bez minusa" loading="lazy"></div>
+          <figcaption>Kategoria z wpisanymi ocenami. W pozycji karnej ktoś wpisał „−1” — system od razu pokazuje komunikat.</figcaption>
+        </figure>
+        <h3>Zasady wpisywania</h3>
+        <ul>
+          <li><b>Dokładność 0,1 pkt</b> — np. <kbd>1,5</kbd> albo <kbd>1.5</kbd>. Wpis <kbd>1,35</kbd> zostanie odrzucony. (Jeśli supervisor włączy tryb „tylko przecinek”, kropka będzie błędem.)</li>
+          <li><b>Punkty karne</b> — wiersze z czerwoną etykietą <span class="tag-neg">KARA</span>. Wpisz <b>samą liczbę</b>, np. <kbd>1</kbd> za minutę przekroczenia czasu — minus system doda sam. Pustą karę traktuje jak zero.</li>
+          <li><b>Pozycje Tak / Nie</b> (np. „Użycie więcej niż 3 zapachów”) — kliknij <b>„Nie · 0”</b> albo <b>„Tak · 1”</b>. Ponowne kliknięcie zaznaczonej odpowiedzi czyści pole. Z klawiatury: <kbd>0</kbd>, <kbd>1</kbd> lub spacja.</li>
+          <li><b>Puste pole to brak oceny, a nie zero.</b> Karta jest kompletna, gdy wypełnisz wszystkie pozycje punktowe i Tak / Nie (kary mogą zostać puste).</li>
+          <li><kbd>Esc</kbd> cofa zmianę w polu, w którym właśnie jesteś.</li>
+        </ul>
+        <figure>
+          <div class="shot mid"><img src="img/06-tak-nie-uwagi.png" width="1341" height="681" alt="Kategoria Naturalne aromaty z pozycją Tak/Nie, karą i polem Dodatkowe uwagi" loading="lazy"></div>
+          <figcaption>Pozycja Tak / Nie (4), kara (5) i „Dodatkowe uwagi” do kategorii.</figcaption>
+        </figure>
+        <div class="box warn"><svg class="ic"><use href="#i-alert"/></svg>
+          <div>
+            <p><b>Błędny wpis nie jest zapisywany.</b> Pod polem pojawia się czerwony komunikat, a w karcie zostaje poprzednia ocena. Popraw liczbę i przejdź dalej. Najczęstsze komunikaty:</p>
+            <ul>
+              <li>„Wpisz liczbę bez minusa — punkty karne system odejmie sam.”</li>
+              <li>„Maksymalnie 2 pkt w tej pozycji.” — liczba większa niż zakres.</li>
+              <li>„Dokładność oceny to 0,1 pkt — np. 1,3 zamiast 1,35.”</li>
+              <li>„To nie jest liczba. Wpisz np. 2 albo 1,5.”</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="uwagi">
+        <h2 class="sec"><span class="n">5</span>Uwagi do ocen</h2>
+        <p>Uwagi pomagają później porównać zawodników i napisać feedback. Widzisz je Ty i supervisor — inni sędziowie ich nie widzą.</p>
+        <h3>Uwaga do jednej pozycji</h3>
+        <ol class="steps">
+          <li>Kliknij ikonę notatnika <svg class="ic"><use href="#i-note"/></svg> w wierszu pozycji.</li>
+          <li>Wpisz uwagę i kliknij <b>„Zapisz uwagę”</b> (albo <kbd>Ctrl</kbd> + <kbd>Enter</kbd>).</li>
+          <li>Ikona zmieni się na wypełnioną <svg class="ic"><use href="#i-note-text"/></svg>. Najedź na nią kursorem, aby zobaczyć treść; kliknij, aby poprawić lub usunąć uwagę.</li>
+        </ol>
+        <figure>
+          <div class="shot mid"><img src="img/05-uwaga.png" width="1140" height="546" alt="Okno „Uwaga do pozycji” z treścią uwagi i przyciskiem „Zapisz uwagę”" loading="lazy"></div>
+          <figcaption>Okno uwagi do pozycji „Wykonanie seansu”.</figcaption>
+        </figure>
+        <h3>Dodatkowe uwagi do kategorii</h3>
+        <p>Pod każdą kategorią jest odnośnik <b>„+ Dodatkowe uwagi”</b>. Kliknij go i pisz — tekst zapisuje się sam w trakcie pisania. To miejsce na ogólne wrażenia z całej kategorii.</p>
+      </section>
+
+      <section id="poprawki">
+        <h2 class="sec"><span class="n">6</span>Poprawianie ocen</h2>
+        <ul>
+          <li>Oceny możesz zmieniać w dowolnym momencie, <b>dopóki turniej trwa</b>. Wejdź na kartę zawodnika i wpisz nową wartość.</li>
+          <li>Aby usunąć ocenę, skasuj liczbę z pola.</li>
+          <li>Każda zmiana zapisuje się w <b>historii zmian</b>, którą widzi supervisor. To normalne — nie musisz niczego wyjaśniać.</li>
+          <li>Gdy supervisor zakończy turniej, karty są <b>tylko do odczytu</b> (komunikat „Turniej jest zakończony — karta jest tylko do odczytu”). Feedback nadal możesz przygotować.</li>
+        </ul>
+        <div class="box tip"><svg class="ic"><use href="#i-bulb"/></svg>
+          <p><b>Wpisałeś oceny niewłaściwemu zawodnikowi?</b> Wpisz je na karcie właściwego zawodnika, a na błędnej karcie skasuj liczby z pól.</p>
+        </div>
+      </section>
+
+      <section id="karta">
+        <h2 class="sec"><span class="n">7</span>Po seansie: karta PDF i Excel</h2>
+        <p>Gdy zaczniesz wypełniać kartę, nad kategoriami pojawią się przyciski <b>„Karta PDF”</b> i <b>„Excel”</b>.</p>
+        <figure>
+          <div class="shot"><img src="img/07-naglowek-karty.png" width="1341" height="408" alt="Nagłówek karty z sumą punktów, postępem i przyciskami Karta PDF, Excel oraz Feedback dla zawodnika" loading="lazy"></div>
+          <figcaption>Nagłówek karty: suma, postęp („8 z 16 ocen”), godzina zapisu i przyciski.</figcaption>
+        </figure>
+        <ul>
+          <li><b>Karta PDF</b> — Twoja karta z logo Sommer Residence i miejscem na podpis, do wydruku. Jest też kopią bezpieczeństwa na wypadek awarii.</li>
+          <li><b>Excel</b> — ta sama karta w arkuszu kalkulacyjnym.</li>
+          <li>Pliki zapisują się w folderze <b>„Pobrane”</b> na laptopie.</li>
+        </ul>
+      </section>
+
+      <section id="feedback">
+        <h2 class="sec"><span class="n">8</span>Feedback dla zawodnika</h2>
+        <p>Feedback to opisowa ocena seansu z Twojego punktu widzenia, którą zawodnik może dostać w PDF. System przygotowuje szkic na podstawie Twoich ocen i uwag — Ty go czytasz, poprawiasz i zapisujesz.</p>
+        <ol class="steps">
+          <li>Na karcie zawodnika kliknij <b>„Feedback dla zawodnika”</b> (przycisk działa, gdy karta ma już oceny).</li>
+          <li>Kliknij <b>„Przygotuj szkic feedbacku”</b>. Jeśli karta nie jest kompletna, system Cię o tym uprzedzi.</li>
+          <li>Przeczytaj szkic i popraw, co chcesz — możesz zmieniać tytuły i treść każdej sekcji. Linie zaczynające się od „• ” w PDF staną się listą punktowaną.</li>
+          <li>Kliknij <b>„Zapisz”</b>, a potem <b>„Pobierz PDF”</b>.</li>
+        </ol>
+        <figure>
+          <div class="shot"><img src="img/08-feedback-start.png" width="1560" height="581" alt="Okno feedbacku przed przygotowaniem szkicu z przyciskiem „Przygotuj szkic feedbacku”" loading="lazy"></div>
+          <figcaption>Okno feedbacku przed przygotowaniem szkicu.</figcaption>
+        </figure>
+        <figure>
+          <div class="shot"><img src="img/09-feedback-szkic.png" width="1560" height="875" alt="Szkic feedbacku z sekcjami Podsumowanie, Profesjonalizm, Show do edycji" loading="lazy"></div>
+          <figcaption>Szkic feedbacku — każdą sekcję można edytować.</figcaption>
+        </figure>
+        <figure>
+          <div class="shot"><img src="img/10-feedback-przyciski.png" width="1560" height="83" alt="Przyciski na dole okna feedbacku: Przygotuj szkic od nowa, Zapisz, Pobierz PDF" loading="lazy"></div>
+          <figcaption>Na dole okna: „Przygotuj szkic od nowa” (zastępuje Twoje poprawki), „Zapisz” i „Pobierz PDF”.</figcaption>
+        </figure>
+        <ul>
+          <li>Zapisany feedback zobaczysz pod przyciskiem <b>„Feedback — edytuj”</b>; możesz do niego wrócić w każdej chwili.</li>
+          <li>Przy zamykaniu okna z niezapisanymi zmianami system zapyta, czy na pewno je porzucić.</li>
+          <li>Zapisany feedback widzi też supervisor.</li>
+        </ul>
+      </section>
+
+      <section id="porownanie">
+        <h2 class="sec"><span class="n">9</span>Porównanie zawodników</h2>
+        <p>Zakładka <b>„Porównanie”</b> pokazuje Twoje oceny kilku zawodników obok siebie, pozycja po pozycji — przydaje się, gdy chcesz być konsekwentny w ocenach.</p>
+        <ol class="steps">
+          <li>Kliknij <b>„Porównanie”</b> w górnym pasku.</li>
+          <li>Zaznacz od 2 do 6 zawodników (na start system zaznacza trzech ostatnich w kolejności startu, którym wpisałeś już oceny). <b>„Wyczyść wybór”</b> odznacza wszystkich, a <b>×</b> nad kolumną usuwa jednego zawodnika.</li>
+          <li>Zielone tło i pogrubienie oznaczają najwyższą notę w wierszu. Przy dwóch zawodnikach pojawia się kolumna z różnicą.</li>
+          <li>Ikona przy wartości pokazuje Twoją uwagę — wystarczy najechać kursorem.</li>
+        </ol>
+        <figure>
+          <div class="shot"><img src="img/11-porownanie.png" width="1600" height="925" alt="Porównanie trzech zawodników: wybór zawodników i tabela ocen pozycja po pozycji z wyróżnieniem najwyższych not" loading="lazy"></div>
+          <figcaption>Porównanie trzech zawodników.</figcaption>
+        </figure>
+      </section>
+
+      <section id="ranking">
+        <h2 class="sec"><span class="n">10</span>Mój ranking</h2>
+        <p>Zakładka <b>„Mój ranking”</b> układa zawodników według <b>Twoich</b> ocen. Paski pokazują wynik w każdej kategorii, a dopisek „karta niekompletna” przypomina o brakujących ocenach. Kliknięcie zawodnika otwiera jego kartę.</p>
+        <figure>
+          <div class="shot"><img src="img/12-ranking.png" width="1600" height="646" alt="Mój ranking: lista zawodników według ocen sędziego z paskami kategorii i sumą punktów" loading="lazy"></div>
+          <figcaption>Ranking według ocen jednego sędziego.</figcaption>
+        </figure>
+        <div class="box info"><svg class="ic"><use href="#i-info"/></svg>
+          <p>Twojego rankingu nie widzą inni sędziowie. To nie jest oficjalny wynik — oficjalne wyniki liczy supervisor z kart wszystkich sędziów.</p>
+        </div>
+      </section>
+
+      <section id="final">
+        <h2 class="sec"><span class="n">11</span>Finał — trzy dni, trzy karty</h2>
+        <ul>
+          <li>W finale każdego zawodnika oceniasz na <b>trzech osobnych kartach</b>: piątek — <b>Relax</b>, sobota — <b>HOT</b>, niedziela — <b>Banya</b>.</li>
+          <li>Nad listą zawodników jest przełącznik <b>„Konkurencja”</b> z datą każdego dnia — wybierz właściwy dzień przed wpisywaniem ocen.</li>
+          <li>Każda konkurencja ma własną kartę oceny (inne kategorie i pozycje).</li>
+          <li>W „Porównaniu” i „Moim rankingu” jest dodatkowo widok <b>„Suma 3 dni”</b>.</li>
+        </ul>
+      </section>
+
+      <section id="internet">
+        <h2 class="sec"><span class="n">12</span>Zapis ocen i brak internetu</h2>
+        <p>Znacznik w górnym pasku zawsze pokazuje stan zapisu:</p>
+        <table class="simple">
+          <thead><tr><th>Znacznik</th><th>Co oznacza</th></tr></thead>
+          <tbody>
+            <tr><td><span class="chip ok"><svg class="ic"><use href="#i-check"/></svg>Zapisano</span></td><td>Wszystkie Twoje oceny są w bazie. Wszystko w porządku.</td></tr>
+            <tr><td><span class="chip busy"><svg class="ic"><use href="#i-refresh"/></svg>Zapisywanie…</span></td><td>Oceny właśnie się wysyłają — zwykle trwa to ułamek sekundy.</td></tr>
+            <tr><td><span class="chip off"><svg class="ic"><use href="#i-alert"/></svg>Brak połączenia · 3 czeka</span></td><td>Nie ma internetu. Oceny są bezpieczne w przeglądarce i wyślą się same, gdy połączenie wróci. Możesz dalej oceniać.</td></tr>
+          </tbody>
+        </table>
+        <div class="box warn"><svg class="ic"><use href="#i-alert"/></svg>
+          <div>
+            <p><b>Gdy nie ma internetu:</b></p>
+            <ul>
+              <li>oceniaj dalej, jak zwykle;</li>
+              <li><b>nie zamykaj karty przeglądarki i nie wylogowuj się</b>, dopóki znacznik nie wróci do „Zapisano”;</li>
+              <li>nie czyść historii ani danych przeglądarki;</li>
+              <li>jeśli brak połączenia trwa dłużej, powiedz supervisorowi i dla pewności pobierz kartę PDF.</li>
+            </ul>
+          </div>
+        </div>
+        <p>Jeśli odświeżysz stronę bez internetu, u góry pojawi się żółty pasek „Brak połączenia z bazą — pracujesz na kopii zapisanej w tej przeglądarce”. Możesz oceniać dalej; po powrocie internetu oceny wyślą się same.</p>
+      </section>
+
+      <section id="koniec">
+        <h2 class="sec"><span class="n">13</span>Koniec pracy i wylogowanie</h2>
+        <ul>
+          <li>Po zakończeniu oceniania kliknij <b>„Wyloguj”</b> w prawym górnym rogu.</li>
+          <li><b>Na wspólnym laptopie zawsze się wyloguj</b>, zanim oddasz komputer kolejnej osobie.</li>
+          <li>Przed wylogowaniem upewnij się, że u góry widać <span class="chip ok"><svg class="ic"><use href="#i-check"/></svg>Zapisano</span>.</li>
+        </ul>
+      </section>
+
+      <section id="pytania">
+        <h2 class="sec"><span class="n">14</span>Pytania i problemy</h2>
+        <details><summary>System sam mnie wylogował.</summary>
+          <div><p>Supervisor mógł zmienić Twój kod albo przywrócić dane z kopii zapasowej. Zaloguj się ponownie kodem od supervisora — <b>najlepiej na tym samym laptopie i w tej samej przeglądarce</b>. Oceny, które czekały na wysłanie, dotrą po zalogowaniu.</p></div></details>
+        <details><summary>Nie widzę zawodnika na liście.</summary>
+          <div><p>Lista pokazuje zawodników tej konkurencji, w kolejności startu. Jeśli kogoś brakuje albo godzina się nie zgadza — zgłoś to supervisorowi, który prowadzi listę zawodników.</p></div></details>
+        <details><summary>Nie mogę wpisać oceny — pola są szare.</summary>
+          <div><p>Turniej został zakończony i karty są tylko do odczytu. Jeśli musisz coś poprawić, poproś supervisora.</p></div></details>
+        <details><summary>Liczba nie chce się zapisać.</summary>
+          <div><p>Przeczytaj czerwony komunikat pod polem. Najczęściej to minus w polu kary, liczba większa niż zakres albo dwie cyfry po przecinku (rozdział <a href="#oceny">4</a>).</p></div></details>
+        <details><summary>Strona się nie ładuje albo jest biała.</summary>
+          <div><p>Sprawdź internet i naciśnij <kbd>Ctrl</kbd> + <kbd>F5</kbd> (twarde odświeżenie). Jeśli to nie pomaga — zgłoś supervisorowi. Twoje oceny są zapisane w bazie.</p></div></details>
+        <details><summary>Czy inni sędziowie widzą moje oceny?</summary>
+          <div><p>Nie. Widzisz wyłącznie własne karty. Supervisor widzi karty wszystkich sędziów na bieżąco.</p></div></details>
+        <details><summary>Czy mogę oceniać na telefonie lub tablecie?</summary>
+          <div><p>System działa na tablecie i telefonie, ale do oceniania zalecamy laptop — karta jest długa, a z klawiaturą wpisywanie jest najszybsze.</p></div></details>
+      </section>
+    </main>
+  </div>
+
+  <footer class="end">Sommer Residence Spa &amp; Wellness · Turniej Trzech Saun · instrukcja dla sędziów, wersja z 15.10.2026</footer>
+</body>
+</html>

@@ -11,6 +11,7 @@ import { Wizard } from './wizard.js';
 import { autoBackupTick } from './backup.js';
 
 const HERO = new URL('../assets/login-hero.jpg', import.meta.url).href;
+const MANUAL = new URL('../instrukcja/', import.meta.url).href; // instrukcja dla sędziów (osobna strona, nowa karta)
 let remote = null; // js/remote.js — ładowany tylko w wersji produkcyjnej
 
 const go = (hash) => {
@@ -71,6 +72,7 @@ function Login({ onLogin, notice }) {
           onInput=${(e) => { setCode(e.currentTarget.value.toUpperCase()); setErr(null); }} />
         ${err ? html`<p class="err" id="code-err" role="alert"><${Icon} name="alert" size=${14} />${err}</p>` : null}
         <button class="btn primary lg block" type="submit" disabled=${!!busy}>${busy === 'judge' ? 'Logowanie…' : 'Zaloguj się'}<${Icon} name="arrow-right" /></button>
+        <a class="manual-link" href=${MANUAL} target="_blank" rel="noopener"><${Icon} name="book" size=${15} />Instrukcja obsługi dla sędziów</a>
       </form>
 
       <form class="panel login-card" onSubmit=${(e) => { e.preventDefault(); submit('sup', pin, setPinErr); }}>
@@ -198,6 +200,8 @@ function TopBar({ session, t, judge, hash, onLogout, sync, offline }) {
       <span class="tb-av"><${Icon} name=${session.role === 'sup' ? 'monitor' : 'user'} size=${16} /></span>
       <span><b>${session.role === 'sup' ? 'Supervisor' : fullName(judge || {})}</b><small>${session.role === 'sup' ? 'sędzia techniczny' : 'sędzia'}</small></span>
     </div>
+    ${session.role === 'judge' ? html`<a class="btn ghost sm tb-help" href=${MANUAL} target="_blank" rel="noopener" title="Instrukcja obsługi dla sędziów (otwiera się w nowej karcie)">
+      <${Icon} name="book" size=${16} /><span class="hide-sm">Instrukcja</span></a>` : null}
     <button class="btn ghost sm" onClick=${onLogout}><${Icon} name="logout" size=${16} /><span class="hide-sm">Wyloguj</span></button>
   </header>`;
 }

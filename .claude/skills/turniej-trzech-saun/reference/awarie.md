@@ -13,6 +13,8 @@ i w kopiach (baza co godzinę o :30 + pliki na komputerze supervisora). Nie czy�
 4. Na komputerze supervisora: „Kopie i przywracanie” → włączone automatyczne pobieranie kopii o :30.
 5. Każdy laptop sędziego: zaloguj kodem, wpisz próbnie i usuń jedną ocenę (znacznik w pasku górnym: „Zapisano”).
 6. Zapas: wydrukowane papierowe karty oceny na wypadek całkowitej awarii.
+7. Sędziom: link do instrukcji (https://aufgussworld.github.io/aufguss-world/turniej-trzech-saun/instrukcja/) albo jej wydruk;
+   w panelu sędziego jest też przycisk „Instrukcja”.
 
 ## Objaw → przyczyna → co zrobić
 
