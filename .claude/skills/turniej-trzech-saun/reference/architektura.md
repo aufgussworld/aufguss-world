@@ -133,12 +133,16 @@
 
 Pokazuje nowe funkcje do akceptacji, gdy trwa turniej, bez zmiany żadnego pliku, który ładuje produkcja albo `/demo/`.
 
-- `demo-beta/index.html` — jak `demo/index.html` (`mode: 'demo'`), plus `css/beta.css` po `../css/app.css` i **mapa importów**
-  `{ "../js/judge.js": "./js/judge.js", "./js/": "../js/" }`: moduł karty oceny z `demo-beta/js/judge.js`, wszystko inne
-  (także importy z wnętrza podmienionego modułu, np. `./model.js`) ze wspólnego `js/`. Jedna kopia `store.js` → te same
-  dane demo (localStorage `tts-demo-v1`) co `/demo/`.
-- Podmiana kolejnego modułu: skopiuj `js/<plik>.js` do `demo-beta/js/` i dopisz do mapy `"../js/<plik>.js": "./js/<plik>.js"`.
-  Importy w kopii zostają `./x.js` (mapa kieruje je do `js/`), więc po akceptacji plik przechodzi do `js/` bez poprawek.
+- `demo-beta/index.html` — jak `demo/index.html` (`mode: 'demo'`), plus `css/beta.css` po `../css/app.css` i **mapa importów**:
+  dla każdego podmienionego modułu dwa wpisy `"../js/<plik>": "./js/<plik>"` i `"./js/<plik>": "./js/<plik>"`, na końcu
+  prefiks `"./js/": "../js/"`. Podmienione dziś: `judge.js`, `model.js`. Wszystko inne (także importy z wnętrza
+  podmienionych modułów, np. `./store.js`) idzie ze wspólnego `js/`. Jedna kopia `store.js` → te same dane demo
+  (localStorage `tts-demo-v1`) co `/demo/`.
+- Podmiana kolejnego modułu: skopiuj `js/<plik>.js` do `demo-beta/js/` i dopisz OBA wpisy do mapy. Drugi wpis
+  (`./js/<plik>` na siebie) jest konieczny: bez niego import z wnętrza bety (np. `judge.js` → `./model.js`) trafiłby przez
+  prefiks do starej wersji z `js/` — powstałyby dwie kopie modułu (dokładny wpis wygrywa z prefiksem; mapa nie działa
+  rekurencyjnie). Sprawdzenie w przeglądarce: w zakładce Sieć każdy podmieniony plik ładuje się raz i tylko z `demo-beta/js/`.
+  Importy w kopii zostają `./x.js`, więc po akceptacji plik przechodzi do `js/` bez poprawek.
 - `check.js` sprawdza składnię `demo-beta/js/*.js` i importy: kopia względem eksportów `js/` oraz moduły `js/` względem
   eksportów kopii (np. `supervisor.js` importuje `ScoreCard` z `judge.js`).
 - Mapy importów: Chrome/Edge 89+, Safari 16.4+, Firefox 108+ — dotyczy tylko bety; produkcja po wdrożeniu mapy nie używa.
@@ -173,6 +177,11 @@ Pokazuje nowe funkcje do akceptacji, gdy trwa turniej, bez zmiany żadnego pliku
   z komunikatem (toast). Zapis jak w karcie: `setScore` + `logChange` (wartość „z” świeża ze store), więc karta
   zawodnika, sumy kategorii, wynik i wyróżnienia w tabeli zmieniają się od razu. Nad tabelą podpowiedź z ołówkiem.
 
+`demo-beta/js/model.js` = `js/model.js` z commita `26e1382` + jedna zmiana (od 2026-10-17): `parseScore` przyjmuje wpis
+bez zera przed separatorem — „,8” / „.8” = 0,8 (jak w Excelu; po wyjściu z pola widać „0,8”). Działa w karcie, w porównaniu
+i w głosach publiczności. Bez zmian: „,85” (za dokładnie), sam „,” (nie liczba), kropka w trybie „tylko przecinek”, `bin` tylko
+0 / maks. Wskazówka nad kartą: „<kbd>,8</kbd> = 0,8”.
+
 `demo-beta/css/beta.css`, sekcja „karta oceny”: nowy układ wiersza `.item` (nazwa i pod nią suwak w kolumnie 2;
 uwaga, pole i przycisk ocen po prawej na wysokość obu wierszy; `bin` — przyciski Nie/Tak w drugim wierszu; telefon
 ≤ 820 px: nazwa na całą szerokość, pod nią suwak, pole 76 px i przycisk), suwak, okienko, większe cele dotyku
@@ -183,17 +192,18 @@ Sekcji „tylko demo-beta” (dopisek „· nowe funkcje” przy znaczku Demo) N
 
 ### Wdrożenie po akceptacji
 
-1. `git pull`; sprawdź, czy `js/judge.js` zmienił się od bazy bety:
-   `git log --oneline 26e1382.. -- turniej-trzech-saun/js/judge.js`. Jeśli tak — połącz zmiany
-   (`git diff --no-index turniej-trzech-saun/js/judge.js turniej-trzech-saun/demo-beta/js/judge.js`).
-2. Skopiuj `demo-beta/js/judge.js` → `js/judge.js`. Sekcje „karta oceny” i „porównanie zawodników” z `beta.css` dopisz
+1. `git pull`; sprawdź, czy `js/judge.js` lub `js/model.js` zmieniły się od bazy bety:
+   `git log --oneline 26e1382.. -- turniej-trzech-saun/js/judge.js turniej-trzech-saun/js/model.js`. Jeśli tak — połącz zmiany
+   (`git diff --no-index turniej-trzech-saun/js/judge.js turniej-trzech-saun/demo-beta/js/judge.js`, tak samo `model.js`).
+2. Skopiuj `demo-beta/js/judge.js` → `js/judge.js` i `demo-beta/js/model.js` → `js/model.js`. Sekcje „karta oceny” i „porównanie zawodników” z `beta.css` dopisz
    na końcu `css/app.css` (nadpisują stare reguły `.item`; porządniej — zastąp nimi reguły `.item` w app.css i ich
    odpowiedniki w `@media (max-width: 820px)`).
 3. Instrukcja dla sędziów: rozdział o wpisywaniu ocen — suwak i przycisk ocen; rozdział o porównaniu — poprawianie ocen
    kliknięciem; nowe zrzuty ([instrukcja-sedziow.md](instrukcja-sedziow.md)).
-4. Wyczyść betę: usuń `demo-beta/js/judge.js` i obie sekcje z `beta.css`, z mapy importów usuń wpis `judge.js`
+4. Wyczyść betę: usuń `demo-beta/js/judge.js`, `demo-beta/js/model.js` i obie sekcje z `beta.css`, z mapy importów
+   usuń ich wpisy
    (strona `demo-beta/` zostaje na kolejne funkcje). Aktualizacja tego pliku i dziennika zmian.
-5. `check.js`, test w `/demo/`, commit, push, potem **Ctrl+F5 u wszystkich** (zmieniają się `judge.js` i `app.css`).
+5. `check.js`, test w `/demo/`, commit, push, potem **Ctrl+F5 u wszystkich** (zmieniają się `judge.js`, `model.js` i `app.css`).
    Wystawione oceny są bezpieczne: kształt danych bez zmian, kolejka offline ze starego formatu działa dalej.
 
 ## Kopie zapasowe i eksporty

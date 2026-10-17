@@ -498,7 +498,7 @@ export function ScoreCard({ t, disc, cid, jid, readOnly = false, judgeName, onPr
       ${fieldsToFix(errCount)} — błędnej wartości nie zapisano, w karcie pozostaje poprzednia ocena.</div>` : null}
     ${locked && !readOnly ? html`<div class="alert info"><${Icon} name="lock" />Turniej jest zakończony — karta jest tylko do odczytu. Feedback dla zawodnika możesz nadal przygotować.</div>` : null}
     <div class="sc-toolbar">
-      ${!locked ? html`<p class="hint-line"><${Icon} name="info" size=${14} /> Wpisuj liczby z dokładnością do 0,1 (przecinek lub kropka) albo przesuń suwak. Punkty karne wpisuj bez minusa. <kbd>Enter</kbd> przenosi dalej, <kbd>Esc</kbd> cofa zmianę, <${Icon} name="note" size=${14} /> dodaje uwagę do pozycji, <${Icon} name="ranking" size=${14} /> pokazuje Twoje oceny tej pozycji u innych zawodników.</p>` : html`<span></span>`}
+      ${!locked ? html`<p class="hint-line"><${Icon} name="info" size=${14} /> Wpisuj liczby z dokładnością do 0,1 (przecinek lub kropka; <kbd>,8</kbd> = 0,8) albo przesuń suwak. Punkty karne wpisuj bez minusa. <kbd>Enter</kbd> przenosi dalej, <kbd>Esc</kbd> cofa zmianę, <${Icon} name="note" size=${14} /> dodaje uwagę do pozycji, <${Icon} name="ranking" size=${14} /> pokazuje Twoje oceny tej pozycji u innych zawodników.</p>` : html`<span></span>`}
       <div class="sc-actions">
         ${stats.started ? html`
           <button class="btn sm" onClick=${() => exportCard('pdf', t, disc, cid, jid)} title="Pobierz kartę jako PDF (do wydruku i podpisu)">

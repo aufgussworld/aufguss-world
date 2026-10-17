@@ -16,11 +16,16 @@
   <link rel="modulepreload" href="https://unpkg.com/htm@3.1.1/preact/standalone.module.js">
   <link rel="stylesheet" href="../css/app.css">
   <link rel="stylesheet" href="css/beta.css">
-  <!-- Demo nowych funkcji: wspólny kod z ../js, ale moduł karty oceny (judge.js) z tego folderu.
-       Mapa importów podmienia ../js/judge.js na ./js/judge.js, a importy z ./js/judge.js ('./model.js' itd.)
-       kieruje z powrotem do ../js — jedna kopia stanu, te same dane demo co /demo/. -->
+  <!-- Demo nowych funkcji: wspólny kod z ../js, ale podmienione moduły (judge.js, model.js) z tego folderu.
+       Mapa importów: ../js/<plik> → ./js/<plik> dla podmienionych; wpis ./js/<plik> → ./js/<plik> pilnuje, żeby
+       podmieniony moduł importowany z wnętrza bety też był wersją z bety (dokładny wpis wygrywa z prefiksem);
+       pozostałe importy z ./js/ ('./store.js' itd.) wracają do ../js — jedna kopia stanu, te same dane demo co /demo/. -->
   <script type="importmap">
-    { "imports": { "../js/judge.js": "./js/judge.js", "./js/": "../js/" } }
+    { "imports": {
+      "../js/judge.js": "./js/judge.js", "./js/judge.js": "./js/judge.js",
+      "../js/model.js": "./js/model.js", "./js/model.js": "./js/model.js",
+      "./js/": "../js/"
+    } }
   </script>
 </head>
 <body>

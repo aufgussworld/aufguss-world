@@ -153,6 +153,10 @@ Najpierw zawsze: co dokładnie widzi użytkownik (treść komunikatu) i na ilu u
 
 Najnowsze na górze. Każdy wpis: data — co — dlaczego.
 
+- **2026-10-17** — `demo-beta/`: wpis „,8” (bez zera przed przecinkiem) = 0,8 — w karcie, porównaniu i głosach publiczności
+  (`parseScore` w `demo-beta/js/model.js`; mapa importów podmienia teraz `judge.js` i `model.js`, z wpisami „na siebie”,
+  żeby nie powstały dwie kopie modułu). Produkcja bez zmian. Powód: sędziowie przyzwyczajeni do Excela.
+
 - **2026-10-17** — `demo-beta/`: w „Porównaniu zawodników” sędzia poprawia oceny pozycji kliknięciem w tabeli (`CompareCell`);
   zapis jak w karcie (`setScore` + historia), więc karta zawodnika i wyniki zmieniają się od razu; supervisor tylko ogląda.
   Produkcja bez zmian. Powód: prośba sędziów — korekta przy porównywaniu zawodników obok siebie.
