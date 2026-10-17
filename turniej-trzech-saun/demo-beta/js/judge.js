@@ -660,6 +660,64 @@ export function ContestantPicker({ t, disc, selected, onChange, max = 6 }) {
   </div>`;
 }
 
+// Komórka pozycji w porównaniu: ocena + dymek z uwagą. U sędziego (editable) kliknięcie otwiera pole do poprawy
+// oceny — zapis tą samą drogą co w karcie (setScore + wpis w historii), więc karta zawodnika zmienia się od razu.
+// Enter zapisuje, Esc anuluje, wyjście z pola zapisuje poprawną wartość (błędną odrzuca z komunikatem).
+function CompareCell({ t, disc, cid, jid, item, value, note, editable }) {
+  const [edit, setEdit] = useState(false);
+  const [text, setText] = useState('');
+  const [err, setErr] = useState(null);
+  const input = useRef();
+  const btn = useRef();
+  const closing = useRef(false); // po Enter / Esc pole znika — blur z tego zamknięcia nie zapisuje drugi raz
+  const refocus = useRef(false);
+  // od razu po zmianie DOM (nie po klatce) — szybko wpisana cyfra nie może trafić obok pola
+  useLayoutEffect(() => {
+    if (edit) { closing.current = false; input.current?.focus(); input.current?.select(); }
+    else if (refocus.current) { refocus.current = false; btn.current?.focus(); }
+  }, [edit]);
+
+  const neg = item.kind === 'minus';
+  const shown = value == null ? '—' : neg ? (value ? '−' + fmt(value) : '0') : fmt(value);
+  if (!editable) return html`<span class="cv">${shown}<${NoteTip} text=${note} size=${14} /></span>`;
+
+  const close = (back) => { closing.current = true; refocus.current = back; setErr(null); setEdit(false); };
+  const commit = (fromBlur) => {
+    const r = parseScore(text, item, t.decimalMode);
+    if (!r.ok) {
+      if (fromBlur) { toast(`${item.label}: ${r.error} Ocena bez zmian.`, 'err'); close(false); }
+      else setErr(r.error);
+      return;
+    }
+    const cur = getEntry(getT(t.id), disc, cid, jid)?.v?.[item.id] ?? null;
+    if (r.value !== cur) {
+      setScore(t.id, disc, cid, jid, item.id, r.value);
+      logChange(t.id, { j: jid, c: cid, d: disc, i: item.id, f: cur, t: r.value });
+    }
+    close(!fromBlur);
+  };
+  if (edit) {
+    return html`<span class=${`cv-edit k-${item.kind} ${err ? 'invalid' : ''}`}>
+      ${neg ? html`<span class="prefix" aria-hidden="true">−</span>` : null}
+      <input ref=${input} type="text" inputmode="decimal" autocomplete="off" spellcheck="false" value=${text}
+        aria-label=${item.label + ' — popraw ocenę'} aria-invalid=${err ? 'true' : 'false'}
+        onInput=${(e) => { setText(e.currentTarget.value); if (err) setErr(null); }}
+        onKeyDown=${(e) => {
+          if (e.key === 'Enter') { e.preventDefault(); commit(false); }
+          else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close(true); }
+        }}
+        onBlur=${() => { if (!closing.current) commit(true); }} />
+      ${err ? html`<span class="cv-err" role="alert">${err}</span>` : null}
+    </span>`;
+  }
+  return html`<span class="cv">
+    <button type="button" ref=${btn} class="cv-btn" title="Kliknij, aby poprawić ocenę"
+      aria-label=${`${item.label}: ${shown} — popraw ocenę`}
+      onClick=${() => { setText(fmtInput(value)); setErr(null); setEdit(true); }}>
+      ${shown}<${Icon} name="pencil" size=${12} /></button>
+    <${NoteTip} text=${note} size=${14} /></span>`;
+}
+
 function bestIndex(vals, higherIsBetter = true) {
   const present = vals.map((x, i) => [x, i]).filter(([x]) => x != null);
   if (present.length < 2) return new Set();
@@ -668,7 +726,8 @@ function bestIndex(vals, higherIsBetter = true) {
   return new Set(present.filter(([x]) => x === target).map(([, i]) => i));
 }
 
-export function Comparison({ t, disc, jid, cids, onRemove }) {
+// editable — sędzia poprawia własne oceny w tabeli (supervisor i suma kart: tylko podgląd)
+export function Comparison({ t, disc, jid, cids, onRemove, editable = false }) {
   const card = t.cards[disc];
   const cols = cids.map((cid) => {
     const c = t.contestants.find((x) => x.id === cid);
@@ -702,12 +761,12 @@ export function Comparison({ t, disc, jid, cids, onRemove }) {
           ${cat.items.map((it) => {
             const vals = cols.map((x) => x.v[it.id] ?? null);
             const b = it.kind === 'minus' ? new Set() : bestIndex(vals);
-            const shown = (x) => (x == null ? '—' : it.kind === 'minus' ? (x ? '−' + fmt(x) : '0') : fmt(x));
             const dv = it.kind === 'minus' ? diff(vals[1], vals[0]) : diff(vals[0], vals[1]);
             return html`<tr class=${'k-' + it.kind} key=${it.id}>
               <th scope="row"><span>${it.label}</span>${it.kind === 'minus' ? html`<span class="tag-neg">kara</span>` : null}<small>${rangeText(it)}</small></th>
-              ${vals.map((x, i) => html`<td class=${`${b.has(i) ? 'best' : ''} ${it.kind === 'minus' && x ? 'neg' : ''}`}>
-                <span class="cv">${shown(x)}<${NoteTip} text=${cols[i].notes.items[it.id]} size=${14} /></span></td>`)}
+              ${vals.map((x, i) => html`<td key=${cols[i].c.id} class=${`${b.has(i) ? 'best' : ''} ${it.kind === 'minus' && x ? 'neg' : ''}`}>
+                <${CompareCell} t=${t} disc=${disc} cid=${cols[i].c.id} jid=${jid} item=${it} value=${x}
+                  note=${cols[i].notes.items[it.id]} editable=${editable} /></td>`)}
               ${two ? diffCell(dv) : null}
             </tr>`;
           })}
@@ -760,8 +819,10 @@ function defaultPicks(t, disc, jid) {
   return list.slice(-3).map((c) => c.id);
 }
 
-export function CompareView({ t, jid, disc, onDisc, isFinal }) {
+// editable — tylko u sędziego w turnieju „W trakcie”: oceny pozycji można poprawiać w tabeli
+export function CompareView({ t, jid, disc, onDisc, isFinal, editable = false }) {
   const pd = disc === 'all' ? 'relax' : disc;
+  const canEdit = editable && disc !== 'all';
   const [sel, setSel] = useState(() => defaultPicks(t, disc, jid));
   const keyRef = useRef(jid);
   useEffect(() => {
@@ -773,11 +834,13 @@ export function CompareView({ t, jid, disc, onDisc, isFinal }) {
         options=${[...FINAL_ORDER.map((d) => ({ value: d, label: DISCIPLINES[d].label, icon: DISCIPLINES[d].icon, disc: d })), { value: 'all', label: 'Suma 3 dni', icon: 'trophy' }]} />` : null}
       <span class="muted">${sel.length} z maks. 6 zaznaczonych</span>
       ${sel.length ? html`<button class="link-btn" onClick=${() => setSel([])}>Wyczyść wybór</button>` : null}
+      ${canEdit && sel.length >= 2 ? html`<span class="muted small cmp-edit-hint"><${Icon} name="pencil" size=${14} />
+        Kliknij ocenę pozycji, aby ją poprawić — zmiana od razu trafia do karty zawodnika.</span>` : null}
     </div>
     <${ContestantPicker} t=${t} disc=${pd} selected=${sel} onChange=${setSel} />
     ${disc === 'all'
       ? html`<${ComparisonFinal} t=${t} jid=${jid} cids=${sel} />`
-      : html`<${Comparison} t=${t} disc=${disc} jid=${jid} cids=${sel} onRemove=${(id) => setSel(sel.filter((x) => x !== id))} />`}
+      : html`<${Comparison} t=${t} disc=${disc} jid=${jid} cids=${sel} editable=${canEdit} onRemove=${(id) => setSel(sel.filter((x) => x !== id))} />`}
   </div>`;
 }
 
@@ -863,7 +926,7 @@ export function JudgeApp({ t, judge, route, go }) {
     </div>` : null}
     ${view === 'porownanie' ? html`<div class="page"><div class="page-head"><h1>Porównanie zawodników</h1>
         <p class="muted">Twoje oceny obok siebie, pozycja po pozycji. Pogrubienie oznacza najwyższą notę w wierszu.</p></div>
-      <${CompareView} t=${t} jid=${judge.id} disc=${disc} isFinal=${isFinal} onDisc=${(d) => go(`#/j/porownanie/${d}`)} /></div>` : null}
+      <${CompareView} t=${t} jid=${judge.id} disc=${disc} isFinal=${isFinal} editable=${t.status === 'live'} onDisc=${(d) => go(`#/j/porownanie/${d}`)} /></div>` : null}
     ${view === 'ranking' ? html`<div class="page"><div class="page-head"><h1>Mój ranking</h1></div>
       <${MyRanking} t=${t} jid=${judge.id} disc=${disc} isFinal=${isFinal} onDisc=${(d) => go(`#/j/ranking/${d}`)}
         onOpen=${(id) => goCard(id, scoringDisc)} /></div>` : null}

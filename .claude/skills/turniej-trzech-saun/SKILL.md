@@ -153,6 +153,13 @@ Najpierw zawsze: co dokładnie widzi użytkownik (treść komunikatu) i na ilu u
 
 Najnowsze na górze. Każdy wpis: data — co — dlaczego.
 
+- **2026-10-17** — `demo-beta/`: w „Porównaniu zawodników” sędzia poprawia oceny pozycji kliknięciem w tabeli (`CompareCell`);
+  zapis jak w karcie (`setScore` + historia), więc karta zawodnika i wyniki zmieniają się od razu; supervisor tylko ogląda.
+  Produkcja bez zmian. Powód: prośba sędziów — korekta przy porównywaniu zawodników obok siebie.
+  Przy okazji zdiagnozowane zgłoszenie z produkcji (bez zmiany kodu): pozycja karna Banya „Zastosowanie mniej niż trzech
+  przedmiotów…” ustawiona w karcie turnieju jako „Tak / Nie” — liczy się wtedy jako punkty DODATNIE; naprawa w edytorze
+  karty (rodzaj „Punkty karne”), procedura w [reference/awarie.md](reference/awarie.md).
+
 - **2026-10-17** — Demo nowych funkcji `demo-beta/` (produkcja i `/demo/` bez zmian): na karcie oceny **suwak punktacji**
   0–maks. co 0,1 pkt pod nazwą każdej pozycji (mysz, palec, klawiatura; jeden wpis w historii na jedno przeciągnięcie)
   oraz **przycisk z listą** po prawej stronie pola punktów — okienko z ocenami tego sędziego w tej pozycji u zawodników

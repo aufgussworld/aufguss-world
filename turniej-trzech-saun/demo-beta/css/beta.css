@@ -106,5 +106,34 @@
   .peer-btn { width: 36px; height: 36px; }
 }
 
+/* ---------- porównanie zawodników: poprawianie ocen w tabeli (sędzia) ---------- */
+
+.cmp-edit-hint { display: inline-flex; align-items: center; gap: 6px; }
+.cv-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 5px; min-width: 58px; height: 32px; padding: 0 8px;
+  border: 1px dashed transparent; border-radius: 7px; background: none; font: inherit; color: inherit; cursor: pointer;
+  transition: background-color 0.12s, border-color 0.12s;
+}
+.cv-btn .ic { color: var(--ink-3); opacity: 0; transition: opacity 0.12s; }
+.cv-btn:hover, .cv-btn:focus-visible { border-color: var(--line-2); background: var(--surface); }
+.cv-btn:hover .ic, .cv-btn:focus-visible .ic { opacity: 1; }
+@media (hover: none) {
+  .cv-btn { border-color: var(--line); background: var(--surface); }
+  .cv-btn .ic { opacity: 0.55; }
+}
+.cv-edit { position: relative; display: inline-flex; justify-content: center; }
+.cv-edit input {
+  width: 78px; height: 34px; padding: 0 9px; text-align: right; font: 600 16px var(--f-ui); font-variant-numeric: tabular-nums lining-nums;
+  border: 1.5px solid var(--acc-fill); border-radius: 8px; background: #fff; box-shadow: 0 0 0 3px var(--acc-ring);
+}
+.cv-edit.k-minus input { padding-left: 22px; color: var(--neg); }
+.cv-edit .prefix { position: absolute; left: calc(50% - 39px + 9px); top: 50%; transform: translateY(-52%); color: var(--neg); font: 700 16px var(--f-ui); pointer-events: none; }
+.cv-edit.invalid input { border-color: var(--neg); background: #fff6f5; box-shadow: 0 0 0 3px rgba(180, 35, 24, 0.14); }
+.cv-err {
+  position: absolute; top: calc(100% + 5px); left: 50%; transform: translateX(-50%); z-index: 3; width: max-content; max-width: 230px;
+  padding: 6px 9px; border-radius: 7px; background: var(--neg-ink); color: #fff; font-size: 12.5px; font-weight: 500; line-height: 1.35;
+  text-align: left; white-space: normal; box-shadow: var(--sh-2);
+}
+
 /* ---------- tylko demo-beta (nie przenosić do app.css) ---------- */
 .demo-pill::after { content: ' · nowe funkcje'; }

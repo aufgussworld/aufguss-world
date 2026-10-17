@@ -165,23 +165,33 @@ Pokazuje nowe funkcje do akceptacji, gdy trwa turniej, bez zmiany żadnego pliku
   (karta tylko do odczytu) teksty „Oceny sędziego: …” i „ta karta”. Przycisk jest nieaktywny, dopóki żaden inny
   zawodnik nie ma oceny w tej pozycji.
 - Wskazówka nad kartą wspomina suwak i przycisk ocen.
+- `CompareCell` (od 2026-10-17) — **poprawianie ocen w porównaniu zawodników**: u sędziego (`CompareView` / `Comparison`
+  z `editable`, przekazywanym tylko z `JudgeApp` przy statusie „W trakcie”; nie w „Suma 3 dni”, nie u supervisora,
+  nie w trybie sumy kart) każda ocena pozycji jest przyciskiem; kliknięcie otwiera pole (fokus w `useLayoutEffect`,
+  żeby szybko wpisana cyfra nie trafiła obok), walidacja `parseScore` (także `bin`: tylko 0 albo maks.). Enter zapisuje
+  (błąd — komunikat pod polem, pole zostaje), Esc anuluje, wyjście z pola zapisuje poprawną wartość, a błędną odrzuca
+  z komunikatem (toast). Zapis jak w karcie: `setScore` + `logChange` (wartość „z” świeża ze store), więc karta
+  zawodnika, sumy kategorii, wynik i wyróżnienia w tabeli zmieniają się od razu. Nad tabelą podpowiedź z ołówkiem.
 
 `demo-beta/css/beta.css`, sekcja „karta oceny”: nowy układ wiersza `.item` (nazwa i pod nią suwak w kolumnie 2;
 uwaga, pole i przycisk ocen po prawej na wysokość obu wierszy; `bin` — przyciski Nie/Tak w drugim wierszu; telefon
 ≤ 820 px: nazwa na całą szerokość, pod nią suwak, pole 76 px i przycisk), suwak, okienko, większe cele dotyku
 (`pointer: coarse`) oraz poprawka szerokości strony na telefonie (`.split` `minmax(0, 1fr)`, zawijane przyciski `.sc-foot`
-— wcześniej strona była o ~44 px szersza od ekranu). Sekcji „tylko demo-beta” (dopisek „· nowe funkcje” przy znaczku
-Demo) NIE przenosić.
+— wcześniej strona była o ~44 px szersza od ekranu). Sekcja „porównanie zawodników”: przyciski ocen (`.cv-btn`, ołówek
+po najechaniu; na ekranach dotykowych ramka zawsze widoczna), pole edycji `.cv-edit`, dymek błędu `.cv-err`.
+Sekcji „tylko demo-beta” (dopisek „· nowe funkcje” przy znaczku Demo) NIE przenosić.
 
 ### Wdrożenie po akceptacji
 
 1. `git pull`; sprawdź, czy `js/judge.js` zmienił się od bazy bety:
    `git log --oneline 26e1382.. -- turniej-trzech-saun/js/judge.js`. Jeśli tak — połącz zmiany
    (`git diff --no-index turniej-trzech-saun/js/judge.js turniej-trzech-saun/demo-beta/js/judge.js`).
-2. Skopiuj `demo-beta/js/judge.js` → `js/judge.js`. Sekcję „karta oceny” z `beta.css` dopisz na końcu `css/app.css`
-   (nadpisuje stare reguły `.item`; porządniej — zastąp nią reguły `.item` w app.css i ich odpowiedniki w `@media (max-width: 820px)`).
-3. Instrukcja dla sędziów: rozdział o wpisywaniu ocen — suwak i przycisk ocen, nowe zrzuty ([instrukcja-sedziow.md](instrukcja-sedziow.md)).
-4. Wyczyść betę: usuń `demo-beta/js/judge.js` i sekcję „karta oceny” z `beta.css`, z mapy importów usuń wpis `judge.js`
+2. Skopiuj `demo-beta/js/judge.js` → `js/judge.js`. Sekcje „karta oceny” i „porównanie zawodników” z `beta.css` dopisz
+   na końcu `css/app.css` (nadpisują stare reguły `.item`; porządniej — zastąp nimi reguły `.item` w app.css i ich
+   odpowiedniki w `@media (max-width: 820px)`).
+3. Instrukcja dla sędziów: rozdział o wpisywaniu ocen — suwak i przycisk ocen; rozdział o porównaniu — poprawianie ocen
+   kliknięciem; nowe zrzuty ([instrukcja-sedziow.md](instrukcja-sedziow.md)).
+4. Wyczyść betę: usuń `demo-beta/js/judge.js` i obie sekcje z `beta.css`, z mapy importów usuń wpis `judge.js`
    (strona `demo-beta/` zostaje na kolejne funkcje). Aktualizacja tego pliku i dziennika zmian.
 5. `check.js`, test w `/demo/`, commit, push, potem **Ctrl+F5 u wszystkich** (zmieniają się `judge.js` i `app.css`).
    Wystawione oceny są bezpieczne: kształt danych bez zmian, kolejka offline ze starego formatu działa dalej.
