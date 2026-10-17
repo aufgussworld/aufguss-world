@@ -1,6 +1,7 @@
 // Lokalny serwer do podglądu systemu sędziowskiego (serwuje katalog główny repozytorium).
 // Uruchom z katalogu głównego repo:  node .claude/skills/turniej-trzech-saun/scripts/serve.js
 // Demo:       http://localhost:8123/turniej-trzech-saun/demo/   (PIN supervisora 2026)
+// Beta:       http://localhost:8123/turniej-trzech-saun/demo-beta/   (nowe funkcje do akceptacji)
 // Produkcja:  http://localhost:8123/turniej-trzech-saun/        (UWAGA: prawdziwa baza turnieju)
 
 const http = require('http');

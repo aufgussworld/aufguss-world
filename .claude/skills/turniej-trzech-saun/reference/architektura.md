@@ -18,6 +18,7 @@
 | `index.html` | wejście produkcyjne: wczytuje `config.js`, potem `js/app.js` |
 | `config.js` | `window.TTS_CONFIG = { mode: 'live', supabaseUrl, supabaseAnonKey }` (klucz publishable); opcjonalnie `feedbackEndpoint` |
 | `demo/index.html` | wersja demo: `TTS_CONFIG = { mode: 'demo' }`, te same `../css` i `../js` |
+| `demo-beta/index.html`, `demo-beta/js/`, `demo-beta/css/beta.css` | demo nowych funkcji do akceptacji: wspólny kod z `../js`, a wybrane moduły podmienione mapą importów — patrz [Demo nowych funkcji](#demo-nowych-funkcji-demo-beta) |
 | `instrukcja/index.html`, `instrukcja/img/` | instrukcja obsługi dla sędziów (statyczna strona, własny CSS, zrzuty z demo); przycisk „Instrukcja” w pasku sędziego i odnośnik pod logowaniem — patrz [instrukcja-sedziow.md](instrukcja-sedziow.md) |
 | `assets/login-hero.jpg` | grafika ekranu logowania (od organizatora) |
 | `assets/favicon-16.png`, `assets/favicon-32.png`, `assets/apple-touch-icon.png` | favicon i ikona na ekran telefonu: biały sygnet Sommer Residence (wieniec z monogramem SR, wycięty z `logo-sommer-residence.png`, wiersze 0–130, kolumny 45–205) na bordowym tle `#8D2732`; podpięte w `index.html` i `demo/index.html` |
@@ -127,6 +128,63 @@
   - błąd `P0001` (reguła biznesowa, np. turniej zakończony) usuwa wpis z kolejki, `42501` (brak uprawnień) wymusza odświeżenie.
 - Supervisor z kodem nadanym przez administratora (lub przekazanym przez poprzednika) nie widzi danych,
   dopóki nie ustawi własnego kodu (`session.codeSetBy !== 'supervisor'` → ekran wymuszonej zmiany).
+
+## Demo nowych funkcji (`demo-beta/`)
+
+Pokazuje nowe funkcje do akceptacji, gdy trwa turniej, bez zmiany żadnego pliku, który ładuje produkcja albo `/demo/`.
+
+- `demo-beta/index.html` — jak `demo/index.html` (`mode: 'demo'`), plus `css/beta.css` po `../css/app.css` i **mapa importów**
+  `{ "../js/judge.js": "./js/judge.js", "./js/": "../js/" }`: moduł karty oceny z `demo-beta/js/judge.js`, wszystko inne
+  (także importy z wnętrza podmienionego modułu, np. `./model.js`) ze wspólnego `js/`. Jedna kopia `store.js` → te same
+  dane demo (localStorage `tts-demo-v1`) co `/demo/`.
+- Podmiana kolejnego modułu: skopiuj `js/<plik>.js` do `demo-beta/js/` i dopisz do mapy `"../js/<plik>.js": "./js/<plik>.js"`.
+  Importy w kopii zostają `./x.js` (mapa kieruje je do `js/`), więc po akceptacji plik przechodzi do `js/` bez poprawek.
+- `check.js` sprawdza składnię `demo-beta/js/*.js` i importy: kopia względem eksportów `js/` oraz moduły `js/` względem
+  eksportów kopii (np. `supervisor.js` importuje `ScoreCard` z `judge.js`).
+- Mapy importów: Chrome/Edge 89+, Safari 16.4+, Firefox 108+ — dotyczy tylko bety; produkcja po wdrożeniu mapy nie używa.
+
+### Co jest teraz w becie (od 2026-10-17)
+
+`demo-beta/js/judge.js` = `js/judge.js` z commita `26e1382` + zmiany:
+
+- `ScoreSlider` — suwak 0–maks. (dziesiąte części) pod nazwą pozycji `plus` / `minus`; nie dla `bin` i nie na karcie
+  zablokowanej / tylko do odczytu (tam zostaje tekst zakresu). Mysz: wartość od razu w miejscu kliknięcia i przy przeciąganiu.
+  Dotyk: `touch-action: pan-y` — ruch w pionie przewija stronę, wartość zmienia ruch w bok (> 6 px) albo stuknięcie;
+  `pointercancel` przywraca ocenę sprzed gestu. Klawiatura: strzałki ±0,1, PageUp/PageDown ±1, Home/End.
+  Zapis przez `setScore` na żywo (jak wpisywanie w pole), w historii jeden wpis `logChange` po puszczeniu (klawiatura:
+  po 0,8 s przerwy); wartość „z” czytana świeżo ze store (`getT`), bo pole obok mogło przed chwilą zapisać wpis.
+  W produkcji kolejka `tts-live-outbox` łączy zapisy tej samej karty (klucz turniej|konkurencja|zawodnik|sędzia,
+  wysyłka po 350 ms), więc przeciąganie nie zalewa bazy zapisami.
+- `ScoreInput` — zmiana oceny z zewnątrz (suwak, inne urządzenie) czyści komunikat o błędnym wpisie w polu.
+- `PeerButton` / `PeerPopover` / `peerRows` — przycisk (ikona `ranking`) po prawej od pola punktów; okienko z ocenami
+  **tego samego sędziego** w tej pozycji u zawodników, którzy ją mają, plus bieżący zawodnik (zaznaczony, wartość na żywo);
+  kolejność startowa albo od najwyższej, pasek względem maksimum, dymek z uwagą do pozycji, liczba ocenionych i średnia.
+  Położenie: po prawej od przycisku; gdy brak miejsca (prawa kolumna karty, telefon) — pod wierszem albo nad nim,
+  liczone względem `visualViewport`. Zamykanie: X, Esc (tylko okienko — nie okno karty u supervisora), klik poza
+  okienkiem i poza wierszem tej pozycji (suwak i pole tej pozycji działają przy otwartym okienku). U supervisora
+  (karta tylko do odczytu) teksty „Oceny sędziego: …” i „ta karta”. Przycisk jest nieaktywny, dopóki żaden inny
+  zawodnik nie ma oceny w tej pozycji.
+- Wskazówka nad kartą wspomina suwak i przycisk ocen.
+
+`demo-beta/css/beta.css`, sekcja „karta oceny”: nowy układ wiersza `.item` (nazwa i pod nią suwak w kolumnie 2;
+uwaga, pole i przycisk ocen po prawej na wysokość obu wierszy; `bin` — przyciski Nie/Tak w drugim wierszu; telefon
+≤ 820 px: nazwa na całą szerokość, pod nią suwak, pole 76 px i przycisk), suwak, okienko, większe cele dotyku
+(`pointer: coarse`) oraz poprawka szerokości strony na telefonie (`.split` `minmax(0, 1fr)`, zawijane przyciski `.sc-foot`
+— wcześniej strona była o ~44 px szersza od ekranu). Sekcji „tylko demo-beta” (dopisek „· nowe funkcje” przy znaczku
+Demo) NIE przenosić.
+
+### Wdrożenie po akceptacji
+
+1. `git pull`; sprawdź, czy `js/judge.js` zmienił się od bazy bety:
+   `git log --oneline 26e1382.. -- turniej-trzech-saun/js/judge.js`. Jeśli tak — połącz zmiany
+   (`git diff --no-index turniej-trzech-saun/js/judge.js turniej-trzech-saun/demo-beta/js/judge.js`).
+2. Skopiuj `demo-beta/js/judge.js` → `js/judge.js`. Sekcję „karta oceny” z `beta.css` dopisz na końcu `css/app.css`
+   (nadpisuje stare reguły `.item`; porządniej — zastąp nią reguły `.item` w app.css i ich odpowiedniki w `@media (max-width: 820px)`).
+3. Instrukcja dla sędziów: rozdział o wpisywaniu ocen — suwak i przycisk ocen, nowe zrzuty ([instrukcja-sedziow.md](instrukcja-sedziow.md)).
+4. Wyczyść betę: usuń `demo-beta/js/judge.js` i sekcję „karta oceny” z `beta.css`, z mapy importów usuń wpis `judge.js`
+   (strona `demo-beta/` zostaje na kolejne funkcje). Aktualizacja tego pliku i dziennika zmian.
+5. `check.js`, test w `/demo/`, commit, push, potem **Ctrl+F5 u wszystkich** (zmieniają się `judge.js` i `app.css`).
+   Wystawione oceny są bezpieczne: kształt danych bez zmian, kolejka offline ze starego formatu działa dalej.
 
 ## Kopie zapasowe i eksporty
 

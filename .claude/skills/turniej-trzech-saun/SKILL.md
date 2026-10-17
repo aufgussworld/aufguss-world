@@ -15,6 +15,7 @@ zawodnicy, każdy sędzia ma osobną kartę na każdą konkurencję. Wynik fina�
 | Aplikacja (produkcja, prawdziwa baza) | https://aufgussworld.github.io/aufguss-world/turniej-trzech-saun/ |
 | Instrukcja dla sędziów (przycisk „Instrukcja” w panelu sędziego) | https://aufgussworld.github.io/aufguss-world/turniej-trzech-saun/instrukcja/ |
 | Wersja demo (dane przykładowe w przeglądarce, PIN supervisora `2026`) | https://aufgussworld.github.io/aufguss-world/turniej-trzech-saun/demo/ |
+| Demo nowych funkcji do akceptacji (produkcja ich nie ma; te same dane przykładowe co demo) | https://aufgussworld.github.io/aufguss-world/turniej-trzech-saun/demo-beta/ — opis: [reference/architektura.md](reference/architektura.md#demo-nowych-funkcji-demo-beta) |
 | Kod źródłowy | repo `aufgussworld/aufguss-world`, gałąź `main`, folder `turniej-trzech-saun/` |
 | Baza danych | Supabase, projekt `turniej-trzech-saun`, ref `wripvwhwginexvcmwdsq` (org. aufguss.world, Frankfurt, plan Free) — https://supabase.com/dashboard/project/wripvwhwginexvcmwdsq |
 | Schemat bazy (pełny, idempotentny) | [supabase/setup.sql](supabase/setup.sql) |
@@ -46,7 +47,8 @@ Zmiana, której nie ma w skillu, jest niedokończona.
 
 1. **Produkcja to żywy turniej.** Push na `main` zmienia aplikację wszystkim sędziom naraz. W trakcie
    oceniania wdrażaj tylko poprawki krytyczne, zawsze po teście w wersji demo i po `check.js` (niżej).
-   Zmiany kosmetyczne — przed turniejem albo po nim.
+   Zmiany kosmetyczne — przed turniejem albo po nim. Nowe funkcje w trakcie turnieju — tylko w `demo-beta/`
+   (osobna strona, nie zmienia żadnego pliku produkcji), do produkcji dopiero po akceptacji.
 2. **Nie zmieniaj kształtu danych** (pola turnieju, wpis karty `v / n / ni / fb`, nazwy tabel i funkcji
    w bazie) bez przemyślanej migracji. Przeglądarki sędziów trzymają kolejkę niewysłanych ocen
    i kopię stanu w starym formacie.
@@ -126,6 +128,8 @@ z podłączonym repo `aufgussworld/aufguss-world` (opis w tym samym pliku).
 | Przywrócić dane z wybranej godziny | w aplikacji: supervisor → „Kopie i przywracanie” → „Podgląd” → strzałki między godzinami → „Przywróć ten stan…” → kod supervisora |
 | Instrukcję dla sędziów (tekst, zrzuty ekranu) | `turniej-trzech-saun/instrukcja/index.html` + `img/` — [reference/instrukcja-sedziow.md](reference/instrukcja-sedziow.md) |
 | Kolejność wierszy w wynikach / głosach publiczności | przełącznik „Kolejność startowa / Ranking” w `ResultsTab` i `AudienceTab` (`js/supervisor.js`) |
+| Pokazać nową funkcję do akceptacji bez ruszania produkcji | `turniej-trzech-saun/demo-beta/` (mapa importów podmienia wybrane moduły) — [reference/architektura.md](reference/architektura.md#demo-nowych-funkcji-demo-beta) |
+| Przenieść zaakceptowane funkcje z `demo-beta/` do produkcji | procedura „Wdrożenie po akceptacji” w [reference/architektura.md](reference/architektura.md#demo-nowych-funkcji-demo-beta) |
 
 ## Awaria w trakcie turnieju
 
@@ -148,6 +152,15 @@ Najpierw zawsze: co dokładnie widzi użytkownik (treść komunikatu) i na ilu u
 ## Dziennik zmian
 
 Najnowsze na górze. Każdy wpis: data — co — dlaczego.
+
+- **2026-10-17** — Demo nowych funkcji `demo-beta/` (produkcja i `/demo/` bez zmian): na karcie oceny **suwak punktacji**
+  0–maks. co 0,1 pkt pod nazwą każdej pozycji (mysz, palec, klawiatura; jeden wpis w historii na jedno przeciągnięcie)
+  oraz **przycisk z listą** po prawej stronie pola punktów — okienko z ocenami tego sędziego w tej pozycji u zawodników
+  już ocenionych (kolejność startowa / od najwyższej, średnia, uwagi; bieżący zawodnik zaznaczony i aktualizowany na żywo).
+  Poprawka przy okazji (też tylko w becie): na telefonie przyciski „Poprzedni / Następny zawodnik” poszerzały stronę
+  (przewijanie w bok). Kształt danych bez zmian — suwak zapisuje to samo `v[itemId]` co pole. `check.js` sprawdza też
+  `demo-beta/js`. Powód: prośba sędziów (szybsze wypełnianie karty, porównanie z wcześniej ocenionymi); w trakcie
+  turnieju tylko demo, wdrożenie do produkcji po akceptacji organizatora.
 
 - **2026-10-15** — Feedback zbiorczy: sędzia tylko zapisuje szkic, zatwierdza albo usuwa feedback (bez PDF); supervisor w nowej
   zakładce „Feedback zawodników” pobiera dla każdego zawodnika jeden PDF z zatwierdzonymi opiniami wszystkich sędziów (każda na
