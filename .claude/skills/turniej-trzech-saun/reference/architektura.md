@@ -135,9 +135,12 @@ Pokazuje nowe funkcje do akceptacji, gdy trwa turniej, bez zmiany żadnego pliku
 
 - `demo-beta/index.html` — jak `demo/index.html` (`mode: 'demo'`), plus `css/beta.css` po `../css/app.css` i **mapa importów**:
   dla każdego podmienionego modułu dwa wpisy `"../js/<plik>": "./js/<plik>"` i `"./js/<plik>": "./js/<plik>"`, na końcu
-  prefiks `"./js/": "../js/"`. Podmienione dziś: `judge.js`, `model.js`. Wszystko inne (także importy z wnętrza
-  podmienionych modułów, np. `./store.js`) idzie ze wspólnego `js/`. Jedna kopia `store.js` → te same dane demo
-  (localStorage `tts-demo-v1`) co `/demo/`.
+  prefiks `"./js/": "../js/"`. Podmienione dziś: `judge.js`, `model.js`, `templates.js`, `store.js`. Wszystko inne
+  (także importy z wnętrza podmienionych modułów, np. `./seed.js`) idzie ze wspólnego `js/`.
+- **Własne dane przykładowe bety** (od 2026-10-18): `TTS_CONFIG = { mode: 'demo', demoKey: 'tts-demo-beta-v1' }`, a `store.js`
+  bety czyta klucz localStorage z `CONFIG.demoKey` (domyślnie `tts-demo-v1`, więc ta zmiana jest bezpieczna także w `js/`).
+  Dzięki temu beta zasiewa dane z SWOICH kart wzorcowych (`templates.js` bety, przez wspólny `seed.js`), niezależnie od tego,
+  co przeglądarka ma zapisane z `/demo/`; `/demo/` nie jest dotykane.
 - Podmiana kolejnego modułu: skopiuj `js/<plik>.js` do `demo-beta/js/` i dopisz OBA wpisy do mapy. Drugi wpis
   (`./js/<plik>` na siebie) jest konieczny: bez niego import z wnętrza bety (np. `judge.js` → `./model.js`) trafiłby przez
   prefiks do starej wersji z `js/` — powstałyby dwie kopie modułu (dokładny wpis wygrywa z prefiksem; mapa nie działa
@@ -182,6 +185,12 @@ bez zera przed separatorem — „,8” / „.8” = 0,8 (jak w Excelu; po wyjś
 i w głosach publiczności. Bez zmian: „,85” (za dokładnie), sam „,” (nie liczba), kropka w trybie „tylko przecinek”, `bin` tylko
 0 / maks. Wskazówka nad kartą: „<kbd>,8</kbd> = 0,8”.
 
+`demo-beta/js/templates.js` = `js/templates.js` z commita `f011048` + zmiana (od 2026-10-18, decyzja organizatora):
+„Użycie więcej niż 3 zapachów (/ kompozycji)” (`z4`, karty Relax, HOT i Banya) to **kara** — `kind: 'minus'`, maks. 1
+(zwykłe pole + suwak 0 do −1), zamiast `bin` (0/1, liczone jako punkty dodatnie). Szablon dotyczy tylko NOWYCH turniejów
+i danych demo; istniejące turnieje zmienia supervisor w edytorze karty (procedura w [awarie.md](awarie.md)).
+`demo-beta/js/store.js` = `js/store.js` z `f011048` + klucz demo z `CONFIG.demoKey`.
+
 `demo-beta/css/beta.css`, sekcja „karta oceny”: nowy układ wiersza `.item` (nazwa i pod nią suwak w kolumnie 2;
 uwaga, pole i przycisk ocen po prawej na wysokość obu wierszy; `bin` — przyciski Nie/Tak w drugim wierszu; telefon
 ≤ 820 px: nazwa na całą szerokość, pod nią suwak, pole 76 px i przycisk), suwak, okienko, większe cele dotyku
@@ -192,18 +201,23 @@ Sekcji „tylko demo-beta” (dopisek „· nowe funkcje” przy znaczku Demo) N
 
 ### Wdrożenie po akceptacji
 
-1. `git pull`; sprawdź, czy `js/judge.js` lub `js/model.js` zmieniły się od bazy bety:
-   `git log --oneline 26e1382.. -- turniej-trzech-saun/js/judge.js turniej-trzech-saun/js/model.js`. Jeśli tak — połącz zmiany
-   (`git diff --no-index turniej-trzech-saun/js/judge.js turniej-trzech-saun/demo-beta/js/judge.js`, tak samo `model.js`).
-2. Skopiuj `demo-beta/js/judge.js` → `js/judge.js` i `demo-beta/js/model.js` → `js/model.js`. Sekcje „karta oceny” i „porównanie zawodników” z `beta.css` dopisz
+1. `git pull`; sprawdź, czy podmienione pliki zmieniły się w `js/` od bazy bety:
+   `git log --oneline 26e1382.. -- turniej-trzech-saun/js/judge.js turniej-trzech-saun/js/model.js` oraz
+   `git log --oneline f011048.. -- turniej-trzech-saun/js/templates.js turniej-trzech-saun/js/store.js`. Jeśli tak — połącz zmiany
+   (`git diff --no-index turniej-trzech-saun/js/<plik> turniej-trzech-saun/demo-beta/js/<plik>`).
+2. Skopiuj z `demo-beta/js/` do `js/`: `judge.js`, `model.js`, `templates.js`, `store.js` (zmiana w `store.js` jest
+   neutralna dla produkcji i `/demo/`). Uwaga: `templates.js` zmienia tylko NOWE turnieje — w istniejących turniejach
+   supervisor zmienia `z4` w edytorze karty (osobno, można wcześniej — [awarie.md](awarie.md)). Dane `/demo/` w przeglądarkach
+   mają stare karty, dopóki nie podbije się `SEED_VERSION` w `seed.js`. Sekcje „karta oceny” i „porównanie zawodników” z `beta.css` dopisz
    na końcu `css/app.css` (nadpisują stare reguły `.item`; porządniej — zastąp nimi reguły `.item` w app.css i ich
    odpowiedniki w `@media (max-width: 820px)`).
 3. Instrukcja dla sędziów: rozdział o wpisywaniu ocen — suwak i przycisk ocen; rozdział o porównaniu — poprawianie ocen
    kliknięciem; nowe zrzuty ([instrukcja-sedziow.md](instrukcja-sedziow.md)).
-4. Wyczyść betę: usuń `demo-beta/js/judge.js`, `demo-beta/js/model.js` i obie sekcje z `beta.css`, z mapy importów
-   usuń ich wpisy
+4. Wyczyść betę: usuń `demo-beta/js/judge.js`, `model.js`, `templates.js`, `store.js` i obie sekcje z `beta.css`,
+   z mapy importów usuń ich wpisy (`demoKey` może zostać — beta dalej ma osobne dane)
    (strona `demo-beta/` zostaje na kolejne funkcje). Aktualizacja tego pliku i dziennika zmian.
-5. `check.js`, test w `/demo/`, commit, push, potem **Ctrl+F5 u wszystkich** (zmieniają się `judge.js`, `model.js` i `app.css`).
+5. `check.js`, test w `/demo/`, commit, push, potem **Ctrl+F5 u wszystkich** (zmieniają się `judge.js`, `model.js`, `store.js`,
+   `templates.js` i `app.css`).
    Wystawione oceny są bezpieczne: kształt danych bez zmian, kolejka offline ze starego formatu działa dalej.
 
 ## Kopie zapasowe i eksporty

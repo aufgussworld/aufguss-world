@@ -15,7 +15,7 @@ zawodnicy, każdy sędzia ma osobną kartę na każdą konkurencję. Wynik fina�
 | Aplikacja (produkcja, prawdziwa baza) | https://aufgussworld.github.io/aufguss-world/turniej-trzech-saun/ |
 | Instrukcja dla sędziów (przycisk „Instrukcja” w panelu sędziego) | https://aufgussworld.github.io/aufguss-world/turniej-trzech-saun/instrukcja/ |
 | Wersja demo (dane przykładowe w przeglądarce, PIN supervisora `2026`) | https://aufgussworld.github.io/aufguss-world/turniej-trzech-saun/demo/ |
-| Demo nowych funkcji do akceptacji (produkcja ich nie ma; te same dane przykładowe co demo) | https://aufgussworld.github.io/aufguss-world/turniej-trzech-saun/demo-beta/ — opis: [reference/architektura.md](reference/architektura.md#demo-nowych-funkcji-demo-beta) |
+| Demo nowych funkcji do akceptacji (produkcja ich nie ma; własne dane przykładowe, PIN `2026`) | https://aufgussworld.github.io/aufguss-world/turniej-trzech-saun/demo-beta/ — opis: [reference/architektura.md](reference/architektura.md#demo-nowych-funkcji-demo-beta) |
 | Kod źródłowy | repo `aufgussworld/aufguss-world`, gałąź `main`, folder `turniej-trzech-saun/` |
 | Baza danych | Supabase, projekt `turniej-trzech-saun`, ref `wripvwhwginexvcmwdsq` (org. aufguss.world, Frankfurt, plan Free) — https://supabase.com/dashboard/project/wripvwhwginexvcmwdsq |
 | Schemat bazy (pełny, idempotentny) | [supabase/setup.sql](supabase/setup.sql) |
@@ -152,6 +152,12 @@ Najpierw zawsze: co dokładnie widzi użytkownik (treść komunikatu) i na ilu u
 ## Dziennik zmian
 
 Najnowsze na górze. Każdy wpis: data — co — dlaczego.
+
+- **2026-10-18** — `demo-beta/`: „Użycie więcej niż 3 zapachów (/ kompozycji)” (`z4`) we wszystkich kartach wzorcowych to kara
+  (`minus`, maks. 1) zamiast „Tak / Nie” (`demo-beta/js/templates.js`). Beta ma własne dane przykładowe (`demoKey`
+  `tts-demo-beta-v1`, `demo-beta/js/store.js`), żeby nowe karty było widać mimo starych danych `/demo/` w przeglądarce.
+  Produkcja bez zmian; istniejące turnieje przestawia supervisor w edytorze karty bez ruszania ocen — procedura
+  w [reference/awarie.md](reference/awarie.md) (przećwiczona na demo). Powód: decyzja organizatora — pozycja ma odejmować punkty.
 
 - **2026-10-17** — `demo-beta/`: wpis „,8” (bez zera przed przecinkiem) = 0,8 — w karcie, porównaniu i głosach publiczności
   (`parseScore` w `demo-beta/js/model.js`; mapa importów podmienia teraz `judge.js` i `model.js`, z wpisami „na siebie”,
