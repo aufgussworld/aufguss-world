@@ -47,7 +47,14 @@ czcionki, ikony), a pliki odbiera lokalny serwer.
    await shot(document.querySelector('.app'), '02-ekran-oceny.png', { w: 1280, h: 800 });
    ```
    Wycinki: `.login-card`, `.topbar`, `.sc-cat` (tło `#ffffff`), `.modal` (zostaw `bg` domyślne),
-   `.app-body .page` (porównanie, ranking). Długie okna przycinaj opcjami `w` / `h`.
+   `.app-body .page` (porównanie, ranking), `.peer-pop` (okienko ocen innych zawodników). Długie okna przycinaj
+   opcjami `w` / `h`. Elementy z `position: fixed` (np. `.peer-pop`) wychodzą puste — wołaj `htmlToImage.toBlob`
+   bezpośrednio z opcją `style: { position: 'static', left: 'auto', top: 'auto', boxShadow: 'none' }`.
+   Wartości na karcie do zrzutów najprościej ustawić z konsoli: `const s = await import('/turniej-trzech-saun/js/store.js');
+   s.setScore('bny26', 'banya', '<id zawodnika>', 'bny26-j1', '<id pozycji>', 15)` (dziesiąte części); dane demo resetuje
+   `s.store.reset()` (bez okna potwierdzenia).
+   Zrzuty z 2026-10-18: `02-ekran-oceny.png` (Bartłomiej Kos, karta w trakcie), `04-wpisywanie.png` (błąd „−1”),
+   `06-kary-uwagi.png`, `11-porownanie.png` (otwarte pole poprawki), `13-oceny-innych.png`.
 5. Numerowane znaczniki na zrzutach (`<span class="pin" style="left:…%;top:…%">`) liczy się z
    `getBoundingClientRect()` elementów w oknie 1280×800 (procent szerokości / wysokości kadru).
    Po zmianie układu ekranu sprawdź, czy znaczniki dalej wskazują właściwe miejsca.

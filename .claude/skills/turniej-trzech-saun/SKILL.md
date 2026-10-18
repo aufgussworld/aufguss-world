@@ -160,6 +160,8 @@ Najnowsze na górze. Każdy wpis: data — co — dlaczego.
   z `demoKey`), `js/seed.js` (`SEED_VERSION` 4), `css/app.css` (reguły z bety wpięte w miejsce starych). Bez zmian w bazie
   i w `remote.js`; kształt danych bez zmian — wystawione oceny nietknięte. Beta wyczyszczona (bez podmienionych modułów).
   Po wdrożeniu: Ctrl+F5 u sędziów i supervisora. Opis funkcji: [reference/architektura.md](reference/architektura.md).
+  Instrukcja dla sędziów (wersja z 18.10.2026): suwak, przycisk ocen innych zawodników, „,8”, poprawki w porównaniu, kary
+  z suwakiem; nowe zrzuty 02, 04, 06 (`06-kary-uwagi.png` zamiast `06-tak-nie-uwagi.png`), 11 i nowy 13.
 
 - **2026-10-18** — `demo-beta/`: „Użycie więcej niż 3 zapachów (/ kompozycji)” (`z4`) we wszystkich kartach wzorcowych to kara
   (`minus`, maks. 1) zamiast „Tak / Nie” (`demo-beta/js/templates.js`). Beta ma własne dane przykładowe (`demoKey`

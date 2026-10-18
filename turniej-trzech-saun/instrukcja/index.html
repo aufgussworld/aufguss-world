@@ -165,6 +165,8 @@
     <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></symbol>
     <symbol id="i-note" viewBox="0 0 24 24"><path d="M15.5 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.5z"/><path d="M15 3v6h6"/></symbol>
     <symbol id="i-note-text" viewBox="0 0 24 24"><path d="M15.5 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.5z"/><path d="M15 3v6h6M7 12h6M7 16h9"/></symbol>
+    <symbol id="i-ranking" viewBox="0 0 24 24"><path d="M10 6h11M10 12h11M10 18h11M4 6h1v4M4 10h2M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></symbol>
+    <symbol id="i-pencil" viewBox="0 0 24 24"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></symbol>
     <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></symbol>
   </svg>
 
@@ -211,7 +213,8 @@
           <li><svg class="ic"><use href="#i-check"/></svg><span>Zaloguj się <b>kodem z kartki</b> od supervisora.</span></li>
           <li><svg class="ic"><use href="#i-check"/></svg><span>Wybierz zawodnika z <b>listy po lewej</b> i wpisuj punkty.</span></li>
           <li><svg class="ic"><use href="#i-check"/></svg><span>Zapis jest <b>automatyczny</b> — nie ma przycisku „Zapisz”.</span></li>
-          <li><svg class="ic"><use href="#i-check"/></svg><span>Liczby z dokładnością do <b>0,1</b> — przecinek albo kropka.</span></li>
+          <li><svg class="ic"><use href="#i-check"/></svg><span>Liczby z dokładnością do <b>0,1</b> — przecinek albo kropka; <kbd>,8</kbd> to 0,8. Zamiast wpisywać, możesz przesunąć <b>suwak</b> pod pozycją.</span></li>
+          <li><svg class="ic"><use href="#i-check"/></svg><span>Przycisk <svg class="ic"><use href="#i-ranking"/></svg> obok pola pokazuje <b>Twoje oceny tej pozycji</b> u zawodników ocenionych wcześniej.</span></li>
           <li><svg class="ic"><use href="#i-check"/></svg><span>Punkty karne wpisuj <b>bez minusa</b> — system sam je odejmie.</span></li>
           <li><svg class="ic"><use href="#i-check"/></svg><span><kbd>Enter</kbd> przenosi do następnego pola, <kbd>Esc</kbd> cofa zmianę.</span></li>
           <li><svg class="ic"><use href="#i-check"/></svg><span>Znacznik <span class="chip ok"><svg class="ic"><use href="#i-check"/></svg>Zapisano</span> u góry = wszystko jest w bazie.</span></li>
@@ -264,13 +267,15 @@
         <figure>
           <div class="shot">
             <img src="img/02-ekran-oceny.png" width="1920" height="1200" alt="Ekran oceniania: lista zawodników po lewej, karta oceny zawodnika po prawej" loading="lazy">
-            <span class="pin" style="left:19.3%;top:11%">1</span>
-            <span class="pin" style="left:24.5%;top:49%">2</span>
-            <span class="pin" style="left:36.5%;top:15%">3</span>
-            <span class="pin" style="left:80%;top:14%">4</span>
-            <span class="pin" style="left:82.2%;top:33.5%">5</span>
-            <span class="pin" style="left:80.8%;top:51.2%">6</span>
-            <span class="pin" style="left:93%;top:51.2%">7</span>
+            <span class="pin" style="left:25.3%;top:16.7%">1</span>
+            <span class="pin" style="left:21%;top:57.9%">2</span>
+            <span class="pin" style="left:36%;top:16.3%">3</span>
+            <span class="pin" style="left:88.2%;top:18%">4</span>
+            <span class="pin" style="left:65.5%;top:38.9%">5</span>
+            <span class="pin" style="left:83.5%;top:57.4%">6</span>
+            <span class="pin" style="left:89.1%;top:61.6%">7</span>
+            <span class="pin" style="left:62%;top:60.5%">8</span>
+            <span class="pin" style="left:95.1%;top:57.4%">9</span>
           </div>
           <figcaption>Ekran oceniania (wersja demonstracyjna, zawodnicy fikcyjni).</figcaption>
         </figure>
@@ -281,7 +286,9 @@
           <li><b class="k">4</b><span><b>Twoja ocena:</b> suma na bieżąco, postęp wypełniania i godzina ostatniego zapisu.</span></li>
           <li><b class="k">5</b><span><b>Karta PDF, Excel</b> i <b>Feedback dla zawodnika</b> — szkic, zatwierdzenie (rozdziały <a href="#karta">7</a> i <a href="#feedback">8</a>).</span></li>
           <li><b class="k">6</b><span><b>Uwaga do pozycji</b> — ikona notatnika (rozdział <a href="#uwagi">5</a>).</span></li>
-          <li><b class="k">7</b><span><b>Pole oceny</b> — obok widać dozwolony zakres, np. 0–2.</span></li>
+          <li><b class="k">7</b><span><b>Pole oceny</b> — wpisz liczbę, np. <kbd>1,5</kbd> albo <kbd>,8</kbd>.</span></li>
+          <li><b class="k">8</b><span><b>Suwak</b> — przeciągnij myszą albo palcem (co 0,1 pkt); na jego końcach widać dozwolony zakres, np. 0 i 2.</span></li>
+          <li><b class="k">9</b><span><b>Twoje oceny tej pozycji u innych zawodników</b> (rozdział <a href="#oceny">4</a>).</span></li>
         </ul>
         <h3>Stan karty na liście zawodników</h3>
         <p>
@@ -316,26 +323,46 @@
       <section id="oceny">
         <h2 class="sec"><span class="n">4</span>Wpisywanie ocen</h2>
         <ol class="steps">
-          <li>Kliknij w pole oceny i wpisz liczbę. Dozwolony zakres widać tuż obok pola (np. <b>0–2</b>).</li>
+          <li>Kliknij w pole oceny i wpisz liczbę (np. <kbd>1,5</kbd>; zamiast <kbd>0,8</kbd> wystarczy <kbd>,8</kbd>) — <b>albo przesuń suwak</b> pod nazwą pozycji. Dozwolony zakres widać na końcach suwaka (np. <b>0</b> i <b>2</b>).</li>
           <li>Naciśnij <kbd>Enter</kbd> (albo strzałkę w dół) — przejdziesz do następnej pozycji. <kbd>Shift</kbd> + <kbd>Enter</kbd> lub strzałka w górę wraca do poprzedniej.</li>
           <li>Ocena zapisuje się sama przy każdej zmianie. Suma kategorii i całej karty liczy się na bieżąco.</li>
           <li>Na dole karty przyciskiem <b>„Następny zawodnik”</b> przejdziesz dalej (albo wybierz zawodnika z listy).</li>
         </ol>
         <figure>
-          <div class="shot mid"><img src="img/04-wpisywanie.png" width="1341" height="890" alt="Kategoria Profesjonalizm z wpisanymi ocenami; w pozycji karnej wpisano -1 i pojawił się komunikat o wpisywaniu liczby bez minusa" loading="lazy"></div>
-          <figcaption>Kategoria z wpisanymi ocenami. W pozycji karnej ktoś wpisał „−1” — system od razu pokazuje komunikat.</figcaption>
+          <div class="shot mid"><img src="img/04-wpisywanie.png" width="1341" height="1005" alt="Kategoria Profesjonalizm z ocenami w polach i na suwakach; w pozycji karnej wpisano -1 i pojawił się komunikat o wpisywaniu liczby bez minusa" loading="lazy"></div>
+          <figcaption>Kategoria z wpisanymi ocenami — suwak pokazuje tę samą wartość co pole. W pozycji karnej ktoś wpisał „−1” — system od razu pokazuje komunikat.</figcaption>
         </figure>
+        <h3>Suwak</h3>
+        <ul>
+          <li><b>Kliknij albo stuknij</b> w wybrane miejsce suwaka — ocena ustawi się od razu. <b>Przeciągnij</b> w bok, żeby ją dopasować co 0,1 pkt. Pole obok i suma kategorii zmieniają się razem z suwakiem.</li>
+          <li>Na telefonie i tablecie <b>przewijanie strony palcem w górę i w dół nie zmienia ocen</b>, nawet gdy zaczniesz na suwaku — ocena zmienia się dopiero przy ruchu w bok albo po stuknięciu.</li>
+          <li>Z klawiatury (po kliknięciu suwaka): strzałki ±0,1, <kbd>PageUp</kbd> / <kbd>PageDown</kbd> ±1 pkt.</li>
+          <li>Dokładną wartość zawsze możesz też wpisać w pole — oba sposoby zapisują to samo.</li>
+        </ul>
+        <h3>Twoje oceny tej pozycji u innych zawodników</h3>
+        <p>Przycisk <svg class="ic"><use href="#i-ranking"/></svg> po prawej stronie pola otwiera okienko z ocenami, które w <b>tej samej pozycji</b> dałeś zawodnikom ocenionym wcześniej — żeby łatwiej trzymać jedną miarę. Widzisz tylko własne oceny.</p>
+        <figure>
+          <div class="shot narrow" style="max-width:360px"><img src="img/13-oceny-innych.png" width="510" height="480" alt="Okienko „Twoje oceny w tej pozycji” dla pozycji Wykonanie seansu: lista zawodników z ocenami i paskami, wyróżniony bieżący zawodnik, średnia" loading="lazy"></div>
+          <figcaption>Twoje oceny pozycji „Wykonanie seansu” u czterech zawodników; zawodnik oceniany teraz jest wyróżniony.</figcaption>
+        </figure>
+        <ul>
+          <li>Przełącznik <b>„Kolejność startowa” / „Najwyższa ocena”</b> zmienia kolejność listy. Na dole — liczba ocenionych i średnia.</li>
+          <li>Zawodnik, którego oceniasz teraz, jest wyróżniony. Gdy przy otwartym okienku przesuniesz suwak albo wpiszesz liczbę, jego ocena na liście zmienia się od razu.</li>
+          <li>Ikona notatnika na liście pokazuje Twoją uwagę do tej pozycji (najedź kursorem).</li>
+          <li>Zamykasz okienko krzyżykiem, klawiszem <kbd>Esc</kbd> albo klikając w inne miejsce karty. Dopóki nie ocenisz w tej pozycji żadnego innego zawodnika, przycisk jest nieaktywny.</li>
+        </ul>
         <h3>Zasady wpisywania</h3>
         <ul>
-          <li><b>Dokładność 0,1 pkt</b> — np. <kbd>1,5</kbd> albo <kbd>1.5</kbd>. Wpis <kbd>1,35</kbd> zostanie odrzucony. (Jeśli supervisor włączy tryb „tylko przecinek”, kropka będzie błędem.)</li>
+          <li><b>Dokładność 0,1 pkt</b> — np. <kbd>1,5</kbd> albo <kbd>1.5</kbd>. Zero przed przecinkiem można pominąć: <kbd>,8</kbd> = 0,8 (po wyjściu z pola zobaczysz „0,8”). Wpis <kbd>1,35</kbd> zostanie odrzucony. (Jeśli supervisor włączy tryb „tylko przecinek”, kropka będzie błędem.)</li>
           <li><b>Punkty karne</b> — wiersze z czerwoną etykietą <span class="tag-neg">KARA</span>. Wpisz <b>samą liczbę</b>, np. <kbd>1</kbd> za minutę przekroczenia czasu — minus system doda sam. Pustą karę traktuje jak zero.</li>
-          <li><b>Pozycje Tak / Nie</b> (np. „Użycie więcej niż 3 zapachów”) — kliknij <b>„Nie · 0”</b> albo <b>„Tak · 1”</b>. Ponowne kliknięcie zaznaczonej odpowiedzi czyści pole. Z klawiatury: <kbd>0</kbd>, <kbd>1</kbd> lub spacja.</li>
+          <li><b>Punkty karne</b> mają suwak od 0 do wartości ujemnej (np. 0 do −1) — przesuwasz go tak samo jak przy zwykłej pozycji.</li>
+          <li><b>Pozycje Tak / Nie</b> (jeśli supervisor ustawi taką na karcie) — kliknij <b>„Nie · 0”</b> albo <b>„Tak · …”</b>. Ponowne kliknięcie zaznaczonej odpowiedzi czyści pole. Z klawiatury: <kbd>0</kbd>, <kbd>1</kbd> lub spacja.</li>
           <li><b>Puste pole to brak oceny, a nie zero.</b> Karta jest kompletna, gdy wypełnisz wszystkie pozycje punktowe i Tak / Nie (kary mogą zostać puste).</li>
           <li><kbd>Esc</kbd> cofa zmianę w polu, w którym właśnie jesteś.</li>
         </ul>
         <figure>
-          <div class="shot mid"><img src="img/06-tak-nie-uwagi.png" width="1341" height="681" alt="Kategoria Naturalne aromaty z pozycją Tak/Nie, karą i polem Dodatkowe uwagi" loading="lazy"></div>
-          <figcaption>Pozycja Tak / Nie (4), kara (5) i „Dodatkowe uwagi” do kategorii.</figcaption>
+          <div class="shot mid"><img src="img/06-kary-uwagi.png" width="1341" height="767" alt="Kategoria Naturalne aromaty z suwakami, dwiema pozycjami karnymi i polem Dodatkowe uwagi" loading="lazy"></div>
+          <figcaption>Kary (4, 5) mają pole z minusem i suwak; pod kategorią — „Dodatkowe uwagi”.</figcaption>
         </figure>
         <div class="box warn"><svg class="ic"><use href="#i-alert"/></svg>
           <div>
@@ -370,7 +397,8 @@
       <section id="poprawki">
         <h2 class="sec"><span class="n">6</span>Poprawianie ocen</h2>
         <ul>
-          <li>Oceny możesz zmieniać w dowolnym momencie, <b>dopóki turniej trwa</b>. Wejdź na kartę zawodnika i wpisz nową wartość.</li>
+          <li>Oceny możesz zmieniać w dowolnym momencie, <b>dopóki turniej trwa</b>. Wejdź na kartę zawodnika i wpisz nową wartość (albo przesuń suwak).</li>
+          <li>Pojedynczą ocenę poprawisz też w zakładce <a href="#porownanie">„Porównanie”</a> — kliknij ją w tabeli. Zmiana trafia od razu do karty zawodnika.</li>
           <li>Aby usunąć ocenę, skasuj liczbę z pola.</li>
           <li>Każda zmiana zapisuje się w <b>historii zmian</b>, którą widzi supervisor. To normalne — nie musisz niczego wyjaśniać.</li>
           <li>Gdy supervisor zakończy turniej, karty są <b>tylko do odczytu</b> (komunikat „Turniej jest zakończony — karta jest tylko do odczytu”). Feedback nadal możesz przygotować.</li>
@@ -446,10 +474,11 @@
           <li>Zaznacz od 2 do 6 zawodników (na start system zaznacza trzech ostatnich w kolejności startu, którym wpisałeś już oceny). <b>„Wyczyść wybór”</b> odznacza wszystkich, a <b>×</b> nad kolumną usuwa jednego zawodnika.</li>
           <li>Zielone tło i pogrubienie oznaczają najwyższą notę w wierszu. Przy dwóch zawodnikach pojawia się kolumna z różnicą.</li>
           <li>Ikona przy wartości pokazuje Twoją uwagę — wystarczy najechać kursorem.</li>
+          <li><b>Poprawka w tabeli:</b> kliknij ocenę pozycji (po najechaniu pojawia się ołówek <svg class="ic"><use href="#i-pencil"/></svg>), wpisz nową wartość i naciśnij <kbd>Enter</kbd>; <kbd>Esc</kbd> anuluje. Zmiana od razu trafia do karty zawodnika, sum i historii zmian. Błędna wartość nie zostanie zapisana — pod polem pojawi się komunikat.</li>
         </ol>
         <figure>
-          <div class="shot"><img src="img/11-porownanie.png" width="1600" height="925" alt="Porównanie trzech zawodników: wybór zawodników i tabela ocen pozycja po pozycji z wyróżnieniem najwyższych not" loading="lazy"></div>
-          <figcaption>Porównanie trzech zawodników.</figcaption>
+          <div class="shot"><img src="img/11-porownanie.png" width="1920" height="990" alt="Porównanie trzech zawodników: wybór zawodników, podpowiedź o poprawianiu ocen i tabela ocen z otwartym polem poprawki w kolumnie trzeciego zawodnika" loading="lazy"></div>
+          <figcaption>Porównanie trzech zawodników — w ostatniej kolumnie sędzia poprawia ocenę „Wykonanie seansu” na 2,7.</figcaption>
         </figure>
       </section>
 
@@ -526,11 +555,11 @@
         <details><summary>Czy inni sędziowie widzą moje oceny?</summary>
           <div><p>Nie. Widzisz wyłącznie własne karty. Supervisor widzi karty wszystkich sędziów na bieżąco.</p></div></details>
         <details><summary>Czy mogę oceniać na telefonie lub tablecie?</summary>
-          <div><p>System działa na tablecie i telefonie, ale do oceniania zalecamy laptop — karta jest długa, a z klawiaturą wpisywanie jest najszybsze.</p></div></details>
+          <div><p>System działa na tablecie i telefonie, ale do oceniania zalecamy laptop — karta jest długa, a z klawiaturą wpisywanie jest najszybsze. Na ekranie dotykowym wygodny jest suwak pod każdą pozycją; dokładną wartość zawsze możesz wpisać w pole.</p></div></details>
       </section>
     </main>
   </div>
 
-  <footer class="end">Sommer Residence Spa &amp; Wellness · Turniej Trzech Saun · instrukcja dla sędziów, wersja z 15.10.2026</footer>
+  <footer class="end">Sommer Residence Spa &amp; Wellness · Turniej Trzech Saun · instrukcja dla sędziów, wersja z 18.10.2026</footer>
 </body>
 </html>
