@@ -10,7 +10,7 @@ import { seedState, SEED_VERSION, SEED_IDS, LEGACY_SEED_IDS } from './seed.js';
 export const CONFIG = window.TTS_CONFIG || {};
 export const LIVE = CONFIG.mode === 'live';
 
-const KEY = 'tts-demo-v1';
+const KEY = CONFIG.demoKey || 'tts-demo-v1'; // demo-beta ma własne dane przykładowe (TTS_CONFIG.demoKey)
 const SESSION_KEY = LIVE ? 'tts-live-session' : 'tts-session';
 
 let saveError = null;

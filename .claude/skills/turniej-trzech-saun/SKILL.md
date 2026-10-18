@@ -15,7 +15,7 @@ zawodnicy, każdy sędzia ma osobną kartę na każdą konkurencję. Wynik fina�
 | Aplikacja (produkcja, prawdziwa baza) | https://aufgussworld.github.io/aufguss-world/turniej-trzech-saun/ |
 | Instrukcja dla sędziów (przycisk „Instrukcja” w panelu sędziego) | https://aufgussworld.github.io/aufguss-world/turniej-trzech-saun/instrukcja/ |
 | Wersja demo (dane przykładowe w przeglądarce, PIN supervisora `2026`) | https://aufgussworld.github.io/aufguss-world/turniej-trzech-saun/demo/ |
-| Demo nowych funkcji do akceptacji (produkcja ich nie ma; własne dane przykładowe, PIN `2026`) | https://aufgussworld.github.io/aufguss-world/turniej-trzech-saun/demo-beta/ — opis: [reference/architektura.md](reference/architektura.md#demo-nowych-funkcji-demo-beta) |
+| Demo nowych funkcji do akceptacji (miejsce na funkcje przed wdrożeniem; własne dane przykładowe, PIN `2026`) | https://aufgussworld.github.io/aufguss-world/turniej-trzech-saun/demo-beta/ — opis: [reference/architektura.md](reference/architektura.md#demo-nowych-funkcji-demo-beta) |
 | Kod źródłowy | repo `aufgussworld/aufguss-world`, gałąź `main`, folder `turniej-trzech-saun/` |
 | Baza danych | Supabase, projekt `turniej-trzech-saun`, ref `wripvwhwginexvcmwdsq` (org. aufguss.world, Frankfurt, plan Free) — https://supabase.com/dashboard/project/wripvwhwginexvcmwdsq |
 | Schemat bazy (pełny, idempotentny) | [supabase/setup.sql](supabase/setup.sql) |
@@ -152,6 +152,14 @@ Najpierw zawsze: co dokładnie widzi użytkownik (treść komunikatu) i na ilu u
 ## Dziennik zmian
 
 Najnowsze na górze. Każdy wpis: data — co — dlaczego.
+
+- **2026-10-18** — **Wdrożenie funkcji z `demo-beta/` do produkcji** (akceptacja organizatora, w trakcie finału): suwak punktacji,
+  oceny tej pozycji u innych zawodników, poprawianie ocen w porównaniu, wpis „,8” = 0,8, poprawka szerokości strony na telefonie,
+  „Użycie więcej niż 3 zapachów” jako kara w kartach wzorcowych (tylko nowe turnieje; istniejące — edytor karty,
+  [reference/awarie.md](reference/awarie.md)). Pliki: `js/judge.js`, `js/model.js`, `js/templates.js`, `js/store.js` (klucz demo
+  z `demoKey`), `js/seed.js` (`SEED_VERSION` 4), `css/app.css` (reguły z bety wpięte w miejsce starych). Bez zmian w bazie
+  i w `remote.js`; kształt danych bez zmian — wystawione oceny nietknięte. Beta wyczyszczona (bez podmienionych modułów).
+  Po wdrożeniu: Ctrl+F5 u sędziów i supervisora. Opis funkcji: [reference/architektura.md](reference/architektura.md).
 
 - **2026-10-18** — `demo-beta/`: „Użycie więcej niż 3 zapachów (/ kompozycji)” (`z4`) we wszystkich kartach wzorcowych to kara
   (`minus`, maks. 1) zamiast „Tak / Nie” (`demo-beta/js/templates.js`). Beta ma własne dane przykładowe (`demoKey`

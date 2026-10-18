@@ -122,12 +122,13 @@ export function parseScore(raw, item, mode = 'both') {
   if (mode === 'comma' && s.includes('.')) {
     return { ok: false, immediate: true, error: 'Użyj przecinka jako separatora, np. 1,3.' };
   }
-  if (!/^\d+([.,]\d+)?$/.test(s)) {
+  // „,8” = 0,8 — jak w Excelu, zero przed przecinkiem można pominąć
+  if (!/^(\d+([.,]\d+)?|[.,]\d+)$/.test(s)) {
     return { ok: false, error: 'To nie jest liczba. Wpisz np. 2 albo 1,5.' };
   }
   const [ip, fp = ''] = s.split(/[.,]/);
   if (fp.length > 1) return { ok: false, error: 'Dokładność oceny to 0,1 pkt — np. 1,3 zamiast 1,35.' };
-  const value = parseInt(ip, 10) * 10 + (fp ? parseInt(fp, 10) : 0);
+  const value = (ip ? parseInt(ip, 10) : 0) * 10 + (fp ? parseInt(fp, 10) : 0);
   const maxT = Math.round(item.max * 10);
   if (item.kind === 'bin' && value !== 0 && value !== maxT) {
     return { ok: false, error: `W tej pozycji tylko 0 albo ${fmt(maxT)}.` };

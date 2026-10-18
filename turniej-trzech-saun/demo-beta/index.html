@@ -16,19 +16,10 @@
   <link rel="modulepreload" href="https://unpkg.com/htm@3.1.1/preact/standalone.module.js">
   <link rel="stylesheet" href="../css/app.css">
   <link rel="stylesheet" href="css/beta.css">
-  <!-- Demo nowych funkcji: wspólny kod z ../js, ale podmienione moduły (judge.js, model.js, templates.js, store.js)
-       z tego folderu. Mapa importów: ../js/<plik> → ./js/<plik> dla podmienionych; wpis ./js/<plik> → ./js/<plik> pilnuje,
-       żeby podmieniony moduł importowany z wnętrza bety też był wersją z bety (dokładny wpis wygrywa z prefiksem);
-       pozostałe importy z ./js/ wracają do ../js. Własne dane przykładowe (demoKey) — karty z templates.js bety. -->
-  <script type="importmap">
-    { "imports": {
-      "../js/judge.js": "./js/judge.js", "./js/judge.js": "./js/judge.js",
-      "../js/model.js": "./js/model.js", "./js/model.js": "./js/model.js",
-      "../js/templates.js": "./js/templates.js", "./js/templates.js": "./js/templates.js",
-      "../js/store.js": "./js/store.js", "./js/store.js": "./js/store.js",
-      "./js/": "../js/"
-    } }
-  </script>
+  <!-- Demo nowych funkcji: dziś bez podmienionych modułów (funkcje z 17–18.10.2026 są już w produkcji).
+       Żeby pokazać nową funkcję: skopiuj ../js/<plik>.js do ./js/ i dodaj mapę importów z wpisami
+       "../js/<plik>.js": "./js/<plik>.js", "./js/<plik>.js": "./js/<plik>.js" oraz na końcu "./js/": "../js/"
+       (szczegóły: skill turniej-trzech-saun, architektura.md, „Demo nowych funkcji”). Własne dane przykładowe (demoKey). -->
 </head>
 <body>
   <div id="app"><p class="boot">Ładowanie systemu sędziowskiego…</p></div>

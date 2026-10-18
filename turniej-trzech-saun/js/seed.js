@@ -35,7 +35,7 @@ const JUDGE_POOL = [
   ['Dorota', 'Fijałkowska'], ['Leszek', 'Urban'],
 ];
 
-export const SEED_VERSION = 3;
+export const SEED_VERSION = 4;
 export const SEED_IDS = ['fin25', 'hot26', 'rlx26', 'bny26'];
 export const LEGACY_SEED_IDS = ['fin26'];
 

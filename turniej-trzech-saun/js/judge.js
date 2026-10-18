@@ -1,12 +1,12 @@
 // Widok sędziego: karta oceny z walidacją, porównanie zawodników, własny ranking.
 // Sędzia widzi wyłącznie własne oceny — nigdy kart innych sędziów ani wyników łącznych.
 
-import { html, useEffect, useRef, useState } from './lib.js';
+import { html, useEffect, useLayoutEffect, useRef, useState } from './lib.js';
 import {
-  DISCIPLINES, FINAL_ORDER, fmt, fmtInput, fmtDate, fullName, parseScore, entryStats, getEntry,
+  DISCIPLINES, FINAL_ORDER, fmt, fmtAvg, fmtInput, fmtDate, fullName, parseScore, entryStats, getEntry,
   orderedContestants, startOf, startNumber, cardMax, categoryMax, disciplinesOf, assignRanks,
 } from './model.js';
-import { setScore, logChange, setNote, setItemNote } from './store.js';
+import { setScore, logChange, setNote, setItemNote, getT } from './store.js';
 import { Icon, Avatar, DiscBadge, StatusIcon, Segmented, Empty, Modal, NoteTip, tipProps, toast } from './ui.js';
 import { FeedbackModal } from './feedback.js';
 import { cardPDF, slug } from './pdf.js';
@@ -50,7 +50,10 @@ function ScoreInput({ id, item, value, mode, onLive, onDone, onError, errId }) {
 
   useEffect(() => {
     if (keepText.current) { keepText.current = false; return; }
-    if (!focused.current) setText(fmtInput(value));
+    if (!focused.current) {
+      setText(fmtInput(value));
+      if (err) show(null); // ocena zmieniona z zewnątrz (suwak, inne urządzenie) — stary błąd już nie dotyczy pola
+    }
   }, [value]);
 
   const show = (m) => {
@@ -147,6 +150,240 @@ function rangeText(it) {
   if (it.kind === 'minus') return `0 do −${fmt(Math.round(it.max * 10))}`;
   if (it.kind === 'bin') return `0 / ${fmt(Math.round(it.max * 10))}`;
   return `0–${fmt(Math.round(it.max * 10))}`;
+}
+
+// Suwak 0–maks. co 0,1 pkt — szybsze wypełnianie karty myszką albo palcem. Ocena zmienia się na żywo
+// (ten sam zapis co z pola), a historia zmian dostaje jeden wpis po puszczeniu suwaka.
+// Dotyk: ruch w pionie przewija stronę (touch-action: pan-y) i niczego nie zmienia; ocena zmienia się
+// dopiero po ruchu w bok albo po stuknięciu w suwak. Przerwane przeciąganie przywraca ocenę sprzed niego.
+// Klawiatura: strzałki ±0,1, PageUp/PageDown ±1, Home/End 0/maks.
+function ScoreSlider({ item, value, current, onLive, onDone }) {
+  const max = Math.round(item.max * 10);
+  const track = useRef();
+  const drag = useRef(null);
+  const keys = useRef(null); // { from, timer } — seria zmian z klawiatury trafia do historii po chwili przerwy
+  const latest = useRef(value);
+  if (!drag.current && !keys.current) latest.current = value;
+
+  const apply = (x) => {
+    x = Math.min(max, Math.max(0, x));
+    if (x !== latest.current) {
+      latest.current = x;
+      onLive(x);
+    }
+  };
+  const at = (clientX) => {
+    const r = track.current.getBoundingClientRect();
+    return Math.round(((clientX - r.left) / r.width) * max);
+  };
+  const flushKeys = () => {
+    const k = keys.current;
+    if (!k) return;
+    keys.current = null;
+    clearTimeout(k.timer);
+    if (latest.current !== k.from) onDone(k.from, latest.current);
+  };
+  useEffect(() => flushKeys, []);
+
+  const onPointerDown = (e) => {
+    if (e.button !== 0 || drag.current) return;
+    const mouse = e.pointerType === 'mouse';
+    e.currentTarget.focus({ preventScroll: true }); // zatwierdza ewentualny wpis z pola obok
+    flushKeys();
+    drag.current = { id: e.pointerId, from: current(), x: e.clientX, y: e.clientY, active: mouse };
+    latest.current = drag.current.from;
+    try { e.currentTarget.setPointerCapture(e.pointerId); } catch (_) { /* bez przechwycenia też działa, póki palec jest nad suwakiem */ }
+    if (mouse) {
+      e.preventDefault();
+      apply(at(e.clientX));
+    }
+  };
+  const onPointerMove = (e) => {
+    const d = drag.current;
+    if (!d || e.pointerId !== d.id) return;
+    if (!d.active) {
+      const dx = Math.abs(e.clientX - d.x), dy = Math.abs(e.clientY - d.y);
+      if (dx < 6 || dx < dy) return;
+      d.active = true;
+    }
+    apply(at(e.clientX));
+  };
+  const onPointerUp = (e) => {
+    const d = drag.current;
+    if (!d || e.pointerId !== d.id) return;
+    if (!d.active) apply(at(e.clientX)); // stuknięcie w suwak
+    drag.current = null;
+    if (latest.current !== d.from) onDone(d.from, latest.current);
+  };
+  const onPointerCancel = (e) => {
+    const d = drag.current;
+    if (!d || e.pointerId !== d.id) return;
+    drag.current = null;
+    if (latest.current !== d.from) {
+      latest.current = d.from;
+      onLive(d.from);
+    }
+  };
+  const onKeyDown = (e) => {
+    const cur = latest.current ?? 0;
+    const step = { ArrowRight: 1, ArrowUp: 1, ArrowLeft: -1, ArrowDown: -1, PageUp: 10, PageDown: -10 }[e.key];
+    let x;
+    if (step) x = cur + step;
+    else if (e.key === 'Home') x = 0;
+    else if (e.key === 'End') x = max;
+    else return;
+    e.preventDefault();
+    if (!keys.current) keys.current = { from: current() };
+    clearTimeout(keys.current.timer);
+    apply(x);
+    keys.current.timer = setTimeout(flushKeys, 800);
+  };
+
+  const neg = item.kind === 'minus';
+  const pct = value == null ? 0 : (value / max) * 100;
+  const ticks = [];
+  for (let p = 10; p < max; p += 10) ticks.push(html`<i class="sl-tick" key=${p} style=${{ left: (p / max) * 100 + '%' }}></i>`);
+  return html`<div class=${`sl-wrap k-${item.kind} ${value == null ? 'unset' : ''}`}>
+    <span class="sl-end" aria-hidden="true">0</span>
+    <div class="sl" role="slider" tabindex="0" aria-label=${'Suwak: ' + item.label}
+      aria-valuemin="0" aria-valuemax=${item.max} aria-valuenow=${value == null ? undefined : value / 10}
+      aria-valuetext=${value == null ? 'brak oceny' : (neg && value ? '−' : '') + fmt(value) + ' pkt'}
+      onPointerDown=${onPointerDown} onPointerMove=${onPointerMove} onPointerUp=${onPointerUp}
+      onPointerCancel=${onPointerCancel} onKeyDown=${onKeyDown} onBlur=${flushKeys}>
+      <span class="sl-track" ref=${track}>
+        ${ticks}
+        <i class="sl-fill" style=${{ width: pct + '%' }}></i>
+        <span class="sl-thumb" style=${{ left: pct + '%' }}></span>
+      </span>
+    </div>
+    <span class="sl-end" aria-hidden="true">${neg ? '−' : ''}${fmt(max)}</span>
+  </div>`;
+}
+
+// ---------- oceny tej pozycji u innych zawodników ----------
+
+// Oceny tego sędziego w jednej pozycji: zawodnicy już ocenieni w tej pozycji + bieżący zawodnik.
+// Sędzia widzi wyłącznie własne oceny (jid = właściciel karty).
+function peerRows(t, disc, cid, jid, item) {
+  return orderedContestants(t, disc).map((c, i) => {
+    const e = getEntry(t, disc, c.id, jid);
+    return { c, nr: startNumber(t, disc, c.id) || i + 1, v: e?.v?.[item.id] ?? null, note: e?.ni?.[item.id], self: c.id === cid };
+  }).filter((r) => r.self || r.v != null);
+}
+
+const peerLabel = (judgeName) => (judgeName ? `Oceny sędziego ${judgeName} u innych zawodników: ` : 'Twoje oceny innych zawodników: ');
+
+// Okienko z ocenami: obok przycisku po prawej; gdy brak miejsca (prawa kolumna karty, telefon) — pod wierszem
+// albo nad nim. Zamyka się: X, Esc, kliknięcie poza okienkiem i poza wierszem tej pozycji (suwak i pole
+// tej pozycji można zmieniać przy otwartym okienku — ocena bieżącego zawodnika aktualizuje się na żywo).
+function PeerPopover({ anchor, item, rows, judgeName, onClose }) {
+  const ref = useRef();
+  const [sort, setSort] = useState('order');
+  const closeRef = useRef(onClose);
+  closeRef.current = onClose;
+
+  const place = () => {
+    const el = ref.current, btn = anchor.current;
+    if (!el || !btn) return;
+    const a = btn.getBoundingClientRect();
+    const row = (btn.closest('.item') || btn).getBoundingClientRect();
+    // widoczna część strony (na telefonie bywa mniejsza i przesunięta względem obszaru, do którego liczy się position: fixed)
+    const vv = window.visualViewport;
+    const x0 = vv ? vv.offsetLeft : 0, y0 = vv ? vv.offsetTop : 0;
+    const x1 = x0 + (vv ? vv.width : document.documentElement.clientWidth), y1 = y0 + (vv ? vv.height : window.innerHeight);
+    const m = 8;
+    if (a.bottom < y0 || a.top > y1) { closeRef.current(); return; } // wiersz zniknął z ekranu
+    const w = el.offsetWidth, h = el.offsetHeight;
+    let left, top;
+    if (a.right + m + w <= x1 - m) {
+      left = a.right + m;
+      top = Math.min(Math.max(a.top + a.height / 2 - h / 2, y0 + m), y1 - h - m);
+    } else {
+      left = Math.min(Math.max(a.right - w, x0 + m), x1 - w - m);
+      top = row.bottom + 4 + h <= y1 - m ? row.bottom + 4 : Math.max(y0 + m, row.top - 4 - h);
+    }
+    el.style.left = Math.round(left) + 'px';
+    el.style.top = Math.round(top) + 'px';
+  };
+  useLayoutEffect(place);
+  useEffect(() => {
+    const onDown = (e) => {
+      const row = anchor.current?.closest('.item');
+      if (ref.current?.contains(e.target) || row?.contains(e.target)) return;
+      closeRef.current();
+    };
+    const onKey = (e) => {
+      if (e.key !== 'Escape') return;
+      const top = [...document.querySelectorAll('.modal')].pop();
+      if (top && !top.contains(ref.current)) return; // Esc należy do okna otwartego nad kartą (np. uwaga do pozycji)
+      e.stopPropagation(); // Esc zamyka tylko to okienko, a nie kartę sędziego otwartą u supervisora
+      closeRef.current();
+      anchor.current?.focus();
+    };
+    const vv = window.visualViewport;
+    document.addEventListener('pointerdown', onDown, true);
+    document.addEventListener('keydown', onKey, true);
+    window.addEventListener('scroll', place, true);
+    window.addEventListener('resize', place);
+    vv?.addEventListener('resize', place);
+    vv?.addEventListener('scroll', place);
+    return () => {
+      document.removeEventListener('pointerdown', onDown, true);
+      document.removeEventListener('keydown', onKey, true);
+      window.removeEventListener('scroll', place, true);
+      window.removeEventListener('resize', place);
+      vv?.removeEventListener('resize', place);
+      vv?.removeEventListener('scroll', place);
+    };
+  }, []);
+
+  const max = Math.round(item.max * 10);
+  const neg = item.kind === 'minus';
+  const shown = (x) => (x == null ? '—' : neg ? (x ? '−' + fmt(x) : '0') : fmt(x));
+  const list = sort === 'score' ? [...rows].sort((a, b) => (b.v ?? -1) - (a.v ?? -1)) : rows;
+  const others = rows.filter((r) => !r.self && r.v != null);
+  const avg = others.length ? Math.round((others.reduce((s, r) => s + r.v, 0) * 10) / others.length) : null;
+  return html`<div class="peer-pop" ref=${ref} role="dialog" aria-label=${peerLabel(judgeName) + item.label}>
+    <header class="pp-head">
+      <div class="pp-title">
+        <span class="pp-eyebrow">${judgeName ? `Oceny sędziego: ${judgeName}` : 'Twoje oceny w tej pozycji'} · ${rangeText(item)}</span>
+        <b>${item.label}</b>
+      </div>
+      <button type="button" class="btn icon ghost xs" aria-label="Zamknij" onClick=${() => { onClose(); anchor.current?.focus(); }}><${Icon} name="x" size=${15} /></button>
+    </header>
+    <div class="pp-sort" role="group" aria-label="Kolejność">
+      <button type="button" class=${sort === 'order' ? 'on' : ''} aria-pressed=${sort === 'order'} onClick=${() => setSort('order')}>Kolejność startowa</button>
+      <button type="button" class=${sort === 'score' ? 'on' : ''} aria-pressed=${sort === 'score'} onClick=${() => setSort('score')}>${neg ? 'Najwyższa kara' : 'Najwyższa ocena'}</button>
+    </div>
+    <ol class="pp-list">
+      ${list.map((r) => html`<li key=${r.c.id} class=${'pp-row ' + (r.self ? 'self' : '')}>
+        <span class="pp-nr">${r.nr}</span>
+        <${Avatar} c=${r.c} size=${24} />
+        <span class="pp-name">${fullName(r.c)}${r.self ? html`<small>${judgeName ? 'ta karta' : 'oceniasz teraz'}</small>` : null}</span>
+        <span class=${'pp-bar ' + (neg ? 'neg' : '')} aria-hidden="true"><i style=${{ width: (r.v == null ? 0 : (r.v / max) * 100) + '%' }}></i></span>
+        <span class=${'pp-val ' + (neg && r.v ? 'neg' : '')}>${shown(r.v)}</span>
+        <span class="pp-note">${r.note ? html`<${NoteTip} text=${r.note} size=${13} />` : null}</span>
+      </li>`)}
+    </ol>
+    <footer class="pp-foot">${others.length === 1 ? '1 oceniony zawodnik' : `Ocenionych zawodników: ${others.length}`}${avg != null ? html` · średnia <b>${neg && avg ? '−' : ''}${fmtAvg(avg)}</b>` : null}</footer>
+  </div>`;
+}
+
+// judgeName — karta sędziego oglądana przez supervisora (teksty „Oceny sędziego…” zamiast „Twoje oceny”)
+function PeerButton({ t, disc, cid, jid, item, judgeName }) {
+  const [open, setOpen] = useState(false);
+  const btn = useRef();
+  const rows = peerRows(t, disc, cid, jid, item);
+  const others = rows.filter((r) => !r.self).length;
+  useEffect(() => { if (!others) setOpen(false); }, [others]);
+  return html`<span class="peer-cell">
+    <button type="button" ref=${btn} class=${'peer-btn ' + (open ? 'on' : '')} disabled=${!others}
+      aria-expanded=${open} aria-label=${peerLabel(judgeName) + item.label}
+      title=${others ? 'Pokaż oceny już ocenionych zawodników w tej pozycji' : 'Nie ma jeszcze innych zawodników z oceną w tej pozycji'}
+      onClick=${() => setOpen(!open)}>
+      <${Icon} name="ranking" size=${16} /></button>
+    ${open ? html`<${PeerPopover} anchor=${btn} item=${item} rows=${rows} judgeName=${judgeName} onClose=${() => setOpen(false)} />` : null}
+  </span>`;
 }
 
 // Uwaga do jednej pozycji: ikonka notatnika otwiera okienko, a zapisana uwaga pokazuje się po najechaniu.
@@ -261,7 +498,7 @@ export function ScoreCard({ t, disc, cid, jid, readOnly = false, judgeName, onPr
       ${fieldsToFix(errCount)} — błędnej wartości nie zapisano, w karcie pozostaje poprzednia ocena.</div>` : null}
     ${locked && !readOnly ? html`<div class="alert info"><${Icon} name="lock" />Turniej jest zakończony — karta jest tylko do odczytu. Feedback dla zawodnika możesz nadal przygotować.</div>` : null}
     <div class="sc-toolbar">
-      ${!locked ? html`<p class="hint-line"><${Icon} name="info" size=${14} /> Wpisuj liczby z dokładnością do 0,1 — przecinek lub kropka. Punkty karne wpisuj bez minusa. <kbd>Enter</kbd> przenosi dalej, <kbd>Esc</kbd> cofa zmianę, <${Icon} name="note" size=${14} /> dodaje uwagę do pozycji.</p>` : html`<span></span>`}
+      ${!locked ? html`<p class="hint-line"><${Icon} name="info" size=${14} /> Wpisuj liczby z dokładnością do 0,1 (przecinek lub kropka; <kbd>,8</kbd> = 0,8) albo przesuń suwak. Punkty karne wpisuj bez minusa. <kbd>Enter</kbd> przenosi dalej, <kbd>Esc</kbd> cofa zmianę, <${Icon} name="note" size=${14} /> dodaje uwagę do pozycji, <${Icon} name="ranking" size=${14} /> pokazuje Twoje oceny tej pozycji u innych zawodników.</p>` : html`<span></span>`}
       <div class="sc-actions">
         ${stats.started ? html`
           <button class="btn sm" onClick=${() => exportCard('pdf', t, disc, cid, jid)} title="Pobierz kartę jako PDF (do wydruku i podpisu)">
@@ -287,6 +524,7 @@ export function ScoreCard({ t, disc, cid, jid, readOnly = false, judgeName, onPr
             ${cat.items.map((it, ii) => {
               const id = `f-${disc}-${cat.id}-${it.id}`;
               const err = errors[it.id];
+              const slider = !locked && it.kind !== 'bin';
               return html`<li class=${`item k-${it.kind} ${err ? 'has-err' : ''}`} key=${it.id}>
                 <span class="num">${ii + 1}</span>
                 <label class="lbl" for=${id}>
@@ -296,7 +534,12 @@ export function ScoreCard({ t, disc, cid, jid, readOnly = false, judgeName, onPr
                 </label>
                 <${ItemNote} item=${it} note=${entry?.ni?.[it.id]} locked=${locked}
                   onSave=${(txt) => txt !== (entry?.ni?.[it.id] || '') && setItemNote(t.id, disc, cid, jid, it.id, txt)} />
-                <span class="range">${rangeText(it)}</span>
+                ${slider
+                  ? html`<${ScoreSlider} item=${it} value=${v[it.id] ?? null}
+                      current=${() => getEntry(getT(t.id), disc, cid, jid)?.v?.[it.id] ?? null}
+                      onLive=${(x) => live(it.id, x)} onDone=${(f, to) => done(it.id, f, to)} />`
+                  : html`<span class="range">${rangeText(it)}</span>`}
+                <${PeerButton} t=${t} disc=${disc} cid=${cid} jid=${jid} item=${it} judgeName=${readOnly ? judgeName : null} />
                 <span class="val">
                   ${locked
                     ? html`<${ReadValue} item=${it} value=${v[it.id]} />`
@@ -417,6 +660,64 @@ export function ContestantPicker({ t, disc, selected, onChange, max = 6 }) {
   </div>`;
 }
 
+// Komórka pozycji w porównaniu: ocena + dymek z uwagą. U sędziego (editable) kliknięcie otwiera pole do poprawy
+// oceny — zapis tą samą drogą co w karcie (setScore + wpis w historii), więc karta zawodnika zmienia się od razu.
+// Enter zapisuje, Esc anuluje, wyjście z pola zapisuje poprawną wartość (błędną odrzuca z komunikatem).
+function CompareCell({ t, disc, cid, jid, item, value, note, editable }) {
+  const [edit, setEdit] = useState(false);
+  const [text, setText] = useState('');
+  const [err, setErr] = useState(null);
+  const input = useRef();
+  const btn = useRef();
+  const closing = useRef(false); // po Enter / Esc pole znika — blur z tego zamknięcia nie zapisuje drugi raz
+  const refocus = useRef(false);
+  // od razu po zmianie DOM (nie po klatce) — szybko wpisana cyfra nie może trafić obok pola
+  useLayoutEffect(() => {
+    if (edit) { closing.current = false; input.current?.focus(); input.current?.select(); }
+    else if (refocus.current) { refocus.current = false; btn.current?.focus(); }
+  }, [edit]);
+
+  const neg = item.kind === 'minus';
+  const shown = value == null ? '—' : neg ? (value ? '−' + fmt(value) : '0') : fmt(value);
+  if (!editable) return html`<span class="cv">${shown}<${NoteTip} text=${note} size=${14} /></span>`;
+
+  const close = (back) => { closing.current = true; refocus.current = back; setErr(null); setEdit(false); };
+  const commit = (fromBlur) => {
+    const r = parseScore(text, item, t.decimalMode);
+    if (!r.ok) {
+      if (fromBlur) { toast(`${item.label}: ${r.error} Ocena bez zmian.`, 'err'); close(false); }
+      else setErr(r.error);
+      return;
+    }
+    const cur = getEntry(getT(t.id), disc, cid, jid)?.v?.[item.id] ?? null;
+    if (r.value !== cur) {
+      setScore(t.id, disc, cid, jid, item.id, r.value);
+      logChange(t.id, { j: jid, c: cid, d: disc, i: item.id, f: cur, t: r.value });
+    }
+    close(!fromBlur);
+  };
+  if (edit) {
+    return html`<span class=${`cv-edit k-${item.kind} ${err ? 'invalid' : ''}`}>
+      ${neg ? html`<span class="prefix" aria-hidden="true">−</span>` : null}
+      <input ref=${input} type="text" inputmode="decimal" autocomplete="off" spellcheck="false" value=${text}
+        aria-label=${item.label + ' — popraw ocenę'} aria-invalid=${err ? 'true' : 'false'}
+        onInput=${(e) => { setText(e.currentTarget.value); if (err) setErr(null); }}
+        onKeyDown=${(e) => {
+          if (e.key === 'Enter') { e.preventDefault(); commit(false); }
+          else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close(true); }
+        }}
+        onBlur=${() => { if (!closing.current) commit(true); }} />
+      ${err ? html`<span class="cv-err" role="alert">${err}</span>` : null}
+    </span>`;
+  }
+  return html`<span class="cv">
+    <button type="button" ref=${btn} class="cv-btn" title="Kliknij, aby poprawić ocenę"
+      aria-label=${`${item.label}: ${shown} — popraw ocenę`}
+      onClick=${() => { setText(fmtInput(value)); setErr(null); setEdit(true); }}>
+      ${shown}<${Icon} name="pencil" size=${12} /></button>
+    <${NoteTip} text=${note} size=${14} /></span>`;
+}
+
 function bestIndex(vals, higherIsBetter = true) {
   const present = vals.map((x, i) => [x, i]).filter(([x]) => x != null);
   if (present.length < 2) return new Set();
@@ -425,7 +726,8 @@ function bestIndex(vals, higherIsBetter = true) {
   return new Set(present.filter(([x]) => x === target).map(([, i]) => i));
 }
 
-export function Comparison({ t, disc, jid, cids, onRemove }) {
+// editable — sędzia poprawia własne oceny w tabeli (supervisor i suma kart: tylko podgląd)
+export function Comparison({ t, disc, jid, cids, onRemove, editable = false }) {
   const card = t.cards[disc];
   const cols = cids.map((cid) => {
     const c = t.contestants.find((x) => x.id === cid);
@@ -459,12 +761,12 @@ export function Comparison({ t, disc, jid, cids, onRemove }) {
           ${cat.items.map((it) => {
             const vals = cols.map((x) => x.v[it.id] ?? null);
             const b = it.kind === 'minus' ? new Set() : bestIndex(vals);
-            const shown = (x) => (x == null ? '—' : it.kind === 'minus' ? (x ? '−' + fmt(x) : '0') : fmt(x));
             const dv = it.kind === 'minus' ? diff(vals[1], vals[0]) : diff(vals[0], vals[1]);
             return html`<tr class=${'k-' + it.kind} key=${it.id}>
               <th scope="row"><span>${it.label}</span>${it.kind === 'minus' ? html`<span class="tag-neg">kara</span>` : null}<small>${rangeText(it)}</small></th>
-              ${vals.map((x, i) => html`<td class=${`${b.has(i) ? 'best' : ''} ${it.kind === 'minus' && x ? 'neg' : ''}`}>
-                <span class="cv">${shown(x)}<${NoteTip} text=${cols[i].notes.items[it.id]} size=${14} /></span></td>`)}
+              ${vals.map((x, i) => html`<td key=${cols[i].c.id} class=${`${b.has(i) ? 'best' : ''} ${it.kind === 'minus' && x ? 'neg' : ''}`}>
+                <${CompareCell} t=${t} disc=${disc} cid=${cols[i].c.id} jid=${jid} item=${it} value=${x}
+                  note=${cols[i].notes.items[it.id]} editable=${editable} /></td>`)}
               ${two ? diffCell(dv) : null}
             </tr>`;
           })}
@@ -517,8 +819,10 @@ function defaultPicks(t, disc, jid) {
   return list.slice(-3).map((c) => c.id);
 }
 
-export function CompareView({ t, jid, disc, onDisc, isFinal }) {
+// editable — tylko u sędziego w turnieju „W trakcie”: oceny pozycji można poprawiać w tabeli
+export function CompareView({ t, jid, disc, onDisc, isFinal, editable = false }) {
   const pd = disc === 'all' ? 'relax' : disc;
+  const canEdit = editable && disc !== 'all';
   const [sel, setSel] = useState(() => defaultPicks(t, disc, jid));
   const keyRef = useRef(jid);
   useEffect(() => {
@@ -530,11 +834,13 @@ export function CompareView({ t, jid, disc, onDisc, isFinal }) {
         options=${[...FINAL_ORDER.map((d) => ({ value: d, label: DISCIPLINES[d].label, icon: DISCIPLINES[d].icon, disc: d })), { value: 'all', label: 'Suma 3 dni', icon: 'trophy' }]} />` : null}
       <span class="muted">${sel.length} z maks. 6 zaznaczonych</span>
       ${sel.length ? html`<button class="link-btn" onClick=${() => setSel([])}>Wyczyść wybór</button>` : null}
+      ${canEdit && sel.length >= 2 ? html`<span class="muted small cmp-edit-hint"><${Icon} name="pencil" size=${14} />
+        Kliknij ocenę pozycji, aby ją poprawić — zmiana od razu trafia do karty zawodnika.</span>` : null}
     </div>
     <${ContestantPicker} t=${t} disc=${pd} selected=${sel} onChange=${setSel} />
     ${disc === 'all'
       ? html`<${ComparisonFinal} t=${t} jid=${jid} cids=${sel} />`
-      : html`<${Comparison} t=${t} disc=${disc} jid=${jid} cids=${sel} onRemove=${(id) => setSel(sel.filter((x) => x !== id))} />`}
+      : html`<${Comparison} t=${t} disc=${disc} jid=${jid} cids=${sel} editable=${canEdit} onRemove=${(id) => setSel(sel.filter((x) => x !== id))} />`}
   </div>`;
 }
 
@@ -620,7 +926,7 @@ export function JudgeApp({ t, judge, route, go }) {
     </div>` : null}
     ${view === 'porownanie' ? html`<div class="page"><div class="page-head"><h1>Porównanie zawodników</h1>
         <p class="muted">Twoje oceny obok siebie, pozycja po pozycji. Pogrubienie oznacza najwyższą notę w wierszu.</p></div>
-      <${CompareView} t=${t} jid=${judge.id} disc=${disc} isFinal=${isFinal} onDisc=${(d) => go(`#/j/porownanie/${d}`)} /></div>` : null}
+      <${CompareView} t=${t} jid=${judge.id} disc=${disc} isFinal=${isFinal} editable=${t.status === 'live'} onDisc=${(d) => go(`#/j/porownanie/${d}`)} /></div>` : null}
     ${view === 'ranking' ? html`<div class="page"><div class="page-head"><h1>Mój ranking</h1></div>
       <${MyRanking} t=${t} jid=${judge.id} disc=${disc} isFinal=${isFinal} onDisc=${(d) => go(`#/j/ranking/${d}`)}
         onOpen=${(id) => goCard(id, scoringDisc)} /></div>` : null}

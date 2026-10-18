@@ -1,6 +1,7 @@
 // Karty wzorcowe według dokumentów „Kryteria oceniania” (Sommer Hot / Relax / Banya Cup).
 // kind: 'plus' — punkty dodatnie, 'minus' — punkty karne (wpisywane bez minusa, odejmowane),
-//       'bin'  — pozycja 0 albo max (np. „więcej niż 3 zapachy”).
+//       'bin'  — pozycja 0 albo max, liczona jako punkty DODATNIE (żadna karta wzorcowa jej dziś nie używa;
+//                „Użycie więcej niż 3 zapachów” to kara — decyzja organizatora 2026-10-18).
 
 const professionalism = () => ({
   id: 'prof',
@@ -46,7 +47,7 @@ const CARDS = {
           { id: 'z1', label: 'Użycie minimum trzech relaksujących zapachów / kompozycji', kind: 'plus', max: 3 },
           { id: 'z2', label: 'Ciekawy sposób podania zapachów', kind: 'plus', max: 3 },
           { id: 'z3', label: 'Wyjątkowe dopasowanie zapachów do tematu seansu', kind: 'plus', max: 3 },
-          { id: 'z4', label: 'Użycie więcej niż 3 zapachów / kompozycji', kind: 'bin', max: 1 },
+          { id: 'z4', label: 'Użycie więcej niż 3 zapachów / kompozycji', kind: 'minus', max: 1 },
           { id: 'z5', label: 'Słabo wyczuwalne lub przedawkowane zapachy', kind: 'minus', max: 3 },
         ],
       },
@@ -80,7 +81,7 @@ const CARDS = {
           { id: 'z1', label: 'Użycie minimum trzech zapachów', kind: 'plus', max: 3 },
           { id: 'z2', label: 'Ciekawy sposób podania zapachów', kind: 'plus', max: 3 },
           { id: 'z3', label: 'Dopasowanie zapachów do tematu seansu', kind: 'plus', max: 3 },
-          { id: 'z4', label: 'Użycie więcej niż 3 zapachów', kind: 'bin', max: 1 },
+          { id: 'z4', label: 'Użycie więcej niż 3 zapachów', kind: 'minus', max: 1 },
           { id: 'z5', label: 'Słabo wyczuwalne lub przedawkowane zapachy', kind: 'minus', max: 3 },
         ],
       },
@@ -114,7 +115,7 @@ const CARDS = {
           { id: 'z1', label: 'Użycie minimum trzech naturalnych zapachów / kompozycji, dobrze wyczuwalnych i rozpoznawalnych', kind: 'plus', max: 3 },
           { id: 'z2', label: 'Ciekawy sposób podania zapachów', kind: 'plus', max: 3 },
           { id: 'z3', label: 'Wyjątkowe dopasowanie zapachów do tematu seansu', kind: 'plus', max: 3 },
-          { id: 'z4', label: 'Użycie więcej niż 3 zapachów / kompozycji', kind: 'bin', max: 1 },
+          { id: 'z4', label: 'Użycie więcej niż 3 zapachów / kompozycji', kind: 'minus', max: 1 },
           { id: 'z5', label: 'Słabo wyczuwalne lub przedawkowane zapachy', kind: 'minus', max: 3 },
         ],
       },

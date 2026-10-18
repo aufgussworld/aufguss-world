@@ -18,24 +18,24 @@
 | `index.html` | wejście produkcyjne: wczytuje `config.js`, potem `js/app.js` |
 | `config.js` | `window.TTS_CONFIG = { mode: 'live', supabaseUrl, supabaseAnonKey }` (klucz publishable); opcjonalnie `feedbackEndpoint` |
 | `demo/index.html` | wersja demo: `TTS_CONFIG = { mode: 'demo' }`, te same `../css` i `../js` |
-| `demo-beta/index.html`, `demo-beta/js/`, `demo-beta/css/beta.css` | demo nowych funkcji do akceptacji: wspólny kod z `../js`, a wybrane moduły podmienione mapą importów — patrz [Demo nowych funkcji](#demo-nowych-funkcji-demo-beta) |
+| `demo-beta/index.html`, `demo-beta/js/`, `demo-beta/css/beta.css` | demo nowych funkcji do akceptacji (od 2026-10-18 bez podmienionych modułów, własne dane demo): wspólny kod z `../js`, a wybrane moduły podmieniane mapą importów — patrz [Demo nowych funkcji](#demo-nowych-funkcji-demo-beta) |
 | `instrukcja/index.html`, `instrukcja/img/` | instrukcja obsługi dla sędziów (statyczna strona, własny CSS, zrzuty z demo); przycisk „Instrukcja” w pasku sędziego i odnośnik pod logowaniem — patrz [instrukcja-sedziow.md](instrukcja-sedziow.md) |
 | `assets/login-hero.jpg` | grafika ekranu logowania (od organizatora) |
 | `assets/favicon-16.png`, `assets/favicon-32.png`, `assets/apple-touch-icon.png` | favicon i ikona na ekran telefonu: biały sygnet Sommer Residence (wieniec z monogramem SR, wycięty z `logo-sommer-residence.png`, wiersze 0–130, kolumny 45–205) na bordowym tle `#8D2732`; podpięte w `index.html` i `demo/index.html` |
 | `js/app.js` | start aplikacji, ekran logowania, wymuszona zmiana kodu supervisora, routing po `#hash`, pasek górny, znacznik synchronizacji, automatyczna kopia co godzinę o :30 (supervisor) |
-| `js/store.js` | magazyn stanu (demo: localStorage `tts-demo-v1`; live: pamięć + `remote.js`), akcje: `updateT`, `createTournament`, `deleteTournament`, `setScore`, `logChange`, `setNote`, `setItemNote`, `setFeedback`, sesja w sessionStorage |
+| `js/store.js` | magazyn stanu (demo: localStorage `tts-demo-v1` albo `TTS_CONFIG.demoKey`; live: pamięć + `remote.js`), akcje: `updateT`, `createTournament`, `deleteTournament`, `setScore`, `logChange`, `setNote`, `setItemNote`, `setFeedback`, sesja w sessionStorage |
 | `js/remote.js` | tryb produkcyjny: logowanie anonimowe + RPC ról, pobieranie danych, zapisy z kolejką offline, czas rzeczywisty, odświeżanie co 60 s, kopie w bazie, przekazanie dostępu |
 | `js/model.js` | logika punktacji i formatowanie: `parseScore`, `entryStats`, `contestantDisc`, `assignRanks`, `disciplineResults`, `finalResults`, `audienceStats`, `audienceRanking`, `orderedContestants`, `fmt`, `fmtAvg`, `toCSV`, `download` |
 | `js/templates.js` | domyślne karty oceny (Relax / HOT / Banya) według „Kryteriów oceniania” |
 | `js/wizard.js` | kreator nowego turnieju (rodzaj → zawodnicy → harmonogram → sędziowie → karta → podsumowanie) |
 | `js/editors.js` | edytory: zawodnicy i harmonogram startów, import finalistów z eliminacji, sędziowie i kody (+ wydruk kodów PDF), edytor karty oceny |
-| `js/judge.js` | panel sędziego: karta ocen (`ScoreCard`), pola z walidacją, uwagi do pozycji i kategorii, eksport karty PDF/Excel, porównanie zawodników, „Mój ranking” |
+| `js/judge.js` | panel sędziego: karta ocen (`ScoreCard`), pola z walidacją, suwak punktacji (`ScoreSlider`), oceny tej pozycji u innych zawodników (`PeerButton` / `PeerPopover`), poprawianie ocen w porównaniu (`CompareCell`), uwagi do pozycji i kategorii, eksport karty PDF/Excel, porównanie zawodników, „Mój ranking” |
 | `js/supervisor.js` | panel supervisora: lista turniejów, wyniki na żywo (`ResultsTab`: kolejność startowa / ranking), karty sędziów (macierz), porównanie „oczami sędziego”, historia zmian, głosy publiczności (`AudienceTab`: kolejność występów / ranking, podium, CSV/PDF), ustawienia, strona „Kopie zapasowe i kod dostępu” (`SystemPage`: lista kopii, `BackupPreview` — podgląd kopii obok obecnego stanu, `RestoreDialog` — przywrócenie po wpisaniu kodu, zmiana kodu, przekazanie dostępu) |
 | `js/feedback.js` | generator szkicu feedbacku (szablony zdań; opcjonalnie `TTS_CONFIG.feedbackEndpoint` — miejsce na przyszłe AI, dziś nieustawione, więc także w produkcji działa wbudowany generator) + `FeedbackModal`: sędzia — „Zapisz szkic” / „Zatwierdź feedback” / „Usuń feedback” (bez PDF); supervisor (readOnly) — podgląd i „Zbiorczy PDF zawodnika”; `FeedbackBadge` |
 | `js/pdf.js` | PDF: karta sędziego, wyniki, ranking publiczności, **zbiorczy feedback zawodnika** (`contestantFeedbackPDF` — strona tytułowa + każda zatwierdzona opinia na osobnej stronie; `feedbackZip` — wszystkie pliki turnieju w ZIP, JSZip 3.10.1 z cdnjs); nagłówek z logo, stopka z adresem |
 | `js/backup.js` | format kopii `tts-backup-1` (JSON), podział turnieju na wiersze bazy, eksport Excel, automatyczne pobieranie kopii o :30 |
 | `js/ui.js` | ikony SVG (słownik `P`), logo, awatary, odznaki konkurencji, `Segmented`, `Modal`, dymki uwag, toasty |
-| `js/seed.js` | dane demo (turnieje `fin25`, `hot26`, `rlx26`, `bny26`; PIN `2026`); po zmianie podbić `SEED_VERSION` |
+| `js/seed.js` | dane demo (turnieje `fin25`, `hot26`, `rlx26`, `bny26`; PIN `2026`); po zmianie danych albo kart wzorcowych podbić `SEED_VERSION` (dziś 4) |
 | `css/app.css` | całe style; tokeny kolorów i czcionek na górze (`:root`) |
 
 ## Trasy (`location.hash`)
@@ -62,7 +62,7 @@
 - PDF zawodnika (`ocena-seansu-<zawodnik>-<turniej>.pdf`): strona tytułowa (turniej, konkurencja/termin, liczba opinii, lista sędziów —
   w finale z konkurencją i godziną startu), potem każda opinia od nowej strony: konkurencja, start, ocena tego sędziego z tabelą kategorii,
   sekcje feedbacku, podpis sędziego z datą zatwierdzenia. Szkice i opinie puste są pomijane.
-- Dane demo (`seed.js`, `SEED_VERSION = 3`): przykładowy feedback (co piąta opinia to szkic) w hot26, rlx26, fin25 (6 pierwszych w każdej
+- Dane demo (`seed.js`, od `SEED_VERSION = 3`; 4 — karty z `z4` jako karą): przykładowy feedback (co piąta opinia to szkic) w hot26, rlx26, fin25 (6 pierwszych w każdej
   konkurencji) i bny26 (3 pierwszych); osobny generator losowy `rng(5150)`, żeby nie zmieniać pozostałych danych demo.
 
 ## Kolejność wierszy (wyniki i głosy publiczności)
@@ -100,7 +100,8 @@
 
 ## Zasady punktacji (`model.js`)
 
-- Wpis sędziego: liczba ≥ 0 z dokładnością 0,1 (przecinek lub kropka; w trybie `comma` tylko przecinek).
+- Wpis sędziego: liczba ≥ 0 z dokładnością 0,1 (przecinek lub kropka; w trybie `comma` tylko przecinek); zero przed
+  separatorem można pominąć — „,8” = 0,8. Zamiast wpisu — suwak (te same wartości).
   Punkty karne (`minus`) wpisuje się BEZ minusa — system je odejmuje; minus na początku = błąd od razu.
   `bin` = tylko 0 albo max. Nieprawidłowy wpis wraca do poprzedniej wartości z komunikatem.
 - Karta sędziego: suma `plus` + `bin` − suma `minus`.
@@ -129,39 +130,18 @@
 - Supervisor z kodem nadanym przez administratora (lub przekazanym przez poprzednika) nie widzi danych,
   dopóki nie ustawi własnego kodu (`session.codeSetBy !== 'supervisor'` → ekran wymuszonej zmiany).
 
-## Demo nowych funkcji (`demo-beta/`)
+## Karta oceny: suwak, oceny innych zawodników, poprawki w porównaniu (produkcja od 2026-10-18)
 
-Pokazuje nowe funkcje do akceptacji, gdy trwa turniej, bez zmiany żadnego pliku, który ładuje produkcja albo `/demo/`.
+Funkcje z bety zaakceptowane przez organizatora i wdrożone w trakcie finału (kształt danych bez zmian — wszystkie zapisują
+to samo `v[itemId]` co pole, przez `setScore` + `logChange`).
 
-- `demo-beta/index.html` — jak `demo/index.html` (`mode: 'demo'`), plus `css/beta.css` po `../css/app.css` i **mapa importów**:
-  dla każdego podmienionego modułu dwa wpisy `"../js/<plik>": "./js/<plik>"` i `"./js/<plik>": "./js/<plik>"`, na końcu
-  prefiks `"./js/": "../js/"`. Podmienione dziś: `judge.js`, `model.js`, `templates.js`, `store.js`. Wszystko inne
-  (także importy z wnętrza podmienionych modułów, np. `./seed.js`) idzie ze wspólnego `js/`.
-- **Własne dane przykładowe bety** (od 2026-10-18): `TTS_CONFIG = { mode: 'demo', demoKey: 'tts-demo-beta-v1' }`, a `store.js`
-  bety czyta klucz localStorage z `CONFIG.demoKey` (domyślnie `tts-demo-v1`, więc ta zmiana jest bezpieczna także w `js/`).
-  Dzięki temu beta zasiewa dane z SWOICH kart wzorcowych (`templates.js` bety, przez wspólny `seed.js`), niezależnie od tego,
-  co przeglądarka ma zapisane z `/demo/`; `/demo/` nie jest dotykane.
-- Podmiana kolejnego modułu: skopiuj `js/<plik>.js` do `demo-beta/js/` i dopisz OBA wpisy do mapy. Drugi wpis
-  (`./js/<plik>` na siebie) jest konieczny: bez niego import z wnętrza bety (np. `judge.js` → `./model.js`) trafiłby przez
-  prefiks do starej wersji z `js/` — powstałyby dwie kopie modułu (dokładny wpis wygrywa z prefiksem; mapa nie działa
-  rekurencyjnie). Sprawdzenie w przeglądarce: w zakładce Sieć każdy podmieniony plik ładuje się raz i tylko z `demo-beta/js/`.
-  Importy w kopii zostają `./x.js`, więc po akceptacji plik przechodzi do `js/` bez poprawek.
-- `check.js` sprawdza składnię `demo-beta/js/*.js` i importy: kopia względem eksportów `js/` oraz moduły `js/` względem
-  eksportów kopii (np. `supervisor.js` importuje `ScoreCard` z `judge.js`).
-- Mapy importów: Chrome/Edge 89+, Safari 16.4+, Firefox 108+ — dotyczy tylko bety; produkcja po wdrożeniu mapy nie używa.
-
-### Co jest teraz w becie (od 2026-10-17)
-
-`demo-beta/js/judge.js` = `js/judge.js` z commita `26e1382` + zmiany:
-
-- `ScoreSlider` — suwak 0–maks. (dziesiąte części) pod nazwą pozycji `plus` / `minus`; nie dla `bin` i nie na karcie
-  zablokowanej / tylko do odczytu (tam zostaje tekst zakresu). Mysz: wartość od razu w miejscu kliknięcia i przy przeciąganiu.
-  Dotyk: `touch-action: pan-y` — ruch w pionie przewija stronę, wartość zmienia ruch w bok (> 6 px) albo stuknięcie;
-  `pointercancel` przywraca ocenę sprzed gestu. Klawiatura: strzałki ±0,1, PageUp/PageDown ±1, Home/End.
-  Zapis przez `setScore` na żywo (jak wpisywanie w pole), w historii jeden wpis `logChange` po puszczeniu (klawiatura:
-  po 0,8 s przerwy); wartość „z” czytana świeżo ze store (`getT`), bo pole obok mogło przed chwilą zapisać wpis.
-  W produkcji kolejka `tts-live-outbox` łączy zapisy tej samej karty (klucz turniej|konkurencja|zawodnik|sędzia,
-  wysyłka po 350 ms), więc przeciąganie nie zalewa bazy zapisami.
+- `ScoreSlider` (`judge.js`) — suwak 0–maks. (dziesiąte części) pod nazwą pozycji `plus` / `minus`; nie dla `bin` i nie na
+  karcie zablokowanej / tylko do odczytu (tam zostaje tekst zakresu). Mysz: wartość od razu w miejscu kliknięcia i przy
+  przeciąganiu. Dotyk: `touch-action: pan-y` — ruch w pionie przewija stronę, wartość zmienia ruch w bok (> 6 px) albo
+  stuknięcie; `pointercancel` przywraca ocenę sprzed gestu. Klawiatura: strzałki ±0,1, PageUp/PageDown ±1, Home/End.
+  Zapis na żywo (jak wpisywanie w pole), w historii jeden wpis po puszczeniu (klawiatura: po 0,8 s przerwy); wartość „z”
+  czytana świeżo ze store (`getT`), bo pole obok mogło przed chwilą zapisać wpis. Kolejka `tts-live-outbox` łączy zapisy
+  tej samej karty (klucz turniej|konkurencja|zawodnik|sędzia, wysyłka po 350 ms), więc przeciąganie nie zalewa bazy.
 - `ScoreInput` — zmiana oceny z zewnątrz (suwak, inne urządzenie) czyści komunikat o błędnym wpisie w polu.
 - `PeerButton` / `PeerPopover` / `peerRows` — przycisk (ikona `ranking`) po prawej od pola punktów; okienko z ocenami
   **tego samego sędziego** w tej pozycji u zawodników, którzy ją mają, plus bieżący zawodnik (zaznaczony, wartość na żywo);
@@ -169,56 +149,66 @@ Pokazuje nowe funkcje do akceptacji, gdy trwa turniej, bez zmiany żadnego pliku
   Położenie: po prawej od przycisku; gdy brak miejsca (prawa kolumna karty, telefon) — pod wierszem albo nad nim,
   liczone względem `visualViewport`. Zamykanie: X, Esc (tylko okienko — nie okno karty u supervisora), klik poza
   okienkiem i poza wierszem tej pozycji (suwak i pole tej pozycji działają przy otwartym okienku). U supervisora
-  (karta tylko do odczytu) teksty „Oceny sędziego: …” i „ta karta”. Przycisk jest nieaktywny, dopóki żaden inny
-  zawodnik nie ma oceny w tej pozycji.
-- Wskazówka nad kartą wspomina suwak i przycisk ocen.
-- `CompareCell` (od 2026-10-17) — **poprawianie ocen w porównaniu zawodników**: u sędziego (`CompareView` / `Comparison`
-  z `editable`, przekazywanym tylko z `JudgeApp` przy statusie „W trakcie”; nie w „Suma 3 dni”, nie u supervisora,
-  nie w trybie sumy kart) każda ocena pozycji jest przyciskiem; kliknięcie otwiera pole (fokus w `useLayoutEffect`,
-  żeby szybko wpisana cyfra nie trafiła obok), walidacja `parseScore` (także `bin`: tylko 0 albo maks.). Enter zapisuje
-  (błąd — komunikat pod polem, pole zostaje), Esc anuluje, wyjście z pola zapisuje poprawną wartość, a błędną odrzuca
-  z komunikatem (toast). Zapis jak w karcie: `setScore` + `logChange` (wartość „z” świeża ze store), więc karta
-  zawodnika, sumy kategorii, wynik i wyróżnienia w tabeli zmieniają się od razu. Nad tabelą podpowiedź z ołówkiem.
+  (karta tylko do odczytu) teksty „Oceny sędziego: …” i „ta karta”. Przycisk nieaktywny, dopóki żaden inny zawodnik
+  nie ma oceny w tej pozycji.
+- `CompareCell` — **poprawianie ocen w porównaniu zawodników**: u sędziego (`CompareView` / `Comparison` z `editable`,
+  przekazywanym tylko z `JudgeApp` przy statusie „W trakcie”; nie w „Suma 3 dni”, nie u supervisora, nie w trybie sumy
+  kart) każda ocena pozycji jest przyciskiem; kliknięcie otwiera pole (fokus w `useLayoutEffect`, żeby szybko wpisana
+  cyfra nie trafiła obok), walidacja `parseScore`. Enter zapisuje (błąd — komunikat pod polem, pole zostaje), Esc anuluje,
+  wyjście z pola zapisuje poprawną wartość, a błędną odrzuca z komunikatem (toast). Karta zawodnika, sumy, wynik
+  i wyróżnienia w tabeli zmieniają się od razu. Nad tabelą podpowiedź z ołówkiem.
+- `parseScore` (`model.js`) — wpis bez zera przed separatorem: „,8” / „.8” = 0,8 (jak w Excelu; po wyjściu z pola widać
+  „0,8”) — w karcie, porównaniu i głosach publiczności. Bez zmian: „,85” (za dokładnie), sam „,” (nie liczba), kropka
+  w trybie „tylko przecinek”, `bin` tylko 0 / maks. Wskazówka nad kartą: „,8 = 0,8”, suwak i przycisk ocen.
+- `templates.js` — „Użycie więcej niż 3 zapachów (/ kompozycji)” (`z4`, karty Relax, HOT i Banya) to **kara**
+  (`minus`, maks. 1) zamiast `bin` — decyzja organizatora 2026-10-18. Szablon zmienia tylko NOWE turnieje i dane demo;
+  turnieje założone wcześniej przestawia supervisor w edytorze karty — [awarie.md](awarie.md). Dane demo: `SEED_VERSION = 4`.
+- `store.js` — klucz danych demo z `CONFIG.demoKey` (domyślnie `tts-demo-v1`; `demo-beta` ma `tts-demo-beta-v1`).
+- `app.css` — nowy układ wiersza `.item` (nazwa i pod nią suwak w kolumnie 2; uwaga, pole i przycisk ocen po prawej na
+  wysokość obu wierszy; `bin` — przyciski Nie/Tak w drugim wierszu; telefon ≤ 820 px: nazwa na całą szerokość, pod nią
+  suwak, pole 76 px i przycisk), suwak `.sl*`, okienko `.peer-pop` / `.pp-*`, komórki porównania `.cv-btn` / `.cv-edit` /
+  `.cv-err`, większe cele dotyku (`pointer: coarse`), poprawka szerokości strony na telefonie (`.split` `minmax(0, 1fr)`,
+  zawijane przyciski `.sc-foot` — wcześniej strona była o ~44 px szersza od ekranu).
 
-`demo-beta/js/model.js` = `js/model.js` z commita `26e1382` + jedna zmiana (od 2026-10-17): `parseScore` przyjmuje wpis
-bez zera przed separatorem — „,8” / „.8” = 0,8 (jak w Excelu; po wyjściu z pola widać „0,8”). Działa w karcie, w porównaniu
-i w głosach publiczności. Bez zmian: „,85” (za dokładnie), sam „,” (nie liczba), kropka w trybie „tylko przecinek”, `bin` tylko
-0 / maks. Wskazówka nad kartą: „<kbd>,8</kbd> = 0,8”.
+## Demo nowych funkcji (`demo-beta/`)
 
-`demo-beta/js/templates.js` = `js/templates.js` z commita `f011048` + zmiana (od 2026-10-18, decyzja organizatora):
-„Użycie więcej niż 3 zapachów (/ kompozycji)” (`z4`, karty Relax, HOT i Banya) to **kara** — `kind: 'minus'`, maks. 1
-(zwykłe pole + suwak 0 do −1), zamiast `bin` (0/1, liczone jako punkty dodatnie). Szablon dotyczy tylko NOWYCH turniejów
-i danych demo; istniejące turnieje zmienia supervisor w edytorze karty (procedura w [awarie.md](awarie.md)).
-`demo-beta/js/store.js` = `js/store.js` z `f011048` + klucz demo z `CONFIG.demoKey`.
+Pokazuje nowe funkcje do akceptacji, gdy trwa turniej, bez zmiany żadnego pliku, który ładuje produkcja albo `/demo/`.
+Adres: https://aufgussworld.github.io/aufguss-world/turniej-trzech-saun/demo-beta/ — **od 2026-10-18 bez podmienionych
+modułów** (poprzednie funkcje są już w produkcji), więc dziś działa jak demo z własnymi danymi.
 
-`demo-beta/css/beta.css`, sekcja „karta oceny”: nowy układ wiersza `.item` (nazwa i pod nią suwak w kolumnie 2;
-uwaga, pole i przycisk ocen po prawej na wysokość obu wierszy; `bin` — przyciski Nie/Tak w drugim wierszu; telefon
-≤ 820 px: nazwa na całą szerokość, pod nią suwak, pole 76 px i przycisk), suwak, okienko, większe cele dotyku
-(`pointer: coarse`) oraz poprawka szerokości strony na telefonie (`.split` `minmax(0, 1fr)`, zawijane przyciski `.sc-foot`
-— wcześniej strona była o ~44 px szersza od ekranu). Sekcja „porównanie zawodników”: przyciski ocen (`.cv-btn`, ołówek
-po najechaniu; na ekranach dotykowych ramka zawsze widoczna), pole edycji `.cv-edit`, dymek błędu `.cv-err`.
-Sekcji „tylko demo-beta” (dopisek „· nowe funkcje” przy znaczku Demo) NIE przenosić.
+- `demo-beta/index.html` — jak `demo/index.html`, plus `css/beta.css` po `../css/app.css` i własne dane przykładowe:
+  `TTS_CONFIG = { mode: 'demo', demoKey: 'tts-demo-beta-v1' }` (`/demo/` nie jest dotykane; beta zasiewa dane z kart
+  wzorcowych, które sama widzi).
+- **Podmiana modułu:** skopiuj `js/<plik>.js` do `demo-beta/js/` i dodaj w `<head>` (przed skryptami) mapę importów — dla
+  każdego podmienionego pliku DWA wpisy, na końcu prefiks:
+  ```html
+  <script type="importmap">
+    { "imports": { "../js/judge.js": "./js/judge.js", "./js/judge.js": "./js/judge.js", "./js/": "../js/" } }
+  </script>
+  ```
+  Pierwszy wpis kieruje moduły z `js/` do kopii; drugi (`./js/<plik>` na siebie) jest konieczny, bo inaczej import
+  z wnętrza bety (np. kopia `judge.js` → `./model.js`, gdy `model.js` też jest podmieniony) trafiłby przez prefiks do
+  starej wersji — powstałyby dwie kopie modułu (dokładny wpis wygrywa z prefiksem; mapa nie działa rekurencyjnie).
+  Prefiks `./js/` → `../js/` odsyła resztę importów kopii do wspólnego kodu. Importy w kopii zostają `./x.js`, więc po
+  akceptacji plik przechodzi do `js/` bez poprawek. Sprawdzenie: w zakładce Sieć każdy podmieniony plik ładuje się raz
+  i tylko z `demo-beta/js/`. Zapisz w tym pliku commit, z którego zrobiono kopię (baza bety).
+- Nowe style: osobne sekcje w `demo-beta/css/beta.css`; sekcji „tylko demo-beta” (dopisek „· nowe funkcje”) nie przenosić.
+- `check.js` sprawdza składnię `demo-beta/js/*.js` i importy: kopia względem eksportów `js/` oraz moduły `js/` względem
+  eksportów kopii (np. `supervisor.js` importuje `ScoreCard` z `judge.js`).
+- Mapy importów: Chrome/Edge 89+, Safari 16.4+, Firefox 108+ — dotyczy tylko bety.
 
-### Wdrożenie po akceptacji
+### Wdrożenie po akceptacji (tak zrobiono 2026-10-18)
 
-1. `git pull`; sprawdź, czy podmienione pliki zmieniły się w `js/` od bazy bety:
-   `git log --oneline 26e1382.. -- turniej-trzech-saun/js/judge.js turniej-trzech-saun/js/model.js` oraz
-   `git log --oneline f011048.. -- turniej-trzech-saun/js/templates.js turniej-trzech-saun/js/store.js`. Jeśli tak — połącz zmiany
-   (`git diff --no-index turniej-trzech-saun/js/<plik> turniej-trzech-saun/demo-beta/js/<plik>`).
-2. Skopiuj z `demo-beta/js/` do `js/`: `judge.js`, `model.js`, `templates.js`, `store.js` (zmiana w `store.js` jest
-   neutralna dla produkcji i `/demo/`). Uwaga: `templates.js` zmienia tylko NOWE turnieje — w istniejących turniejach
-   supervisor zmienia `z4` w edytorze karty (osobno, można wcześniej — [awarie.md](awarie.md)). Dane `/demo/` w przeglądarkach
-   mają stare karty, dopóki nie podbije się `SEED_VERSION` w `seed.js`. Sekcje „karta oceny” i „porównanie zawodników” z `beta.css` dopisz
-   na końcu `css/app.css` (nadpisują stare reguły `.item`; porządniej — zastąp nimi reguły `.item` w app.css i ich
-   odpowiedniki w `@media (max-width: 820px)`).
-3. Instrukcja dla sędziów: rozdział o wpisywaniu ocen — suwak i przycisk ocen; rozdział o porównaniu — poprawianie ocen
-   kliknięciem; nowe zrzuty ([instrukcja-sedziow.md](instrukcja-sedziow.md)).
-4. Wyczyść betę: usuń `demo-beta/js/judge.js`, `model.js`, `templates.js`, `store.js` i obie sekcje z `beta.css`,
-   z mapy importów usuń ich wpisy (`demoKey` może zostać — beta dalej ma osobne dane)
-   (strona `demo-beta/` zostaje na kolejne funkcje). Aktualizacja tego pliku i dziennika zmian.
-5. `check.js`, test w `/demo/`, commit, push, potem **Ctrl+F5 u wszystkich** (zmieniają się `judge.js`, `model.js`, `store.js`,
-   `templates.js` i `app.css`).
-   Wystawione oceny są bezpieczne: kształt danych bez zmian, kolejka offline ze starego formatu działa dalej.
+1. `git pull`; sprawdź, czy podmienione pliki zmieniły się w `js/` od bazy bety (`git log --oneline <baza>.. -- turniej-trzech-saun/js/<plik>`);
+   jeśli tak — połącz zmiany (`git diff --no-index turniej-trzech-saun/js/<plik> turniej-trzech-saun/demo-beta/js/<plik>`).
+2. Skopiuj pliki z `demo-beta/js/` do `js/`; sekcje stylów z `beta.css` przenieś do `css/app.css` (zastępując stare reguły,
+   nie dublując). Zmiana kart wzorcowych → podbij `SEED_VERSION` w `seed.js` (dane `/demo/` w przeglądarkach).
+3. Wyczyść betę: usuń kopie z `demo-beta/js/`, mapę importów i przeniesione sekcje `beta.css`.
+4. Instrukcja dla sędziów — tekst i zrzuty ([instrukcja-sedziow.md](instrukcja-sedziow.md)); ten plik i dziennik zmian.
+5. `check.js`, test w `/demo/` (to ten sam kod co produkcja), commit, push, sprawdzenie strony produkcyjnej (ekran
+   logowania — samo otwarcie nie loguje do bazy), potem **Ctrl+F5 u wszystkich**. Wystawione oceny są bezpieczne, jeśli
+   kształt danych się nie zmienia (kolejka offline ze starego formatu działa dalej). Zmiana kart wzorcowych NIE zmienia
+   turniejów już założonych.
 
 ## Kopie zapasowe i eksporty
 
